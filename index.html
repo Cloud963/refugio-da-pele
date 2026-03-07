@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Refúgio da Pele — O lugar seguro da sua pele sensível</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- NAV -->
+<div id="scrollProgress"></div>
+<nav id="mainNav">
+  <div class="nav-left">
+    <div class="logo">
+      <svg class="logo-icon" width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M11 2C11 2 5 7 5 12.5C5 15.985 7.686 18.5 11 18.5C14.314 18.5 17 15.985 17 12.5C17 7 11 2 11 2Z" fill="currentColor" opacity="0.18"/>
+        <path d="M11 2C11 2 5 7 5 12.5C5 15.985 7.686 18.5 11 18.5C14.314 18.5 17 15.985 17 12.5C17 7 11 2 11 2Z" stroke="currentColor" stroke-width="1.2" fill="none"/>
+        <line x1="11" y1="10" x2="11" y2="18" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+        <path d="M11 13 Q13.5 11 14.5 9" stroke="currentColor" stroke-width="0.9" fill="none" opacity="0.4"/>
+        <path d="M11 13 Q8.5 11.5 7.5 9.5" stroke="currentColor" stroke-width="0.9" fill="none" opacity="0.4"/>
+      </svg>
+      Refúgio <span>da Pele</span>
+    </div>
+    <div class="nav-divider"></div>
+    <span class="nav-tagline">Pele natural, é pele saudável</span>
+  </div>
+  <div style="display:flex; align-items:center; gap:0;">
+    <a href="#tipos-de-pele" class="nav-link">Tipos de pele</a>
+    <div class="nav-divider" style="margin:0 12px;"></div>
+    <button class="nav-cta" id="navCta" onclick="openQuiz()">Entender minha pele →</button>
+    <div class="nav-divider" style="margin:0 12px;"></div>
+    <a href="#" class="nav-cta-acquire">✦ Adquirir ___________</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="eyebrow">Protocolo natural</div>
+    <h1>
+      O lugar seguro
+      <em>da sua pele</em>
+      sensível.
+    </h1>
+    <p class="hero-desc">
+      A sua pele do jeito que você lembra — calma, macia, sem vermelhidão.
+Uma rotina simples de 3 passos que respeita quem você já é.
+    </p>
+    <div class="hero-ctas">
+      <button class="btn-primary" onclick="openQuiz()">
+        Descobrir o estado da minha pele
+        <span class="arrow">→</span>
+      </button>
+      <button class="btn-secondary" onclick="openPDF()">
+        Quero minha rotina gratuita
+        <span class="arrow">↓</span>
+      </button>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="photo-badge sage" style="top:17%;right:20px;">✨ Pele de volta a si mesma</div>
+    <div class="photo-badge gold" style="bottom:22%;left:4px;">🌿 Rotina natural</div>
+    <div class="hero-photo-wrap">
+      <img src="assets/images/hero.jpeg" alt="Mulher com eye patches e jade roller" class="hero-main-photo"/>
+      <div class="hero-photo-label">Pele que respira</div>
+    </div>
+  </div>
+</section>
+<!-- ISCAS -->
+<div class="section-label fade-up">
+  <div class="tag-line">Dois presentes para sua pele</div>
+</div>
+
+<section class="iscas">
+  <h2 class="iscas-title fade-up">Duas formas de cuidar da sua pele,<br><em>do jeito que ela merece.</em></h2>
+  <p class="iscas-subtitle fade-up">Começa por onde quiser — cada passo é um gesto de carinho com a sua pele.</p>
+
+  <div class="iscas-grid">
+
+    <!-- ISCA 1: QUIZ -->
+    <div class="isca-card quiz fade-up">
+      <div class="isca-number">01</div>
+      <div class="isca-badge">🌸 Conheça sua pele · 2 minutos</div>
+      <h3>Sua pele está pedindo socorro em silêncio?</h3>
+      <p>
+        Seis perguntas simples que revelam o que sua pele tenta te dizer todo dia — aquela secura, aquela vermelhidão, aquela sensação de que algo não está certo.
+      </p>
+      <ul class="isca-features">
+        <li>Rotina pensada para o que sua pele sente</li>
+        <li>Ingredientes que trabalham com você, não contra</li>
+        <li>Simples, direto e sem medo de irritação</li>
+        <li>Como se uma amiga especialista te explicasse</li>
+      </ul>
+      <button class="btn-isca" onclick="openQuiz()">Descobrir o que minha pele precisa →</button>
+    </div>
+
+    <!-- ISCA 2: PDF -->
+    <div class="isca-card pdf fade-up">
+      <div class="isca-number">02</div>
+      <div class="isca-badge">📖 Rotina natural · Gratuita</div>
+      <h3>Sua rotina de volta ao essencial</h3>
+      <p>
+        Um guia simples com os ingredientes certos para devolver à sua pele a calma que ela merece — sem exageros, sem risco, sem choros na frente do espelho.
+      </p>
+      <ul class="isca-features">
+        <li>Três gestos diários que fazem toda a diferença</li>
+        <li>Ingredientes suaves que a pele sensível ama</li>
+        <li>Na ordem certa, para que cada produto funcione</li>
+        <li>Como parar de sofrer com reações sem saber o porquê</li>
+      </ul>
+      <button class="btn-isca" onclick="openPDF()">Quero minha rotina gratuita →</button>
+    </div>
+
+  </div>
+</section>
+
+<!-- CAROUSEL: Tons de pele -->
+<section class="carousel-section fade-up" id="tipos-de-pele">
+  <div class="carousel-header">
+    <h2>Toda pele tem uma <em>história bonita</em> para contar</h2>
+    <p>Cada pele tem sua história. O protocolo Refúgio respeita e protege a sua.</p>
+  </div>
+
+  <div class="carousel-track-wrap">
+    <div class="carousel-track" id="carouselTrack">
+      <!-- SET 1 -->
+      <div class="carousel-card" data-skin="pele-clara" onclick="openSkinModal(this)"><img src="assets/images/pele-clara.jpeg" alt="Pele Clara"/><div class="carousel-card-label"><span class="skin-name">Pele Clara</span><span class="skin-desc">Tom porcelana · Barreira delicada</span></div></div>
+      <div class="carousel-card" data-skin="skincare-natural" onclick="openSkinModal(this)"><img src="assets/images/skincare-natural.jpeg" alt="Skincare Natural"/><div class="carousel-card-label"><span class="skin-name">Skincare Natural</span><span class="skin-desc">Ingredientes · Rituais puros</span></div></div>
+      <div class="carousel-card" data-skin="pele-morena" onclick="openSkinModal(this)"><img src="assets/images/pele-morena.jpeg" alt="Pele Morena"/><div class="carousel-card-label"><span class="skin-name">Pele Morena</span><span class="skin-desc">Tom bronze · Rica em melanina</span></div></div>
+      <div class="carousel-card" data-skin="limpeza-profunda" onclick="openSkinModal(this)"><img src="assets/images/limpeza-profunda.jpeg" alt="Limpeza Profunda"/><div class="carousel-card-label"><span class="skin-name">Limpeza Profunda</span><span class="skin-desc">Rotina · Primeiro passo</span></div></div>
+      <div class="carousel-card" data-skin="ritual-de-pele" onclick="openSkinModal(this)"><img src="assets/images/ritual-de-pele.jpeg" alt="Ritual de Pele"/><div class="carousel-card-label"><span class="skin-name">Ritual de Pele</span><span class="skin-desc">Aplicação · Cuidado consciente</span></div></div>
+      <div class="carousel-card" data-skin="serum-oleos" onclick="openSkinModal(this)"><img src="assets/images/serum-oleos.jpeg" alt="Sérum & Óleos"/><div class="carousel-card-label"><span class="skin-name">Sérum & Óleos</span><span class="skin-desc">Ativos · Protocolo clínico</span></div></div>
+      <div class="carousel-card" data-skin="pele-sardas" onclick="openSkinModal(this)"><img src="assets/images/pele-sardas.jpeg" alt="Pele com Sardas"/><div class="carousel-card-label"><span class="skin-name">Pele com Sardas</span><span class="skin-desc">Close · Olho & cílios</span></div></div>
+      <div class="carousel-card" data-skin="pele-madura" onclick="openSkinModal(this)"><img src="assets/images/pele-madura.jpeg" alt="Pele Madura"/><div class="carousel-card-label"><span class="skin-name">Pele Madura</span><span class="skin-desc">Hidratação · Anti-aging</span></div></div>
+      <div class="carousel-card" data-skin="pele-radiante" onclick="openSkinModal(this)"><img src="assets/images/pele-radiante.jpeg" alt="Pele Radiante"/><div class="carousel-card-label"><span class="skin-name">Pele Radiante</span><span class="skin-desc">Tom médio · Glow natural</span></div></div>
+      <div class="carousel-card" data-skin="pele-morena-clara" onclick="openSkinModal(this)"><img src="assets/images/pele-morena-clara.jpeg" alt="Pele Morena Clara"/><div class="carousel-card-label"><span class="skin-name">Pele Morena Clara</span><span class="skin-desc">Tom dourado · Sardas naturais</span></div></div>
+      <div class="carousel-card" data-skin="serum-vitamina-c" onclick="openSkinModal(this)"><img src="assets/images/serum-vitamina-c.jpeg" alt="Sérum Vitamina C"/><div class="carousel-card-label"><span class="skin-name">Sérum Vitamina C</span><span class="skin-desc">Aplicação · Pele madura</span></div></div>
+      <div class="carousel-card" data-skin="ombro-pescoco" onclick="openSkinModal(this)"><img src="assets/images/ombro-pescoco.jpeg" alt="Ombro & Pescoço"/><div class="carousel-card-label"><span class="skin-name">Ombro & Pescoço</span><span class="skin-desc">Close · Pele hidratada</span></div></div>
+      <div class="carousel-card" data-skin="ritual-roller" onclick="openSkinModal(this)"><img src="assets/images/ritual-roller.jpeg" alt="Ritual com Roller"/><div class="carousel-card-label"><span class="skin-name">Ritual com Roller</span><span class="skin-desc">Técnica · Drenagem linfática</span></div></div>
+      <div class="carousel-card" data-skin="pele-negra" onclick="openSkinModal(this)"><img src="assets/images/pele-negra.jpeg" alt="Pele Negra"/><div class="carousel-card-label"><span class="skin-name">Pele Negra</span><span class="skin-desc">Tom ébano · Glow profundo</span></div></div>
+      <div class="carousel-card" data-skin="gua-sha" onclick="openSkinModal(this)"><img src="assets/images/gua-sha.jpeg" alt="Gua Sha"/><div class="carousel-card-label"><span class="skin-name">Gua Sha</span><span class="skin-desc">Técnica · Sculpting facial</span></div></div>
+      <div class="carousel-card" data-skin="pele-ruiva" onclick="openSkinModal(this)"><img src="assets/images/pele-ruiva.jpeg" alt="Pele Ruiva"/><div class="carousel-card-label"><span class="skin-name">Pele Ruiva</span><span class="skin-desc">Tom rosado · Sardas intensas</span></div></div>
+
+
+      <div class="carousel-card" data-skin="ritual-natural" onclick="openSkinModal(this)"><img src="assets/images/ritual-natural.jpeg" alt="Ritual Natural"/><div class="carousel-card-label"><span class="skin-name">Ritual Natural</span><span class="skin-desc">Ingredientes · Cuidado em casa</span></div></div>
+
+      <!-- SET 2 -->
+      <div class="carousel-card" data-skin="pele-clara" onclick="openSkinModal(this)"><img src="assets/images/pele-clara.jpeg" alt="Pele Clara"/><div class="carousel-card-label"><span class="skin-name">Pele Clara</span><span class="skin-desc">Tom porcelana · Barreira delicada</span></div></div>
+      <div class="carousel-card" data-skin="skincare-natural" onclick="openSkinModal(this)"><img src="assets/images/skincare-natural.jpeg" alt="Skincare Natural"/><div class="carousel-card-label"><span class="skin-name">Skincare Natural</span><span class="skin-desc">Ingredientes · Rituais puros</span></div></div>
+      <div class="carousel-card" data-skin="pele-morena" onclick="openSkinModal(this)"><img src="assets/images/pele-morena.jpeg" alt="Pele Morena"/><div class="carousel-card-label"><span class="skin-name">Pele Morena</span><span class="skin-desc">Tom bronze · Rica em melanina</span></div></div>
+      <div class="carousel-card" data-skin="limpeza-profunda" onclick="openSkinModal(this)"><img src="assets/images/limpeza-profunda.jpeg" alt="Limpeza Profunda"/><div class="carousel-card-label"><span class="skin-name">Limpeza Profunda</span><span class="skin-desc">Rotina · Primeiro passo</span></div></div>
+      <div class="carousel-card" data-skin="ritual-de-pele" onclick="openSkinModal(this)"><img src="assets/images/ritual-de-pele.jpeg" alt="Ritual de Pele"/><div class="carousel-card-label"><span class="skin-name">Ritual de Pele</span><span class="skin-desc">Aplicação · Cuidado consciente</span></div></div>
+      <div class="carousel-card" data-skin="serum-oleos" onclick="openSkinModal(this)"><img src="assets/images/serum-oleos.jpeg" alt="Sérum & Óleos"/><div class="carousel-card-label"><span class="skin-name">Sérum & Óleos</span><span class="skin-desc">Ativos · Protocolo clínico</span></div></div>
+      <div class="carousel-card" data-skin="pele-sardas" onclick="openSkinModal(this)"><img src="assets/images/pele-sardas.jpeg" alt="Pele com Sardas"/><div class="carousel-card-label"><span class="skin-name">Pele com Sardas</span><span class="skin-desc">Close · Olho & cílios</span></div></div>
+      <div class="carousel-card" data-skin="pele-madura" onclick="openSkinModal(this)"><img src="assets/images/pele-madura.jpeg" alt="Pele Madura"/><div class="carousel-card-label"><span class="skin-name">Pele Madura</span><span class="skin-desc">Hidratação · Anti-aging</span></div></div>
+      <div class="carousel-card" data-skin="pele-radiante" onclick="openSkinModal(this)"><img src="assets/images/pele-radiante.jpeg" alt="Pele Radiante"/><div class="carousel-card-label"><span class="skin-name">Pele Radiante</span><span class="skin-desc">Tom médio · Glow natural</span></div></div>
+      <div class="carousel-card" data-skin="pele-morena-clara" onclick="openSkinModal(this)"><img src="assets/images/pele-morena-clara.jpeg" alt="Pele Morena Clara"/><div class="carousel-card-label"><span class="skin-name">Pele Morena Clara</span><span class="skin-desc">Tom dourado · Sardas naturais</span></div></div>
+      <div class="carousel-card" data-skin="serum-vitamina-c" onclick="openSkinModal(this)"><img src="assets/images/serum-vitamina-c.jpeg" alt="Sérum Vitamina C"/><div class="carousel-card-label"><span class="skin-name">Sérum Vitamina C</span><span class="skin-desc">Aplicação · Pele madura</span></div></div>
+      <div class="carousel-card" data-skin="ombro-pescoco" onclick="openSkinModal(this)"><img src="assets/images/ombro-pescoco.jpeg" alt="Ombro & Pescoço"/><div class="carousel-card-label"><span class="skin-name">Ombro & Pescoço</span><span class="skin-desc">Close · Pele hidratada</span></div></div>
+      <div class="carousel-card" data-skin="ritual-roller" onclick="openSkinModal(this)"><img src="assets/images/ritual-roller.jpeg" alt="Ritual com Roller"/><div class="carousel-card-label"><span class="skin-name">Ritual com Roller</span><span class="skin-desc">Técnica · Drenagem linfática</span></div></div>
+      <div class="carousel-card" data-skin="pele-negra" onclick="openSkinModal(this)"><img src="assets/images/pele-negra.jpeg" alt="Pele Negra"/><div class="carousel-card-label"><span class="skin-name">Pele Negra</span><span class="skin-desc">Tom ébano · Glow profundo</span></div></div>
+      <div class="carousel-card" data-skin="gua-sha" onclick="openSkinModal(this)"><img src="assets/images/gua-sha.jpeg" alt="Gua Sha"/><div class="carousel-card-label"><span class="skin-name">Gua Sha</span><span class="skin-desc">Técnica · Sculpting facial</span></div></div>
+      <div class="carousel-card" data-skin="pele-ruiva" onclick="openSkinModal(this)"><img src="assets/images/pele-ruiva.jpeg" alt="Pele Ruiva"/><div class="carousel-card-label"><span class="skin-name">Pele Ruiva</span><span class="skin-desc">Tom rosado · Sardas intensas</span></div></div>
+
+    </div>    </div>
+  </div>
+
+  <div style="text-align:center;padding:18px 0 50px;">
+    <span style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(247,240,230,0.7);font-family:'DM Sans',sans-serif;background:rgba(196,104,62,0.15);border:1px solid rgba(196,104,62,0.3);padding:10px 22px;display:inline-block;">
+      ✦ Clique no tom de pele acima para saber mais sobre ela
+    </span>
+  </div>
+</section>
+<!-- TRUST -->
+<section class="trust-section fade-up">
+  <h2>Sua pele te conhece.
+<br><em>Você só precisa ouvi-la.</em></h2>
+  <p class="trust-intro">Você não precisa de mais produtos. Você precisa do produto certo, na hora certa, da forma certa. E de uma rotina que respeite a pele que você tem.</p>
+
+  <div class="trust-stats">
+    <div class="stat">
+      <span class="stat-icon">⏱</span>
+      <span class="stat-num">2 min</span>
+      <span class="stat-label">Para te conhecer melhor</span>
+      <span class="stat-desc">para entender o que sua pele está sentindo de verdade</span>
+    </div>
+    <div class="stat">
+      <span class="stat-icon">🌿</span>
+      <span class="stat-num">3</span>
+      <span class="stat-label">Passos de carinho</span>
+      <span class="stat-desc">é tudo que uma pele sensível precisa para florescer</span>
+    </div>
+    <div class="stat">
+      <span class="stat-icon">☀️</span>
+      <span class="stat-num">5 min</span>
+      <span class="stat-label">De ritual diário</span>
+      <span class="stat-desc">para começar e terminar o dia com a pele em paz</span>
+    </div>
+    <div class="stat">
+      <span class="stat-icon">🔒</span>
+      <span class="stat-num">100%</span>
+      <span class="stat-label">Com você</span>
+      <span class="stat-desc">do diagnóstico ao cuidado diário, em cada passo</span>
+    </div>
+  </div>
+
+  <div class="testimonials">
+    <div class="testimonial-card">
+      <p class="testimonial-text">Depois de anos usando produtos errados, finalmente minha pele parou de descamar e irritar. O protocolo de 3 passos mudou tudo.</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar">A</div>
+        <div>
+          <span class="testimonial-name">Ana Paula</span>
+          <span class="testimonial-skin">Barreira comprometida · São Paulo</span>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card">
+      <p class="testimonial-text">Descobri que minha barreira estava destruída. Com niacinamida e centella em 3 semanas minha vermelhidão reduziu mais de 70%.</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar" style="background:var(--sage);">C</div>
+        <div>
+          <span class="testimonial-name">Camila</span>
+          <span class="testimonial-skin">Pele reativa · Curitiba</span>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card">
+      <p class="testimonial-text">Tentei mil coisas e sempre piorava. Com o Refúgio aprendi que menos é mais — minha pele reagiu pela primeira vez de forma positiva.</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar" style="background:#8A5020;">J</div>
+        <div>
+          <span class="testimonial-name">Juliana</span>
+          <span class="testimonial-skin">Pele sensível · Porto Alegre</span>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card">
+      <p class="testimonial-text">Eu tinha medo de qualquer coisa nova na minha pele. O diagnóstico me ajudou a entender exatamente o que estava acontecendo — e finalmente parei de ter crises de irritação toda semana.</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar" style="background:#6B5B8A;">M</div>
+        <div>
+          <span class="testimonial-name">Mariana</span>
+          <span class="testimonial-skin">Pele com rosácea · Belo Horizonte</span>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card">
+      <p class="testimonial-text">Em duas semanas seguindo o protocolo a minha pele ficou mais firme, menos vermelha e eu finalmente consigo usar protetor solar sem arder. Parece simples mas pra mim foi uma revolução.</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar" style="background:#3D7A5E;">F</div>
+        <div>
+          <span class="testimonial-name">Fernanda</span>
+          <span class="testimonial-skin">Pele atópica · Rio de Janeiro</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="trust-cta-wrap">
+    <button class="trust-cta-btn" onclick="openQuiz()">Descobrir minha pele →</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+
+    <!-- BRAND -->
+    <div class="footer-brand">
+      <div class="footer-logo">Refúgio <span>da Pele</span></div>
+      <p class="footer-brand-desc">Um espaço seguro para quem quer cuidar da pele com naturalidade, leveza e propósito.</p>
+      <div class="footer-social">
+        <a href="#" class="footer-social-link">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4.5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          Instagram <span class="footer-social-badge">em breve</span>
+        </a>
+        <a href="#" class="footer-social-link">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9a8.96 8.96 0 01-4.72-1.33L3 21l1.33-4.28A8.96 8.96 0 013 12c0-4.97 4.03-9 9-9s9 4.03 9 9z"/></svg>
+          TikTok <span class="footer-social-badge">em breve</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- SOBRE NÓS -->
+    <div class="footer-col">
+      <h4>Sobre nós</h4>
+      <ul>
+        <li><a href="#" onclick="openLegal('historia')">Nossa história</a></li>
+        <li><a href="#" onclick="openLegal('porque')">Por que criamos o Refúgio</a></li>
+        <li><a href="#" onclick="openLegal('missao')">Missão & valores</a></li>
+      </ul>
+    </div>
+
+    <!-- RECURSOS GRATUITOS -->
+    <div class="footer-col">
+      <h4>Recursos gratuitos</h4>
+      <ul>
+        <li><a href="#" onclick="openQuiz()">Diagnóstico de pele</a></li>
+        <li><a href="#" onclick="openPDF()">Protocolo de 3 passos</a></li>
+        <li><span>Guia de ingredientes <span class="soon">em breve</span></span></li>
+        <li><a href="#tipos-de-pele">Tipos de pele</a></li>
+      </ul>
+    </div>
+
+    <!-- PRODUTOS -->
+    <div class="footer-col">
+      <h4>Produtos</h4>
+      <ul>
+        <li><a href="#" onclick="openLegal('produto')">A Pele que Você Lembra</a></li>
+        <li><a href="#" onclick="openLegal('planos')">Ver planos</a></li>
+        <li><span>Assinatura <span class="soon">em breve</span></span></li>
+        <li><span>Cuidado ao Máximo <span class="soon">em breve</span></span></li>
+      </ul>
+    </div>
+
+    <!-- SUPORTE -->
+    <div class="footer-col">
+      <h4>Suporte</h4>
+      <ul>
+        <li><a href="#" onclick="openLegal('faq')">Perguntas frequentes</a></li>
+        <li><a href="#" onclick="openLegal('contato')">Fale conosco</a></li>
+        <li><a href="#" onclick="openLegal('privacidade')">Política de privacidade</a></li>
+        <li><a href="#" onclick="openLegal('termos')">Termos de uso</a></li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    <span>© 2026 Refúgio da Pele · Porque sua pele natural é bonita do jeito que é</span>
+    <div class="footer-bottom-links">
+      <a href="#" onclick="openLegal('privacidade')">Privacidade</a>
+      <a href="#" onclick="openLegal('termos')">Termos</a>
+      <a href="#" onclick="openLegal('cookies')">Cookies</a>
+    </div>
+  </div>
+</footer>
+
+<!-- LEGAL MODALS -->
+<div class="legal-modal-overlay" id="legalModal" onclick="closeLegalModal(event)">
+  <div class="legal-modal-box">
+    <button class="legal-modal-close" onclick="document.getElementById('legalModal').classList.remove('open');document.body.style.overflow=''">✕</button>
+    <div id="legalModalContent"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ -->
+<!-- QUIZ MODAL -->
+<!-- ═══════════════════════════════ -->
+<div class="modal-overlay" id="quizModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('quizModal')">✕</button>
+
+    <div class="modal-header">
+      <div class="badge">Quiz · Barreira da Pele</div>
+      <h2>Descobre em 2 minutos se a tua barreira cutânea está comprometida</h2>
+    </div>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-track">
+        <div class="progress-fill" id="quizProgress" style="width:0%"></div>
+      </div>
+      <span class="progress-text" id="progressText">1 / 6</span>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Q1 -->
+      <div class="quiz-step active" data-step="1">
+        <p class="quiz-q">Como a sua pele se sente logo após lavar o rosto?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" data-score="3" onclick="selectOpt(this)">Tensa, apertada ou ressecada</button>
+          <button class="quiz-opt" data-score="2" onclick="selectOpt(this)">Um pouco desconfortável por alguns minutos</button>
+          <button class="quiz-opt" data-score="1" onclick="selectOpt(this)">Normal, sem grande desconforto</button>
+          <button class="quiz-opt" data-score="0" onclick="selectOpt(this)">Hidratada e confortável</button>
+        </div>
+        <div class="quiz-nav">
+          <button class="btn-next" onclick="nextStep()">Próxima →</button>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="quiz-step" data-step="2">
+        <p class="quiz-q">Com que frequência sua pele fica vermelha ou irritada sem motivo claro?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" data-score="3" onclick="selectOpt(this)">Com frequência, qualquer produto irrita</button>
+          <button class="quiz-opt" data-score="2" onclick="selectOpt(this)">Às vezes, alguns produtos causam reação</button>
+          <button class="quiz-opt" data-score="1" onclick="selectOpt(this)">Raramente, só em produtos específicos</button>
+          <button class="quiz-opt" data-score="0" onclick="selectOpt(this)">Quase nunca fica irritada</button>
+        </div>
+        <div class="quiz-nav">
+          <button class="btn-back" onclick="prevStep()">← Voltar</button>
+          <button class="btn-next" onclick="nextStep()">Próxima →</button>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="quiz-step" data-step="3">
+        <p class="quiz-q">Você usa protetor solar todos os dias, mesmo em casa?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" data-score="2" onclick="selectOpt(this)">Não, esqueço ou acho desnecessário</button>
+          <button class="quiz-opt" data-score="1" onclick="selectOpt(this)">Só quando vou sair de casa</button>
+          <button class="quiz-opt" data-score="0" onclick="selectOpt(this)">Sim, todos os dias sem falta</button>
+        </div>
+        <div class="quiz-nav">
+          <button class="btn-back" onclick="prevStep()">← Voltar</button>
+          <button class="btn-next" onclick="nextStep()">Próxima →</button>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="quiz-step" data-step="4">
+        <p class="quiz-q">Sua pele fica oleosa no meio do dia mesmo depois de hidratar?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" data-score="2" onclick="selectOpt(this)">Sim, fico oleosa rapidinho</button>
+          <button class="quiz-opt" data-score="1" onclick="selectOpt(this)">Um pouco, principalmente na zona T</button>
+          <button class="quiz-opt" data-score="0" onclick="selectOpt(this)">Não, fica equilibrada o dia todo</button>
+        </div>
+        <div class="quiz-nav">
+          <button class="btn-back" onclick="prevStep()">← Voltar</button>
+          <button class="btn-next" onclick="nextStep()">Próxima →</button>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="quiz-step" data-step="5">
+        <p class="quiz-q">Como você descreve sua rotina atual de skincare?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" data-score="3" onclick="selectOpt(this)">Não tenho rotina, uso o que tiver</button>
+          <button class="quiz-opt" data-score="2" onclick="selectOpt(this)">Uso hidratante às vezes, nada consistente</button>
+          <button class="quiz-opt" data-score="1" onclick="selectOpt(this)">Tenho uma rotina básica mas não sigo todo dia</button>
+          <button class="quiz-opt" data-score="0" onclick="selectOpt(this)">Sigo uma rotina completa diariamente</button>
+        </div>
+        <div class="quiz-nav">
+          <button class="btn-back" onclick="prevStep()">← Voltar</button>
+          <button class="btn-next" onclick="nextStep()">Próxima →</button>
+        </div>
+      </div>
+
+      <!-- Q6 -->
+      <div class="quiz-step" data-step="6">
+        <p class="quiz-q">Você percebe escamas, descamação ou manchas de textura irregular na pele?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" data-score="3" onclick="selectOpt(this)">Sim, muito frequente</button>
+          <button class="quiz-opt" data-score="2" onclick="selectOpt(this)">De vez em quando, especialmente no inverno</button>
+          <button class="quiz-opt" data-score="1" onclick="selectOpt(this)">Raramente, quase não percebo</button>
+          <button class="quiz-opt" data-score="0" onclick="selectOpt(this)">Não, minha textura é uniforme</button>
+        </div>
+        <div class="quiz-nav">
+          <button class="btn-back" onclick="prevStep()">← Voltar</button>
+          <button class="btn-next" onclick="nextStep()">Ver resultado →</button>
+        </div>
+      </div>
+
+      <!-- EMAIL STEP -->
+      <div class="email-step" id="quizEmailStep">
+        <div style="margin-bottom:8px;">
+          <div class="quiz-q" style="font-size:20px;">Quase lá! Onde mando seu resultado?</div>
+        </div>
+        <p>Seu diagnóstico personalizado + recomendações chegam direto no seu e-mail. Sem spam, prometido. ✨</p>
+        <div class="field-group">
+          <label>Seu nome</label>
+          <input type="text" id="quizName" placeholder="Como posso te chamar?">
+        </div>
+        <div class="field-group">
+          <label>Seu e-mail</label>
+          <input type="email" id="quizEmail" placeholder="seuemail@email.com">
+        </div>
+
+        <!-- PHONE FIELD HIGHLIGHT -->
+        <div class="phone-highlight-wrap">
+          <div class="phone-highlight-badge">🎁 CONTEÚDO EXCLUSIVO GRÁTIS</div>
+          <p class="phone-highlight-text">Adicione seu WhatsApp e receba dicas semanais personalizadas, ofertas exclusivas e lembretes da sua rotina — direto no seu celular.</p>
+          <div class="field-group">
+            <label>WhatsApp (opcional, mas vale muito!)</label>
+            <div style="position:relative;">
+              <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--mid);">🇧🇷 +55</span>
+              <input type="tel" id="quizPhone" placeholder="(11) 99999-9999" style="padding-left:68px;">
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-next" style="width:100%; padding:16px; font-size:14px;" onclick="showResult()">
+          Ver meu resultado agora →
+        </button>
+        <p class="privacy-note">🔒 Seus dados são protegidos. Zero spam, só dicas e conteúdos úteis.</p>
+      </div>
+
+      <!-- RESULT -->
+      <div class="result-step" id="quizResult">
+        <div id="resultCard"></div>
+        <div class="recommendations" id="resultRecs"></div>
+        <button class="btn-next" style="width:100%; padding:16px;" onclick="openPDF(true); closeModal('quizModal');">
+          Quero também a Rotina Gratuita →
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ -->
+<!-- PDF MODAL -->
+<!-- ═══════════════════════════════ -->
+<div class="modal-overlay" id="pdfModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('pdfModal')">✕</button>
+
+    <div class="modal-header">
+      <div class="badge" style="color:var(--sage);">
+        <span style="display:block;width:20px;height:1px;background:var(--sage);"></span>
+        Protocolo Gratuito
+      </div>
+      <h2>Protocolo de 3 passos para pele sensível</h2>
+    </div>
+
+    <div class="pdf-modal-body">
+      <p id="pdfIntroText" style="font-size:14px;color:var(--mid);margin-bottom:20px;line-height:1.7;">
+        Método natural minimalista com niacinamida, centella e proteção inteligente — para pele calma, sem vermelhidão.
+      </p>
+
+      <!-- Mostrado apenas quando veio pelo quiz -->
+      <div id="pdfDataSaved" style="display:none;align-items:center;gap:8px;background:rgba(122,158,126,0.1);border:1px solid rgba(122,158,126,0.25);padding:10px 14px;margin-bottom:20px;">
+        <span style="font-size:14px;">✅</span>
+        <span style="font-size:12px;color:var(--sage);font-weight:500;">Seus dados já foram salvos. O guia vai chegar no seu e-mail!</span>
+      </div>
+
+      <!-- Mostrado apenas quando veio diretamente (sem passar pelo quiz) -->
+      <div id="pdfDirectFields" style="display:none;margin-bottom:20px;">
+        <div style="background:linear-gradient(135deg,rgba(122,158,126,0.12),rgba(201,169,110,0.08));border:1px solid rgba(122,158,126,0.3);padding:14px 16px;margin-bottom:20px;display:flex;align-items:center;gap:10px;">
+          <span style="font-size:22px;">🎁</span>
+          <div>
+            <p style="font-size:13px;font-weight:600;color:var(--sage);letter-spacing:0.04em;">100% GRATUITO</p>
+            <p style="font-size:12px;color:var(--mid);margin-top:2px;">Preenche abaixo e recebe o protocolo completo no seu e-mail agora.</p>
+          </div>
+        </div>
+        <div class="field-group" style="margin-bottom:12px;">
+          <label>Seu nome</label>
+          <input type="text" id="pdfName" placeholder="Como posso te chamar?">
+        </div>
+        <div class="field-group" style="margin-bottom:12px;">
+          <label>Seu e-mail</label>
+          <input type="email" id="pdfEmail" placeholder="seuemail@email.com">
+        </div>
+        <div class="field-group" style="margin-bottom:4px;">
+          <label>Seu WhatsApp</label>
+          <div style="position:relative;">
+            <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--mid);">🇧🇷 +55</span>
+            <input type="tel" id="pdfPhoneDirect" placeholder="(11) 99999-9999" style="padding-left:68px;">
+          </div>
+        </div>
+        <p style="font-size:11px;color:rgba(107,87,68,0.5);margin-top:8px;">🔒 Seus dados são protegidos. Zero spam, só dicas e conteúdos úteis.</p>
+      </div>
+
+      <!-- Tabs e orçamentos: só aparecem quando veio pelo quiz -->
+      <div id="pdfSkinSection" style="display:none;">
+        <div class="skin-type-tabs">
+          <button class="skin-tab active" onclick="selectSkin(this,'sensivel')">🌿 Sensível</button>
+          <button class="skin-tab" onclick="selectSkin(this,'oleosa')">💧 Oleosa</button>
+          <button class="skin-tab" onclick="selectSkin(this,'acneica')">⚡ Acneica</button>
+        </div>
+        <div class="budget-levels" id="budgetLevels"></div>
+      </div>
+
+      <button class="btn-isca" style="width:100%;background:var(--sage);color:white;padding:16px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;" onclick="submitPDF()">
+        Receber meu protocolo grátis →
+      </button>
+      <p class="privacy-note" style="margin-top:12px;">🔒 Seus dados são protegidos. Zero spam, só dicas e conteúdos úteis.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="js/main.js"></script>
+
+<!-- SKIN INFO MODAL -->
+<div id="skinModal" onclick="closeSkinModal(event)">
+  <div class="skin-modal-inner">
+    <button class="skin-modal-close" onclick="document.getElementById('skinModal').classList.remove('open');document.body.style.overflow=''">✕</button>
+    <div class="skin-modal-img-col">
+      <img class="skin-modal-hero" id="skinModalImg" src="" alt=""/>
+    </div>
+    <div class="skin-modal-body">
+      <span class="skin-modal-tag" id="skinModalTag"></span>
+      <h3 class="skin-modal-title" id="skinModalTitle"></h3>
+      <p class="skin-modal-desc" id="skinModalDesc"></p>
+      <span class="skin-modal-tips-title">🌿 Cuidados naturais recomendados</span>
+      <ul class="skin-modal-tips" id="skinModalTips"></ul>
+      <button class="skin-modal-cta" onclick="closeSkinModalAndOpenQuiz()">Descobrir minha rotina personalizada →</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
