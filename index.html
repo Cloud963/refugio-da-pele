@@ -1732,7 +1732,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
             <label>WhatsApp (opcional, mas vale muito!)</label>
             <div style="position:relative;">
               <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--mid);">🇧🇷 +55</span>
-              <input type="tel" id="quizPhone" placeholder="(11) 99999-9999" style="padding-left:68px;" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9()\s\-+]/g,'')">
+              <input type="tel" id="quizPhone" placeholder="(11) 99999-9999" style="padding-left:68px;" inputmode="numeric" onkeypress="return /[0-9]/.test(event.key)" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
             </div>
           </div>
         </div>
@@ -1802,7 +1802,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
           <label>Seu WhatsApp</label>
           <div style="position:relative;">
             <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--mid);">🇧🇷 +55</span>
-            <input type="tel" id="pdfPhoneDirect" placeholder="(11) 99999-9999" style="padding-left:68px;">
+            <input type="tel" id="pdfPhoneDirect" placeholder="(11) 99999-9999" style="padding-left:68px;" inputmode="numeric" onkeypress="return /[0-9]/.test(event.key)" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
           </div>
         </div>
         <p style="font-size:11px;color:rgba(107,87,68,0.5);margin-top:8px;">🔒 Seus dados são protegidos. Zero spam, só dicas e conteúdos úteis.</p>
@@ -2283,7 +2283,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
       <div class="contact-form">
         <input type="text" placeholder="Seu nome" id="contactName"/>
         <input type="email" placeholder="Seu e-mail" id="contactEmail"/>
-        <input type="tel" placeholder="(11) 99999-9999" id="contactPhone" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9()\s\-+]/g,'')"\/>
+        <input type="tel" placeholder="(11) 99999-9999" id="contactPhone" inputmode="numeric" onkeypress="return /[0-9]/.test(event.key)" oninput="this.value=this.value.replace(/[^0-9]/g,'')"\/>
         <textarea placeholder="Como podemos ajudar?"></textarea>
         <button onclick="submitContact()">Enviar mensagem →</button>
       </div>`
