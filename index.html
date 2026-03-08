@@ -1732,7 +1732,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
             <label>WhatsApp (opcional, mas vale muito!)</label>
             <div style="position:relative;">
               <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--mid);">🇧🇷 +55</span>
-              <input type="tel" id="quizPhone" placeholder="(11) 99999-9999" style="padding-left:68px;">
+              <input type="tel" id="quizPhone" placeholder="(11) 99999-9999" style="padding-left:68px;" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9()\s\-+]/g,'')">
             </div>
           </div>
         </div>
@@ -1982,6 +1982,21 @@ Uma rotina simples de 3 passos que respeita quem você já é.
     document.getElementById('quizEmailStep').classList.remove('active');
     document.getElementById('quizResult').classList.add('active');
     showToast(`Resultado enviado para ${email}! 💌`);
+
+    // ─── ENVIAR PARA N8N ───
+    const phone = document.getElementById('quizPhone') ? document.getElementById('quizPhone').value.trim() : '';
+    fetch('https://refugiodapele.app.n8n.cloud/webhook/db764dab-451b-47cb-b322-880c940c2b7b', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        origem: 'quiz',
+        nome: name,
+        email: email,
+        whatsapp: phone,
+        resultado_pele: type,
+        data: new Date().toISOString()
+      })
+    }).catch(function() {});
   }
 
   // ─── PDF FORM ───
@@ -2268,7 +2283,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
       <div class="contact-form">
         <input type="text" placeholder="Seu nome" id="contactName"/>
         <input type="email" placeholder="Seu e-mail" id="contactEmail"/>
-        <input type="tel" placeholder="Telefone (opcional)" id="contactPhone"/>
+        <input type="tel" placeholder="(11) 99999-9999" id="contactPhone" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9()\s\-+]/g,'')"\/>
         <textarea placeholder="Como podemos ajudar?"></textarea>
         <button onclick="submitContact()">Enviar mensagem →</button>
       </div>`
@@ -2325,6 +2340,23 @@ Uma rotina simples de 3 passos que respeita quem você já é.
   }
 
   function submitContact() {
+    const nome = document.getElementById('contactName') ? document.getElementById('contactName').value.trim() : '';
+    const email = document.getElementById('contactEmail') ? document.getElementById('contactEmail').value.trim() : '';
+    const whatsapp = document.getElementById('contactPhone') ? document.getElementById('contactPhone').value.trim() : '';
+
+    // ─── ENVIAR PARA N8N ───
+    fetch('https://refugiodapele.app.n8n.cloud/webhook/db764dab-451b-47cb-b322-880c940c2b7b', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        origem: 'formulario_contato',
+        nome: nome,
+        email: email,
+        whatsapp: whatsapp,
+        data: new Date().toISOString()
+      })
+    }).catch(function() {});
+
     showToast('Mensagem enviada! Responderemos em breve. 💚');
     document.getElementById('legalModal').classList.remove('open');
     document.body.style.overflow = '';
