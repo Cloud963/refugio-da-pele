@@ -2628,5 +2628,35 @@ Uma rotina simples de 3 passos que respeita quem você já é.
   </div>
 </div>
 
+<script>
+
+document.getElementById("pdfSubmitBtn").addEventListener("click", function() {
+
+  const nome = document.getElementById("pdfName").value;
+  const email = document.getElementById("pdfEmail").value;
+  const whatsapp = document.getElementById("pdfPhoneDirect").value;
+
+  fetch("https://refugiodapele.app.n8n.cloud/webhook/db764dab-451b-47cb-b322-880c940c2b7b", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      origem: "pdf_protocolo",
+      nome: nome,
+      email: email,
+      whatsapp: whatsapp,
+      data: new Date().toISOString()
+    })
+  })
+  .then(() => {
+    alert("Protocolo enviado! Verifique seu e-mail.");
+  })
+  .catch(err => console.log(err));
+
+});
+
+</script>
+
 </body>
 </html>
