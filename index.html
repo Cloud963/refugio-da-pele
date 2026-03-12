@@ -2630,31 +2630,116 @@ Uma rotina simples de 3 passos que respeita quem você já é.
 
 <script>
 
-document.getElementById("pdfSubmitBtn").addEventListener("click", function() {
+// =============================
+// CONFIGURAÇÃO
+// =============================
 
-  const nome = document.getElementById("pdfName").value;
-  const email = document.getElementById("pdfEmail").value;
-  const whatsapp = document.getElementById("pdfPhoneDirect").value;
+const N8N_WEBHOOK = "https://refugiodapele.app.n8n.cloud/webhook/protocolo";
 
-  fetch("https://refugiodapele.app.n8n.cloud/webhook/db764dab-451b-47cb-b322-880c940c2b7b", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      origem: "pdf_protocolo",
-      nome: nome,
-      email: email,
-      whatsapp: whatsapp,
-      data: new Date().toISOString()
-    })
-  })
-  .then(() => {
-    alert("Protocolo enviado! Verifique seu e-mail.");
-  })
-  .catch(err => console.log(err));
+async function enviarLead(dados){
+
+  try{
+
+    const response = await fetch(N8N_WEBHOOK,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify(dados)
+    });
+
+    console.log("Lead enviado", await response.text());
+
+  }catch(error){
+
+    console.error("Erro ao enviar lead", error);
+
+  }
+
+}
+
+
+// =============================
+// FORMULÁRIO PDF
+// =============================
+
+const pdfForm = document.getElementById("pdfForm");
+
+if(pdfForm){
+
+pdfForm.addEventListener("submit", function(e){
+
+e.preventDefault();
+
+const nome = document.getElementById("pdfName")?.value || "";
+const email = document.getElementById("pdfEmail")?.value || "";
+const whatsapp = document.getElementById("pdfPhoneDirect")?.value || "";
+
+enviarLead({
+  origem:"protocolo_pdf",
+  nome:nome,
+  email:email,
+  whatsapp:whatsapp,
+  pagina:window.location.href,
+  data:new Date().toISOString()
+});
+
+alert("Seu protocolo foi enviado para seu email!");
 
 });
+
+}
+
+
+// =============================
+// FORMULÁRIO CONTATO
+// =============================
+
+const contactForm = document.getElementById("contactForm");
+
+if(contactForm){
+
+contactForm.addEventListener("submit", function(e){
+
+e.preventDefault();
+
+const nome = document.getElementById("contactName")?.value || "";
+const email = document.getElementById("contactEmail")?.value || "";
+const whatsapp = document.getElementById("contactWhatsapp")?.value || "";
+
+enviarLead({
+  origem:"contato",
+  nome:nome,
+  email:email,
+  whatsapp:whatsapp,
+  pagina:window.location.href,
+  data:new Date().toISOString()
+});
+
+alert("Mensagem enviada!");
+
+});
+
+}
+
+
+// =============================
+// QUIZ
+// =============================
+
+function enviarResultadoQuiz(nome,email,whatsapp,resultado){
+
+enviarLead({
+  origem:"quiz",
+  nome:nome,
+  email:email,
+  whatsapp:whatsapp,
+  resultado_pele:resultado,
+  pagina:window.location.href,
+  data:new Date().toISOString()
+});
+
+}
 
 </script>
 
