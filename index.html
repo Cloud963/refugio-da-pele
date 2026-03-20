@@ -1985,7 +1985,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
 
     // ─── ENVIAR PARA N8N ───
     const phone = document.getElementById('quizPhone') ? document.getElementById('quizPhone').value.trim() : '';
-    fetch('https://refugiodapele.app.n8n.cloud/webhook/db764dab-451b-47cb-b322-880c940c2b7b', {
+    fetch(N8N_WEBHOOK, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -2008,6 +2008,14 @@ Uma rotina simples de 3 passos que respeita quem você já é.
       if (!name) { showToast('Preenche seu nome para continuar 😊'); return; }
       if (!email || !/\S+@\S+\.\S+/.test(email)) { showToast('E-mail inválido, verifica!'); return; }
       if (!phone) { showToast('Adiciona seu WhatsApp para receber o guia 📱'); return; }
+      enviarLead({
+        origem: 'protocolo_pdf',
+        nome: name,
+        email: email,
+        whatsapp: phone,
+        pagina: window.location.href,
+        data: new Date().toISOString()
+      });
     }
     const skinLabels = { sensivel: 'Pele Sensível', oleosa: 'Pele Oleosa', acneica: 'Pele Acneica' };
     showToast(`Perfeito! Sua rotina para ${skinLabels[selectedSkin]} vai chegar em instantes ✅`);
@@ -2345,7 +2353,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
     const whatsapp = document.getElementById('contactPhone') ? document.getElementById('contactPhone').value.trim() : '';
 
     // ─── ENVIAR PARA N8N ───
-    fetch('https://refugiodapele.app.n8n.cloud/webhook/db764dab-451b-47cb-b322-880c940c2b7b', {
+    fetch(N8N_WEBHOOK, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -2634,7 +2642,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
 // CONFIGURAÇÃO
 // =============================
 
-const N8N_WEBHOOK = "https://refugiodapele.app.n8n.cloud/webhook/protocolo";
+const N8N_WEBHOOK = "https://refugiodapele.app.n8n.cloud/webhook/lead-refugio";
 
 async function enviarLead(dados){
 
