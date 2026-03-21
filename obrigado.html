@@ -155,7 +155,16 @@
 
     <span class="icon">🌿</span>
 
-    <h1>Bem-vinda ao seu <em>refúgio</em>, [Nome]</h1>
+    <h1>Bem-vinda ao seu <em>refúgio</em>, <span id="nome-cliente">amiga</span></h1>
+    <script>
+      (function() {
+        var params = new URLSearchParams(window.location.search);
+        var nome = params.get('nome');
+        if (nome) {
+          document.getElementById('nome-cliente').textContent = nome.split(' ')[0];
+        }
+      })();
+    </script>
     <p class="subtitle">
       Sua assinatura foi confirmada com sucesso.<br>
       O seu primeiro guia já está a caminho do seu email.
