@@ -1,0 +1,168 @@
+REFÚGIO DA PELE — RESUMO DA SESSÃO
+Data: 21/03/2026
+============================================================
+
+CONTINUAÇÃO DA SESSÃO DE 20/03/2026
+Arquivo anterior: docs/resumo-sessao-20-03-2026.txt
+
+============================================================
+ATUALIZAÇÕES E DECISÕES DESTA SESSÃO
+============================================================
+
+1. INFRAESTRUTURA — SUPABASE
+─────────────────────────────────
+- Conta criada em supabase.com
+- URL do projeto: https://aftrvqwazdiumibdfjjy.supabase.co
+- RLS automático ativado
+- 3 tabelas criadas: clientes, cupons, cancelamentos
+- Schema salvo em: docs/supabase-schema.sql
+- Credencial configurada no n8n como "Refugio da Pele — Supabase"
+- Tabela pendente: interacoes (check-ins das clientes via Z-API)
+
+2. REPOSITÓRIOS DE FERRAMENTAS
+─────────────────────────────────
+- Fork do MiroFish feito para github.com/Cloud963
+- Repo de submódulos criado: github.com/Cloud963/cloud963-tools
+  (contém: aiox-core, awesome-claude-code-subagents, MiroFish)
+- Localmente em: workspace/tools/
+
+3. SISTEMA DE PLANOS — REFORMULADO NO SITE
+─────────────────────────────────
+Preços definidos (todos assinaturas):
+  · R$9,90/mês — ATIVO (centro, featured, único com link de compra)
+  · R$14,90/mês — Em breve (plano da influencer, silhueta misteriosa)
+  · R$19,90/mês — Em breve
+- Botão "Avise-me quando abrir" nos planos em breve (captura email)
+- Nomes dos planos: "Com Presença" / "Seu Ritual" / "Experiência Completa"
+
+4. CREDENCIAIS REAIS DO N8N (do WF1)
+─────────────────────────────────
+- instanceId: b3f36ad4b8a579dd86116dc9449ee81a2e4c05ad27fc75bf5538fe5592ed48cb
+- SMTP: id "LQzuLvKBJ7VqTETa", name "SMTP account"
+- Z-API instance: 3F06247099D391366D735EC66E320A44
+- Z-API token: 9FEB7A24EE74CDCBC327832A
+- Z-API Client-Token: F212a72ec09cb4f14b062257d320f4573S
+- Google Sheets: id "DzhWrB0cOwGmCaUD", name "Google Sheets account"
+- Planilha ID: 1RJREELqinbpue4-jkIXkb-Bi_pWMot3oI_Sk4GVQc7o
+
+5. WORKFLOWS CRIADOS
+─────────────────────────────────
+WF1 — Envio PDF GRATIS (já existia, ativo)
+  · Webhook → Organizar Lead → Google Sheets → Z-API + Email
+  · Arquivo: workflows/Envio PDF GRATIS.json
+
+WF4 — Ciclo de Vida (importado, conectar e ativar)
+  · Schedule diário 08h → Supabase → avalia cada cliente
+  · Regras de inatividade: 14 dias (email) / 17 dias (WhatsApp sutil)
+  · Aniversários, FIZ18, cancelamentos
+  · Arquivo: workflows/wf4-ciclo-de-vida.json
+
+WF2 — PDF Semanal (inativo — aguarda SerpAPI, Tavily, Claude key)
+  · Será acionado pelo WF5 (sábado 22h+)
+  · Arquivo: workflows/wf2-pdf-semanal.json
+
+WF3 — Atualização de Link (inativo — aguarda WF2)
+  · Arquivo: workflows/wf3-atualizacao-link.json
+
+6. REGRAS DE INATIVIDADE (ATUALIZADAS)
+─────────────────────────────────
+- 14 dias sem interação → email de saudade + PDF
+- 17 dias sem interação → WhatsApp sutil:
+  "Oi [nome] 🌿 Está tudo bem com você? A gente estava com saudade.
+  Sempre que quiser, o Refúgio está aqui 💛"
+- Sem regra de 45 dias (removida)
+
+7. SISTEMA DE ENQUETE PÓS-ENTREGA (planejado, não implementado)
+─────────────────────────────────
+- 3 dias após entrega do PDF → enquete via WhatsApp (Z-API)
+- Opções:
+  1️⃣ Amei — continue assim
+  2️⃣ Pode melhorar
+  3️⃣ [aberta] Sugira um tema para a próxima edição
+- Resposta salva na aba "Feedback" da planilha
+- Alimenta o WF5 para eleição de temas da semana seguinte
+
+8. FLUXO SEMANAL COMPLETO (arquitetado)
+─────────────────────────────────
+SÁBADO 22h+ — WF5 (a criar, inativo):
+  · Lê aba "Feedback" filtrando semana atual
+  · Conta temas sugeridos
+  · Elege 2–3 temas campeões
+  · Salva na aba "Temas da Semana"
+  · Aciona WF2
+
+DOMINGO 00h — WF2:
+  · Lê temas eleitos
+  · Busca SerpAPI + Tavily
+  · Gera PDF com Claude (7 temas + Momento Curiosidade)
+  · Salva e aciona WF3
+
+DOMINGO 09h — WF6 (a criar, inativo):
+  · Influencer envia resumo do tema da semana via Z-API
+  · Para todas as clientes ativas
+
+SEGUNDA 08h — WF4 (ciclo de vida)
+
+9. ESTRUTURA DE ABAS DA PLANILHA
+─────────────────────────────────
+Existente:
+  · Aba 01 - Leads (nome, email, whatsapp, data, origem, pdf da semana)
+
+A criar:
+  · Feedback (data, nome, email, avaliação, tema_sugerido, semana)
+  · Temas da Semana:
+    Col A: Tema | Col B: Tema Usado | Col C: Tema Novo
+    Col D: Votos Clientes | Col E: Semana Usada | Col F: Fonte
+  · Cupons (codigo, cpf, desconto, validade, usado, data_uso)
+  · Cancelamentos (nome, email, tel, motivo, data, status_retorno)
+
+10. INFLUENCER VIRTUAL
+─────────────────────────────────
+- 1 influencer única, criada no Freepik
+- Vídeos de 15–40s (clips de 10s concatenados)
+- Distribuição: Z-API (WhatsApp)
+- Vídeo semanal: domingo 09h — resumo do tema da semana
+- Vídeos diários: saudações por tema do dia
+- Estrutura semanal:
+  Segunda: RESET | Terça: EDUCAÇÃO | Quarta: CONEXÃO
+  Quinta: AJUSTE | Sexta: PROGRESSO | Sábado: AUTOCUIDADO | Domingo: EMOCIONAL
+- Personalização por dados do Supabase (faixa etária, fase materna, etc.)
+- Modos: leve(1x/dia) / acompanhamento(2x/dia) / intensivo(3x/dia)
+
+11. PENDÊNCIAS ATUALIZADAS
+─────────────────────────────────
+CONCLUÍDO:
+  · [x] Comprar domínio de email profissional (Hostinger)
+  · [x] Criar conta Supabase e tabelas
+  · [x] Configurar credencial Supabase no n8n
+  · [x] Fork MiroFish + repo cloud963-tools
+  · [x] Reformular seção de planos no site
+  · [x] Criar WF4 (importado no n8n)
+  · [x] Criar WF2 e WF3 (JSONs prontos, inativos)
+
+PENDENTE TÉCNICO:
+  · [ ] Configurar SMTP no n8n (domínio já comprado)
+  · [ ] Configurar API Key do n8n (para integração direta)
+  · [ ] Conectar nós do WF4 manualmente no n8n
+  · [ ] Adicionar chaves SerpAPI + Tavily ao n8n
+  · [ ] Adicionar Claude API key ao n8n
+  · [ ] Criar tabela config no Supabase (para link do PDF)
+  · [ ] Criar tabela interacoes no Supabase
+  · [ ] Criar abas Feedback, Temas da Semana, Cupons, Cancelamentos na planilha
+  · [ ] Criar WF5 (eleição de temas, sábado 22h)
+  · [ ] Criar WF6 (disparo influencer domingo 09h)
+  · [ ] Adicionar enquete 3 dias após entrega ao WF1
+  · [ ] Integrar Stripe webhook → n8n → entrega PDF
+  · [ ] Testar WF1 completo end-to-end
+  · [ ] Adicionar campos novos no formulário do index.html
+  · [ ] Criar influencer no Freepik
+  · [ ] Definir sistema de cupons no checkout
+  · [ ] Configurar Z-API webhook de entrada (receber respostas)
+
+REMOVIDO (decisão):
+  · Caixa postal — não agora
+  · CNPJ — não agora
+  · Regra de 45 dias de inatividade (substituída por 14/17 dias)
+
+============================================================
+Gerado por Claude Code — Refúgio da Pele

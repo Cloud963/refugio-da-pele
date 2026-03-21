@@ -1,0 +1,273 @@
+REFÚGIO DA PELE — RESUMO DA SESSÃO
+Data: 20/03/2026
+============================================================
+
+
+1. SEGMENTAÇÃO POR FAIXA ETÁRIA
+─────────────────────────────────
+- Definidas 6 faixas de idade para segmentação de clientes:
+  · Adolescência: 13–19 anos
+  · 20 anos (20–29)
+  · 30 anos (30–39)
+  · 40 anos (40–49)
+  · 50+ anos (menopausa)
+  · 60+ anos (terceira idade)
+
+- Cada faixa recebe influencer de proximidade etária
+- Tom, estilo visual e copy do email variam por faixa
+
+
+2. FILTRO DE MATERNIDADE
+─────────────────────────────────
+- Maternidade é evento biológico, não faixa etária
+- Pergunta extra no formulário:
+  "Você está em alguma dessas fases?"
+  · Grávida
+  · Pós-parto (até 2 anos)
+  · Amamentando
+  · Nenhuma das anteriores
+- Se marcada qualquer fase materna → sobrescreve segmentação por idade
+- Mãe jovem (ex: 17 anos) recebe tratamento diferente de adolescente sem filhos
+
+
+3. REGRAS PARA MENORES DE IDADE (13–17 anos)
+─────────────────────────────────
+- Recebem o PDF gratuito normalmente
+- NÃO recebem oferta de compra
+- Compra exige autorização de responsável
+- Campo extra no checkout: nome + email do responsável
+- Email para menores contém:
+  · Link do PDF
+  · 1 curiosidade educativa gerada pelo agente
+  · Prévia do próximo PDF (teaser de 2 frases)
+  · Sem menção a produto, compra ou oferta
+- Checkbox LGPD: confirmação de autorização do responsável
+- WhatsApp comercial não enviado para número de menor
+
+
+4. FORMULÁRIO DE LEAD — NOVOS CAMPOS
+─────────────────────────────────
+- Campo obrigatório: Idade
+  Justificativa exibida: "Para enviarmos conteúdos e recomendações
+  personalizados para a sua fase de vida"
+
+- Campo obrigatório: Principal preocupação com sua pele
+  (usado também como questão do QUIZ)
+  Opções sugeridas:
+  · Ressecamento / irritação
+  · Odor / pH
+  · Menopausa / mudanças hormonais
+  · Primeira rotina de cuidado
+  · Envelhecimento da pele íntima
+
+- Linguagem: "sua pele" no topo do funil (não invasivo)
+  "cuidado íntimo feminino" apenas no meio/fundo do funil
+
+- Campo: fase materna (grávida / pós-parto / amamentando / nenhuma)
+
+
+5. VERIFICAÇÃO DE IDADE — CPF
+─────────────────────────────────
+- CPF solicitado apenas no checkout para confirmar maioridade
+- NÃO armazenado — consulta pontual e descarte imediato
+- APIs sugeridas: Serpro DataValid / Receita Federal / BigDataCorp
+- Texto exibido na tela:
+  "Este dado não é armazenado — usamos apenas para
+  consulta de idade neste momento e é descartado
+  imediatamente após a verificação."
+- Política de privacidade deve mencionar a consulta
+
+
+6. SISTEMA DE CUPONS
+─────────────────────────────────
+- Não há sistema de cupons atual
+- Cupons gerados pelo n8n e salvos na aba "Cupons" da planilha
+- Estrutura do cupom: código, CPF vinculado, desconto, validade, usado (sim/não)
+- Cupom vinculado ao CPF — não transferível
+- Uso único por cliente
+
+
+7. OFERTAS DE ANIVERSÁRIO
+─────────────────────────────────
+CLIENTE NOVA (sem histórico de compra):
+  · 50% OFF no primeiro pedido
+  · Válido apenas durante o mês do aniversário
+  · Cupom: ANIV[Nome][Ano] — ex: ANIVANA2026
+
+CLIENTE RECORRENTE (desconto por idade):
+  · Desconto = idade da cliente em porcentagem
+  · Exemplos: 30 anos = 30% OFF / 50 anos = 50% OFF
+  · Válido apenas durante o mês do aniversário
+  · Uso único por CPF / 1x por ano
+
+REGRA ANTI-BURLA:
+  · CPF vinculado ao cadastro (via login Supabase)
+  · Cancelamento e recadastro com mesmo CPF = recorrente
+  · Carência mínima de 12 meses para trocar de faixa de desconto
+  · Cupom gerado com CPF vinculado — não transferível
+
+
+8. EMAIL DE ANIVERSÁRIO DE 18 ANOS (FIZ18)
+─────────────────────────────────
+- Disparado no dia exato em que a cliente completa 18 anos
+- Conteúdo:
+  · Feliz aniversário personalizado
+  · PDF completo liberado como presente
+  · Cupom FIZ18: 50% OFF no primeiro mês
+  · Válido por 30 dias
+  · Uso único por CPF
+- Badge visual do cupom: fundo dourado (#c9a84c → #f0d080), comemorativo
+- Arquivo criado: email-templates/fiz18-badge.html
+
+
+9. REATIVAÇÃO DE CLIENTES INATIVAS
+─────────────────────────────────
+Inativa = sem abertura de email + sem acesso + sem compra
+
+MOMENTO 1 — 7 dias sem interação:
+  · Tom: afeto, saudade
+  · Sem oferta
+  · Reencaminha último PDF
+  · Enquete de 1 clique: "O que mudou na sua rotina?"
+
+MOMENTO 2 — 21 dias sem interação:
+  · Tom: novidade, evolução da marca
+  · Texto: "inclusive nós — evoluímos constantemente
+    para que cada conteúdo que chega até você seja
+    mais completo, mais verdadeiro e mais seu."
+  · Teaser do conteúdo mais recente
+  · Preview do PDF atual
+  · Se completou 18: PDF completo + cupom FIZ18
+
+MOMENTO 3 — 45+ dias sem interação:
+  · Tom: oferta de volta
+  · Desconto FIXO: 30% OFF (independente do tempo inativo)
+  · Sem brindes extras
+  · Cupom válido por 72 horas
+  · Cupom: VOLTEI + identificador
+
+
+10. REATIVAÇÃO DE ASSINATURA — 3º MOMENTO DISTINTO
+─────────────────────────────────
+- Cliente que volta após cancelamento recebe tratamento especial
+- Sentimento: "Sentimos sua falta — temos algo novo esperando"
+- Desconto máximo de reativação: 30% OFF (fixo, sem escalonamento)
+- Sem brindes extras
+
+
+11. EMAIL DE CANCELAMENTO
+─────────────────────────────────
+- Disparado quando cliente clica em "Cancelar inscrição"
+- Conteúdo:
+  · Questionário: motivo do cancelamento
+  · Dados salvos na aba "Cancelamentos" da planilha
+    (nome, email, telefone, motivo, data, status_retorno)
+  · Email de despedida afetiva:
+    "Seu Refúgio sempre estará aqui. Quando quiser voltar,
+    a porta estará aberta — e vamos receber você como se
+    nunca tivesse saído."
+
+
+12. FORMATO DOS EMAILS
+─────────────────────────────────
+- Estrutura: texto HTML como base + 1 imagem complementar
+- Nunca apenas imagem (risco de bloqueio e spam)
+- Estilo visual varia por faixa etária:
+  · 13–17: ilustração suave, cores vibrantes
+  · 20–29: foto lifestyle, clean, minimalista
+  · 30–39: foto aconchegante, maternidade
+  · 40–49: elegante, empoderamento, tons quentes
+  · 50+ menopausa: acolhedor, sem estereótipo
+  · 60+: dignidade, sofisticação, bem-estar
+
+
+13. FOOTER PADRÃO (todos os emails)
+─────────────────────────────────
+- Botão/imagem destacada linkando para https://refugiodapele.com.br
+- Email: contato@refugiodapele.com.br (exibido com https://)
+- Site: https://refugiodapele.com.br (clicável)
+- Endereço físico: [em breve — caixa postal]
+- CNPJ: [em breve]
+- Link de cancelamento: obrigatório (LGPD)
+- Nota legal: "Você recebeu este email porque se cadastrou
+  em refugiodapele.com.br"
+- Para menores: call do site sem oferta de compra
+- Para maiores: call do site com call de venda
+
+
+14. WF4 — WORKFLOW DE CICLO DE VIDA (novo)
+─────────────────────────────────
+Trigger: Schedule diário às 08h00
+Lógica por cliente:
+  [A] Aniversário hoje?
+      · Menor de 18 → agenda email FIZ18 para data futura
+      · Nova cliente → 50% OFF
+      · Recorrente → desconto por idade
+  [B] Completou 18 hoje?
+      · Email FIZ18 + PDF completo + cupom
+  [C] Dias sem interação?
+      · 7 dias → Momento 1
+      · 21 dias → Momento 2
+      · 45+ dias → Momento 3 (30% fixo)
+  [D] Cancelou?
+      · Email questionário + despedida
+
+Abas da planilha necessárias:
+  · Clientes (+ colunas: data_nascimento, ultima_interacao,
+    status, total_compras)
+  · Cupons (codigo, cpf, desconto, validade, usado, data_uso)
+  · Cancelamentos (nome, email, tel, motivo, data, status_retorno)
+
+
+15. SISTEMA DE LOGIN — SUPABASE
+─────────────────────────────────
+- Plataforma: Supabase (gratuito até 50k usuários)
+- Resolve: autenticação, banco de dados, API REST para n8n
+- Cadastro cria conta vinculada a CPF
+- Login: email + senha (senha sempre escolha da cliente)
+- Recuperação: por email OU WhatsApp (código de 6 dígitos)
+- Cancelamento não apaga histórico
+- Recadastro com mesmo CPF = reconhecido como recorrente
+- Integra com n8n para verificar nova vs recorrente
+
+
+16. STRIPE + ENTREGA DO PDF
+─────────────────────────────────
+- Stripe sozinho não entrega PDF automaticamente
+- Solução: Stripe → webhook → n8n → envia PDF por email
+- Sem custo extra
+- Futuro: Stripe + Supabase → área do cliente logada
+
+
+17. ARQUIVOS CRIADOS NESTA SESSÃO
+─────────────────────────────────
+- /email-templates/base-template.html
+  → Template HTML completo com header, corpo dinâmico e footer fixo
+  → Compatível com Gmail, Outlook, Apple Mail
+  → Variáveis: {{nome}}, {{link_cancelamento}}
+
+- /email-templates/fiz18-badge.html
+  → Badge comemorativo do cupom FIZ18
+  → Fundo dourado, estrelas, uso único, válido 30 dias
+
+
+18. PENDÊNCIAS
+─────────────────────────────────
+- [ ] Comprar domínio de email profissional (Hostinger)
+- [ ] Configurar SMTP no n8n (Send Email node)
+- [ ] Comprar caixa postal para endereço
+- [ ] Abrir CNPJ
+- [ ] Definir plataforma de checkout (Stripe já tem)
+- [ ] Configurar Supabase para login de clientes
+- [ ] Integrar Stripe webhook → n8n → entrega PDF
+- [ ] Testar WF1 completo end-to-end
+- [ ] Construir WF2 (geração de conteúdo com SerpAPI + Tavily)
+- [ ] Construir WF3 (atualização automática de link do PDF)
+- [ ] Construir WF4 (ciclo de vida — aniversário, reativação, cancelamento)
+- [ ] Definir sistema de cupons (validação no checkout)
+- [ ] Definir influencer real ou perfil fictício para cada faixa etária
+- [ ] Adicionar campos novos no formulário do index.html
+- [ ] Testar verificação de CPF no checkout
+
+============================================================
+Gerado por Claude Code — Refúgio da Pele

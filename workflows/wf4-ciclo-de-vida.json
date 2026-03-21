@@ -1,0 +1,546 @@
+{
+  "name": "WF4 — Ciclo de Vida",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * *"
+            }
+          ]
+        }
+      },
+      "id": "c3d4e5f6-0004-0004-0004-000000000001",
+      "name": "Schedule Trigger — Diário 08h",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "clientes",
+        "returnAll": true
+      },
+      "id": "c3d4e5f6-0004-0004-0004-000000000002",
+      "name": "Supabase — Buscar Todos os Clientes",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        460,
+        300
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-refugio-da-pele",
+          "name": "Refugio da Pele — Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 50,
+        "options": {}
+      },
+      "id": "c3d4e5f6-0004-0004-0004-000000000003",
+      "name": "Split In Batches — 50 por vez",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const today = new Date();\ntoday.setHours(0, 0, 0, 0);\nconst results = [];\nfor (const item of $input.all()) {\n  const c = item.json;\n  if (!c.data_nascimento) continue;\n  const birth = new Date(c.data_nascimento);\n  birth.setHours(0, 0, 0, 0);\n  let age = today.getFullYear() - birth.getFullYear();\n  const monthDiff = today.getMonth() - birth.getMonth();\n  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) age--;\n  const isBirthdayToday = birth.getMonth() === today.getMonth() && birth.getDate() === today.getDate();\n  const turns18 = new Date(birth);\n  turns18.setFullYear(birth.getFullYear() + 18);\n  turns18.setHours(0, 0, 0, 0);\n  const turns18Today = turns18.getTime() === today.getTime();\n  const lastSeen = c.ultima_interacao ? new Date(c.ultima_interacao) : new Date(c.criado_em);\n  const daysSince = Math.floor((today - lastSeen) / 86400000);\n  let action = null;\n  if (turns18Today) action = 'fiz18';\n  else if (isBirthdayToday && age < 18) action = 'birthday_minor';\n  else if (isBirthdayToday && (c.total_compras || 0) === 0) action = 'birthday_new';\n  else if (isBirthdayToday && (c.total_compras || 0) > 0) action = 'birthday_recurring';\n  else if (c.status === 'cancelada') action = 'cancelled';\n  else if (daysSince === 17) action = 'reactivation_2';\n  else if (daysSince === 14) action = 'reactivation_1';\n  if (action) results.push({ json: { ...c, action, age, daysSince } });\n}\nreturn results;"
+      },
+      "id": "c3d4e5f6-0004-0004-0004-000000000004",
+      "name": "Avaliar Condição de Cada Cliente",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        900,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-tem-action",
+              "leftValue": "={{ $json.action }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c3d4e5f6-0004-0004-0004-000000000005",
+      "name": "IF — Tem Ação?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst { action, nome, email, telefone, age } = item;\nconst primeiroNome = nome ? nome.split(' ')[0] : 'querida';\nconst nomeF = primeiroNome.charAt(0).toUpperCase() + primeiroNome.slice(1).toLowerCase();\nconst today = new Date();\nconst ano = today.getFullYear();\nlet subject = '', emailBody = '', whatsappMsg = '', cupom = null, saveCancelamento = false;\nswitch (action) {\n  case 'fiz18':\n    const v18 = new Date(today); v18.setDate(v18.getDate() + 30);\n    cupom = { codigo: 'FIZ18', cpf: item.cpf || '', desconto: 50, validade: v18.toISOString(), usado: false };\n    subject = `🎂 Feliz 18 anos, ${nomeF}! Seu presente está aqui`;\n    emailBody = `<p>Hoje é um dia especial — você chegou nos seus 18 anos!</p><p>Como presente, liberamos o PDF completo para você. Use o cupom <strong>FIZ18</strong> e ganhe <strong>50% OFF</strong> no primeiro mês. Válido por 30 dias.</p>`;\n    whatsappMsg = `🎂 Feliz 18 anos, ${nomeF}! Seu presente do Refúgio da Pele está no email 💛`;\n    break;\n  case 'birthday_minor':\n    subject = `🌸 Feliz aniversário, ${nomeF}!`;\n    emailBody = `<p>Hoje é o seu dia, ${nomeF}! 🌸</p><p>Esperamos que seja incrível. Aqui vai uma curiosidade especial sobre cuidados com a pele para celebrar com você.</p>`;\n    whatsappMsg = null;\n    break;\n  case 'birthday_new':\n    const codNova = `ANIV${nomeF.toUpperCase()}${ano}`;\n    const vNova = new Date(today.getFullYear(), today.getMonth() + 1, 1);\n    cupom = { codigo: codNova, cpf: item.cpf || '', desconto: 50, validade: vNova.toISOString(), usado: false };\n    subject = `🎂 Feliz aniversário — seu presente especial chegou`;\n    emailBody = `<p>Feliz aniversário, ${nomeF}! 🎉</p><p>Para celebrar, preparamos <strong>50% OFF</strong> no seu primeiro pedido. Use o cupom <strong>${codNova}</strong>. Válido apenas este mês.</p>`;\n    whatsappMsg = `🎂 Feliz aniversário, ${nomeF}! Seu presente está no email 💛`;\n    break;\n  case 'birthday_recurring':\n    const desc = Math.min(age, 70);\n    const codRec = `ANIV${nomeF.toUpperCase()}${ano}`;\n    const vRec = new Date(today.getFullYear(), today.getMonth() + 1, 1);\n    cupom = { codigo: codRec, cpf: item.cpf || '', desconto: desc, validade: vRec.toISOString(), usado: false };\n    subject = `🎂 Feliz aniversário — ${desc}% OFF só para você`;\n    emailBody = `<p>Feliz aniversário, ${nomeF}! 🎉</p><p>Porque você faz parte do nosso Refúgio, seu presente é especial: <strong>${desc}% OFF</strong> — um desconto da sua idade. Cupom: <strong>${codRec}</strong>. Válido apenas este mês.</p>`;\n    whatsappMsg = `🎂 Feliz aniversário, ${nomeF}! Um presente especial chegou no seu email 💛`;\n    break;\n  case 'reactivation_1':\n    subject = `Sentimos sua falta, ${nomeF} 🌸`;\n    emailBody = `<p>Oi, ${nomeF}. Tudo bem com você?</p><p>Faz alguns dias que não nos vemos por aqui. Passamos para deixar seu último conteúdo disponível. O que mudou na sua rotina? 💛</p>`;\n    whatsappMsg = `Oi, ${nomeF} 🌸 Sentimos sua falta! Seu último PDF está esperando.`;\n    break;\n  case 'reactivation_2':\n    subject = null;\n    whatsappMsg = `Oi, ${nomeF} 🌿 Está tudo bem com você? A gente estava com saudade. Sempre que quiser, o Refúgio está aqui 💛`;\n    emailBody = null;\n    break;\n  case 'cancelled':\n    saveCancelamento = true;\n    subject = `Seu Refúgio sempre estará aqui`;\n    emailBody = `<p>${nomeF}, lamentamos que esteja partindo.</p><p>Poderia nos contar o motivo? E saiba: quando quiser voltar, a porta estará aberta — e vamos receber você como se nunca tivesse saído. 💛</p>`;\n    whatsappMsg = null;\n    break;\n}\nreturn [{ json: { ...item, subject, emailBody, whatsappMsg, cupom, saveCancelamento } }];"
+      },
+      "id": "c3d4e5f6-0004-0004-0004-000000000006",
+      "name": "Preparar Mensagem e Cupom",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1340,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-tem-cupom",
+              "leftValue": "={{ $json.cupom }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c3d4e5f6-0004-0004-0004-000000000007",
+      "name": "IF — Tem Cupom?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1560,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "tableId": "cupons",
+        "dataToSend": "defineBelow",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "codigo",
+              "fieldValue": "={{ $json.cupom.codigo }}"
+            },
+            {
+              "fieldId": "cpf",
+              "fieldValue": "={{ $json.cupom.cpf }}"
+            },
+            {
+              "fieldId": "desconto",
+              "fieldValue": "={{ $json.cupom.desconto }}"
+            },
+            {
+              "fieldId": "validade",
+              "fieldValue": "={{ $json.cupom.validade }}"
+            },
+            {
+              "fieldId": "usado",
+              "fieldValue": "={{ $json.cupom.usado }}"
+            }
+          ]
+        }
+      },
+      "id": "c3d4e5f6-0004-0004-0004-000000000008",
+      "name": "Supabase — Criar Cupom",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1780,
+        200
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-refugio-da-pele",
+          "name": "Refugio da Pele — Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-cancelamento",
+              "leftValue": "={{ $json.saveCancelamento }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equal"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c3d4e5f6-0004-0004-0004-000000000009",
+      "name": "IF — É Cancelamento?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2000,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "tableId": "cancelamentos",
+        "dataToSend": "defineBelow",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "nome",
+              "fieldValue": "={{ $json.nome }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $json.email }}"
+            },
+            {
+              "fieldId": "telefone",
+              "fieldValue": "={{ $json.telefone }}"
+            },
+            {
+              "fieldId": "motivo",
+              "fieldValue": "Identificado via ciclo de vida automático"
+            },
+            {
+              "fieldId": "data",
+              "fieldValue": "={{ new Date().toISOString() }}"
+            },
+            {
+              "fieldId": "status_retorno",
+              "fieldValue": "pendente"
+            }
+          ]
+        }
+      },
+      "id": "c3d4e5f6-0004-0004-0004-000000000010",
+      "name": "Supabase — Registrar Cancelamento",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2220,
+        200
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-refugio-da-pele",
+          "name": "Refugio da Pele — Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "contato@refugiodapele.com.br",
+        "toEmail": "={{ $json.email }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "html",
+        "message": "={{ $json.emailBody }}",
+        "options": {}
+      },
+      "id": "c3d4e5f6-0004-0004-0004-000000000011",
+      "name": "Email — Enviar para Cliente",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        2440,
+        300
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "LQzuLvKBJ7VqTETa",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-whatsapp-msg",
+              "leftValue": "={{ $json.whatsappMsg }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            },
+            {
+              "id": "cond-idade-adulta",
+              "leftValue": "={{ $json.age }}",
+              "rightValue": 18,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c3d4e5f6-0004-0004-0004-000000000012",
+      "name": "IF — Enviar WhatsApp?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2660,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.z-api.io/instances/3F06247099D391366D735EC66E320A44/token/9FEB7A24EE74CDCBC327832A/send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Client-Token",
+              "value": "F212a72ec09cb4f14b062257d320f4573S"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $json.telefone }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.whatsappMsg }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c3d4e5f6-0004-0004-0004-000000000013",
+      "name": "Z-API — Enviar WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2880,
+        200
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger — Diário 08h": {
+      "main": [
+        [
+          {
+            "node": "Supabase — Buscar Todos os Clientes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase — Buscar Todos os Clientes": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches — 50 por vez",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches — 50 por vez": {
+      "main": [
+        [
+          {
+            "node": "Avaliar Condição de Cada Cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Avaliar Condição de Cada Cliente": {
+      "main": [
+        [
+          {
+            "node": "IF — Tem Ação?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF — Tem Ação?": {
+      "main": [
+        [
+          {
+            "node": "Preparar Mensagem e Cupom",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Preparar Mensagem e Cupom": {
+      "main": [
+        [
+          {
+            "node": "IF — Tem Cupom?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF — Tem Cupom?": {
+      "main": [
+        [
+          {
+            "node": "Supabase — Criar Cupom",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IF — É Cancelamento?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase — Criar Cupom": {
+      "main": [
+        [
+          {
+            "node": "IF — É Cancelamento?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF — É Cancelamento?": {
+      "main": [
+        [
+          {
+            "node": "Supabase — Registrar Cancelamento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email — Enviar para Cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase — Registrar Cancelamento": {
+      "main": [
+        [
+          {
+            "node": "Email — Enviar para Cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email — Enviar para Cliente": {
+      "main": [
+        [
+          {
+            "node": "IF — Enviar WhatsApp?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF — Enviar WhatsApp?": {
+      "main": [
+        [
+          {
+            "node": "Z-API — Enviar WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "active": false,
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "c3d4e5f6-1111-2222-3333-444444444444",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b3f36ad4b8a579dd86116dc9449ee81a2e4c05ad27fc75bf5538fe5592ed48cb"
+  },
+  "id": "WF4CicloVidaRefugio",
+  "tags": []
+}

@@ -1,0 +1,475 @@
+{
+  "name": "Envio PDF GRATIS",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-refugio",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        208,
+        16
+      ],
+      "id": "8862ffe4-a97d-4b00-8f3d-6f64964931ef",
+      "name": "Webhook",
+      "webhookId": "d721210c-0536-40c0-b36d-03547488de6d"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "56a5be6e-07bb-45de-85bf-2007814bc385",
+              "name": "nome",
+              "value": "={{$json.body.nome}}",
+              "type": "string"
+            },
+            {
+              "id": "19df6a3d-9b2f-4a3a-a1e9-4b58ef16514f",
+              "name": "email",
+              "value": "={{$json.body.email}}",
+              "type": "string"
+            },
+            {
+              "id": "05a8968c-ab2a-4625-aa52-da771362a136",
+              "name": "whatsapp",
+              "value": "={{$json.body.whatsapp}}",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-1001-1001-1001-100000000001",
+              "name": "idade",
+              "value": "={{$json.body.idade}}",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-1001-1001-1001-100000000002",
+              "name": "preocupacao",
+              "value": "={{$json.body.preocupacao}}",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-1001-1001-1001-100000000003",
+              "name": "fase_materna",
+              "value": "={{$json.body.fase_materna}}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        16
+      ],
+      "id": "e431be52-756f-4a78-8c33-7d2d3963ed42",
+      "name": "Organizar Lead"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "tableId": "clientes",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "nome",
+              "fieldValue": "={{$json.nome}}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{$json.email}}"
+            },
+            {
+              "fieldId": "telefone",
+              "fieldValue": "={{$json.whatsapp}}"
+            },
+            {
+              "fieldId": "faixa_etaria",
+              "fieldValue": "={{ Number($json.idade) <= 17 ? '13-17' : Number($json.idade) <= 29 ? '20-29' : Number($json.idade) <= 39 ? '30-39' : Number($json.idade) <= 49 ? '40-49' : Number($json.idade) <= 59 ? '50+' : '60+' }}"
+            },
+            {
+              "fieldId": "preocupacao_pele",
+              "fieldValue": "={{$json.preocupacao}}"
+            },
+            {
+              "fieldId": "fase_materna",
+              "fieldValue": "={{$json.fase_materna}}"
+            },
+            {
+              "fieldId": "origem",
+              "fieldValue": "={{$json.origem}}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "ativa"
+            },
+            {
+              "fieldId": "ultima_interacao",
+              "fieldValue": "={{$now}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        600,
+        16
+      ],
+      "id": "a1b2c3d4-2001-2001-2001-200000000001",
+      "name": "Supabase — Upsert Cliente",
+      "credentials": {
+        "supabaseApi": {
+          "id": "SUPABASE_CREDENTIAL_ID",
+          "name": "Refugio da Pele — Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1RJREELqinbpue4-jkIXkb-Bi_pWMot3oI_Sk4GVQc7o",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Aba 01 - Leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RJREELqinbpue4-jkIXkb-Bi_pWMot3oI_Sk4GVQc7o/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Data": "={{$json.data}}",
+            "Nome": "={{$json.nome}}",
+            "Email": "={{$json.email}}",
+            "WhatsApp": "={{$json.whatsapp}}",
+            "Idade": "={{$json.idade}}",
+            "Preocupação": "={{$json.preocupacao}}",
+            "Fase Materna": "={{$json.fase_materna}}",
+            "Origem": "={{$json.origem}}",
+            "PDF da Semana": "={{$json.pagina}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Data",
+              "displayName": "Data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nome",
+              "displayName": "Nome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "WhatsApp",
+              "displayName": "WhatsApp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Idade",
+              "displayName": "Idade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Preocupação",
+              "displayName": "Preocupação",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fase Materna",
+              "displayName": "Fase Materna",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Origem",
+              "displayName": "Origem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PDF da Semana",
+              "displayName": "PDF da Semana",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        800,
+        16
+      ],
+      "id": "1fb42cdd-4114-4d95-a908-6bec57e31c6a",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DzhWrB0cOwGmCaUD",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.z-api.io/instances/3F06247099D391366D735EC66E320A44/token/9FEB7A24EE74CDCBC327832A/send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Client-Token",
+              "value": "F212a72ec09cb4f14b062257d320f4573S"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{$json.whatsapp}}"
+            },
+            {
+              "name": "message",
+              "value": "=Olá, {{$json.nome}}! 🌿\n\nSeu Protocolo Gratuito de 3 Passos para Pele Sensível foi enviado para *{{$json.email}}*.\n\nCaso não encontre, verifique a caixa de spam. 📩\n\nQualquer dúvida é só falar aqui. 💚\n\n— Refúgio da Pele"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1000,
+        -100
+      ],
+      "id": "5d2866a5-9106-4ddf-85c9-a73b00baed9c",
+      "name": "Z-API — Confirmação WhatsApp"
+    },
+    {
+      "parameters": {
+        "fromEmail": "contato@refugiodapele.com.br",
+        "toEmail": "={{$json.email}}",
+        "subject": "Seu protocolo gratuito chegou 🌿 — Refúgio da Pele",
+        "html": "=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"pt-BR\">\n<head>\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n  <meta name=\"x-apple-disable-message-reformatting\" />\n  <title>Seu Protocolo Gratuito Chegou — Refúgio da Pele</title>\n  <style type=\"text/css\">\n    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }\n    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }\n    img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; display: block; }\n    a[x-apple-data-detectors] { color: inherit !important; text-decoration: none !important; }\n    u + #body a { color: inherit; text-decoration: none; }\n    @media only screen and (max-width: 600px) {\n      .wrapper { width: 100% !important; max-width: 100% !important; }\n      .container { width: 100% !important; padding: 20px 16px !important; }\n      .cta-btn { width: 100% !important; display: block !important; text-align: center !important; box-sizing: border-box; }\n    }\n  </style>\n</head>\n<body id=\"body\" style=\"margin:0;padding:0;background-color:#F0E8E1;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;width:100%;\">\n\n  <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse:collapse;background-color:#F0E8E1;\">\n    <tr>\n      <td align=\"center\" style=\"padding:32px 16px;\">\n\n        <!-- CONTAINER -->\n        <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"560\" class=\"wrapper\" style=\"border-collapse:collapse;max-width:560px;width:100%;background-color:#FAF3EE;\">\n\n          <!-- HEADER -->\n          <tr>\n            <td align=\"center\" style=\"background-color:#3d2b1f;padding:36px 32px 28px 32px;\">\n              <p style=\"margin:0 0 4px 0;font-family:Georgia,serif;font-size:11px;color:#c0513a;letter-spacing:5px;text-transform:uppercase;\">Refúgio</p>\n              <p style=\"margin:0;font-family:Georgia,serif;font-size:26px;font-weight:normal;color:#FAF3EE;letter-spacing:2px;font-style:italic;\">da Pele</p>\n              <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"40\" style=\"border-collapse:collapse;margin:16px auto 0 auto;\">\n                <tr><td style=\"height:1px;background-color:#c0513a;font-size:0;line-height:0;\">&nbsp;</td></tr>\n              </table>\n            </td>\n          </tr>\n\n          <!-- HERO BAND -->\n          <tr>\n            <td style=\"background-color:#c0513a;padding:6px 0;text-align:center;\">\n              <p style=\"margin:0;font-family:Arial,sans-serif;font-size:11px;color:#FAF3EE;letter-spacing:4px;text-transform:uppercase;\">Seu protocolo chegou 🌿</p>\n            </td>\n          </tr>\n\n          <!-- BODY -->\n          <tr>\n            <td style=\"background-color:#FAF3EE;padding:40px 40px 32px 40px;\" class=\"container\">\n\n              <!-- Greeting -->\n              <p style=\"margin:0 0 24px 0;font-family:Georgia,serif;font-size:22px;font-weight:normal;color:#3d2b1f;line-height:1.4;\">\n                Olá, <span style=\"font-style:italic;color:#c0513a;\">={{ $json.nome }}</span> 🌸\n              </p>\n\n              <!-- Main para -->\n              <p style=\"margin:0 0 16px 0;font-family:Arial,sans-serif;font-size:15px;color:#6b5744;line-height:1.7;\">\n                O seu <strong style=\"color:#3d2b1f;\">Protocolo Gratuito de Skincare</strong> está pronto. Preparamos um guia pensado especialmente para quem, como você, quer cuidar da pele com intenção — sem complicação.\n              </p>\n\n              <p style=\"margin:0 0 28px 0;font-family:Arial,sans-serif;font-size:15px;color:#6b5744;line-height:1.7;\">\n                Abra, leia com calma, e comece hoje mesmo. Você merece esse momento.\n              </p>\n\n              <!-- CTA BUTTON -->\n              <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse:collapse;margin:0 0 32px 0;\">\n                <tr>\n                  <td align=\"center\">\n                    <!--[if mso]>\n                    <v:roundrect xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:w=\"urn:schemas-microsoft-com:office:word\"\n                      href=\"={{ $json.pdf_url }}\"\n                      style=\"height:52px;v-text-anchor:middle;width:260px;\"\n                      arcsize=\"4%\"\n                      stroke=\"f\"\n                      fillcolor=\"#c0513a\">\n                      <w:anchorlock/>\n                      <center style=\"color:#ffffff;font-family:Arial,sans-serif;font-size:14px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;\">\n                        Acessar Meu Protocolo\n                      </center>\n                    </v:roundrect>\n                    <![endif]-->\n                    <!--[if !mso]><!-->\n                    <a href=\"={{ $json.pdf_url }}\" target=\"_blank\" class=\"cta-btn\"\n                       style=\"display:inline-block;background-color:#c0513a;color:#ffffff;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;text-decoration:none;padding:16px 40px;letter-spacing:2px;text-transform:uppercase;mso-hide:all;\">\n                      Acessar Meu Protocolo →\n                    </a>\n                    <!--<![endif]-->\n                  </td>\n                </tr>\n              </table>\n\n              <!-- Divider -->\n              <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse:collapse;margin-bottom:28px;\">\n                <tr><td style=\"height:1px;background-color:rgba(192,81,58,0.15);font-size:0;line-height:0;\">&nbsp;</td></tr>\n              </table>\n\n              <!-- What's next -->\n              <p style=\"margin:0 0 16px 0;font-family:Georgia,serif;font-size:16px;color:#3d2b1f;\">O que vem a seguir</p>\n\n              <!-- Step 1 -->\n              <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse:collapse;margin-bottom:14px;\">\n                <tr>\n                  <td width=\"32\" valign=\"top\" style=\"padding-top:1px;\">\n                    <div style=\"width:24px;height:24px;background-color:#c0513a;border-radius:50%;text-align:center;line-height:24px;\">\n                      <span style=\"font-family:Arial,sans-serif;font-size:11px;font-weight:bold;color:#ffffff;\">1</span>\n                    </div>\n                  </td>\n                  <td valign=\"top\" style=\"padding-left:8px;\">\n                    <p style=\"margin:0;font-family:Arial,sans-serif;font-size:14px;color:#6b5744;line-height:1.6;\">\n                      <strong style=\"color:#3d2b1f;\">Leia o protocolo</strong> — ele foi criado para o seu perfil de pele e vai te guiar pelos primeiros 7 dias de cuidado.\n                    </p>\n                  </td>\n                </tr>\n              </table>\n\n              <!-- Step 2 -->\n              <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse:collapse;margin-bottom:14px;\">\n                <tr>\n                  <td width=\"32\" valign=\"top\" style=\"padding-top:1px;\">\n                    <div style=\"width:24px;height:24px;background-color:#c0513a;border-radius:50%;text-align:center;line-height:24px;\">\n                      <span style=\"font-family:Arial,sans-serif;font-size:11px;font-weight:bold;color:#ffffff;\">2</span>\n                    </div>\n                  </td>\n                  <td valign=\"top\" style=\"padding-left:8px;\">\n                    <p style=\"margin:0;font-family:Arial,sans-serif;font-size:14px;color:#6b5744;line-height:1.6;\">\n                      <strong style=\"color:#3d2b1f;\">Toda semana</strong> você receberá um novo guia com dicas e rotinas atualizadas. Completamente gratuito.\n                    </p>\n                  </td>\n                </tr>\n              </table>\n\n              <!-- Step 3 -->\n              <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse:collapse;margin-bottom:32px;\">\n                <tr>\n                  <td width=\"32\" valign=\"top\" style=\"padding-top:1px;\">\n                    <div style=\"width:24px;height:24px;background-color:#c0513a;border-radius:50%;text-align:center;line-height:24px;\">\n                      <span style=\"font-family:Arial,sans-serif;font-size:11px;font-weight:bold;color:#ffffff;\">3</span>\n                    </div>\n                  </td>\n                  <td valign=\"top\" style=\"padding-left:8px;\">\n                    <p style=\"margin:0;font-family:Arial,sans-serif;font-size:14px;color:#6b5744;line-height:1.6;\">\n                      <strong style=\"color:#3d2b1f;\">Em 3 dias</strong> te enviamos uma mensagem no WhatsApp para saber como foi a sua experiência 💛\n                    </p>\n                  </td>\n                </tr>\n              </table>\n\n              <!-- Closing -->\n              <p style=\"margin:0;font-family:Georgia,serif;font-size:15px;color:#6b5744;line-height:1.7;font-style:italic;\">\n                Com carinho,<br>\n                <strong style=\"font-style:normal;color:#3d2b1f;\">Equipe Refúgio da Pele</strong>\n              </p>\n\n            </td>\n          </tr>\n\n          <!-- FOOTER -->\n          <tr>\n            <td style=\"background-color:#3d2b1f;padding:28px 32px 32px 32px;\" align=\"center\">\n              <p style=\"margin:0 0 12px 0;font-family:Georgia,serif;font-size:11px;color:#c0513a;letter-spacing:3px;text-transform:uppercase;\">Siga-nos</p>\n              <a href=\"https://www.instagram.com/refugiodapele\" target=\"_blank\"\n                 style=\"font-family:Arial,sans-serif;font-size:12px;color:#FAF3EE;text-decoration:none;letter-spacing:1px;\">\n                @refugiodapele\n              </a>\n              <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"40\" style=\"border-collapse:collapse;margin:16px auto;\">\n                <tr><td style=\"height:1px;background-color:rgba(192,81,58,0.3);font-size:0;line-height:0;\">&nbsp;</td></tr>\n              </table>\n              <p style=\"margin:0 0 6px 0;font-family:Arial,sans-serif;font-size:11px;color:rgba(250,243,238,0.5);line-height:1.6;\">\n                Você recebeu este email porque se cadastrou em refugiodapele.com.br\n              </p>\n              <a href=\"https://refugiodapele.com.br\"\n                 style=\"font-family:Arial,sans-serif;font-size:11px;color:rgba(192,81,58,0.7);text-decoration:underline;\">\n                Cancelar inscrição\n              </a>\n              <p style=\"margin:16px 0 0 0;font-family:Arial,sans-serif;font-size:10px;color:rgba(250,243,238,0.25);letter-spacing:2px;text-transform:uppercase;\">\n                © 2026 Refúgio da Pele\n              </p>\n            </td>\n          </tr>\n\n        </table>\n        <!-- END CONTAINER -->\n\n      </td>\n    </tr>\n  </table>\n\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1000,
+        150
+      ],
+      "id": "e5a7eb1a-02d4-4168-91c0-5d4a0d5450e8",
+      "name": "Send an Email",
+      "credentials": {
+        "smtp": {
+          "id": "LQzuLvKBJ7VqTETa",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resume": "timeInterval",
+        "unit": "days",
+        "amount": 3
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1200,
+        150
+      ],
+      "id": "a1b2c3d4-3001-3001-3001-300000000001",
+      "name": "Aguardar 3 Dias",
+      "webhookId": "a1b2c3d4-3001-3001-3001-300000000002"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.z-api.io/instances/3F06247099D391366D735EC66E320A44/token/9FEB7A24EE74CDCBC327832A/send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Client-Token",
+              "value": "F212a72ec09cb4f14b062257d320f4573S"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{$json.whatsapp}}"
+            },
+            {
+              "name": "message",
+              "value": "=Oi, {{$json.nome}}! 🌿\n\nJá faz 3 dias desde que você recebeu o seu guia. O que achou?\n\n1️⃣ Amei — continue assim\n2️⃣ Pode melhorar\n3️⃣ Tenho uma sugestão de tema\n\nResponda aqui com o número da sua opinião 💛\n— Refúgio da Pele"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1400,
+        150
+      ],
+      "id": "a1b2c3d4-4001-4001-4001-400000000001",
+      "name": "Z-API — Enquete 3 Dias"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Organizar Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Organizar Lead": {
+      "main": [
+        [
+          {
+            "node": "Supabase — Upsert Cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase — Upsert Cliente": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Z-API — Confirmação WhatsApp",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an Email": {
+      "main": [
+        [
+          {
+            "node": "Aguardar 3 Dias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aguardar 3 Dias": {
+      "main": [
+        [
+          {
+            "node": "Z-API — Enquete 3 Dias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "906486b9-faf4-4b7a-b444-267b3ec6c847",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b3f36ad4b8a579dd86116dc9449ee81a2e4c05ad27fc75bf5538fe5592ed48cb"
+  },
+  "id": "G9XfcmnoGm9PkNiT",
+  "tags": []
+}

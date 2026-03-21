@@ -1,0 +1,104 @@
+REFÚGIO DA PELE — RESUMO DA SESSÃO
+Data: 21/03/2026 (Parte 5 — sessão final do dia)
+============================================================
+
+CONTINUAÇÃO DA SESSÃO ANTERIOR
+Arquivo anterior: docs/resumo-sessao-21-03-2026-parte4.txt
+
+============================================================
+DECISÕES E ATUALIZAÇÕES DESTA SESSÃO
+============================================================
+
+1. DOCUMENTAÇÃO CRIADA
+─────────────────────────────────
+- docs/guia-onboarding.md — jornada completa lead→assinante, ciclo de vida, ferramentas
+- docs/checklist-lancamento.md — checklist 6 fases com checkboxes
+- docs/calendario-editorial-instagram.md — 4 semanas de conteúdo, formatos, horários, hashtags
+
+2. EMAILS HTML MELHORADOS
+─────────────────────────────────
+- email-templates/wf1-pdf-gratis.html — novo email brand-aligned (terracota/creme)
+- email-templates/wf7-boas-vindas-assinante.html — email assinante paga com benefícios
+- WF1 e WF7 JSON atualizados com novo HTML
+- Cores corrigidas: abandono do roxo escuro (#1a0a2e) em favor da paleta real da marca
+
+3. REGRAS DE ORQUESTRAÇÃO ATUALIZADAS
+─────────────────────────────────
+- Regra dos 7 dias de antecedência para scripts da influencer (WF8 gera semana seguinte)
+- Regra do clima obrigatório no WF5 (tema + curiosidade + clima = 3 elementos)
+- Tom e voz da marca documentados: leveza, afeto, sátira curta, sem gênero/pessoas/animais
+- Escopo: pele = corpo inteiro (não só rosto)
+- Estrutura obrigatória do PDF: 1-3 naturais + 3-4 produtos de prateleira
+- Claude = orquestrador e filtro de qualidade de todo conteúdo
+
+4. MISSÃO & VALORES ATUALIZADOS NO SITE
+─────────────────────────────────
+- Reescrita completa da seção Missão & Valores no index.html
+- 5 valores definidos: Valor e respeito, Transparência, Leveza, Afeto genuíno, Abrangência
+- "Nossa História" e "Por que criamos o Refúgio" também atualizados
+
+5. PLANO R$9,90 — NOME E CONTEÚDO
+─────────────────────────────────
+- Nome: "Seu Ritual" → "A Semente" (DECISÃO CONFIRMADA)
+- Tagline escolhida: "Uma semente plantada com intenção vira raiz."
+- Features melhoradas (não aplicadas ainda no código — pendente)
+- CTA sugerido: "PLANTAR AGORA →"
+- PENDENTE: aplicar estas mudanças no index.html
+
+6. IMAGEM DA INFLUENCER — CARD R$14,90
+─────────────────────────────────
+- Imagem aprovada: silhueta feminina contraluz âmbar, frasco sem rótulo
+- Salva em: assets/influencer-silhueta.jpg
+- Aplicada no card "Com Presença" (R$14,90) no index.html
+- PENDENTE: melhorar layout do card com gradiente/fade (prompt gerado para Claude Desktop)
+
+7. PROMPTS GERADOS PARA CLAUDE DESKTOP
+─────────────────────────────────
+PROMPT CARD R$14,90 (layout com imagem):
+- Imagem ocupa largura total no topo (180-200px)
+- Gradiente fade dissolvendo imagem no fundo do card
+- Badge "Em breve" sobreposto à imagem
+- Texto "Ela está chegando." em itálico abaixo da imagem
+- padding:0 no topo, normal no restante
+
+PROMPT CARD R$19,90 (Experiência Completa):
+- Visual premium, sensação de "topo da jornada"
+- Tagline: "Não é mais conteúdo. É uma relação com a sua pele."
+- Features atualizadas com influencer semanal + comunidade privada
+- Botão: "Quero a Experiência →"
+- Efeito sutil dourado/terracota no badge
+
+8. STRIPE
+─────────────────────────────────
+- CPF será habilitado no checkout (pendente — dono vai ativar)
+- Quando WF7 for revisado: adicionar coluna cpf na tabela clientes
+
+9. MARKETING — PENDÊNCIAS FUTURAS
+─────────────────────────────────
+- Quando R$9,90 tiver assinantes rodando: elaborar estratégias de MKT
+- Criar mecanismo para capturar sugestões de temas dos clientes → salvar na planilha
+
+============================================================
+PENDÊNCIAS TÉCNICAS GERAIS
+============================================================
+- [ ] Criar email contato@refugiodapele.com.br na Hostinger
+- [ ] Configurar SMTP no n8n (credencial ID: LQzuLvKBJ7VqTETa já criada)
+- [ ] Importar WF7, WF8, WF_SUMMARY no n8n
+- [ ] Substituir SUPABASE_SERVICE_KEY nos workflows
+- [ ] Contratar Z-API e associar número da marca
+- [ ] Associar +351926856955 ao Z-API (número do dono)
+- [ ] Criar produto R$14,90/mês recorrente no Stripe (quando influencer lançar)
+- [ ] Aplicar mudanças do plano "A Semente" no index.html
+- [ ] Melhorar layout card R$14,90 (prompt gerado, passar pro Claude Desktop)
+- [ ] Melhorar layout card R$19,90 (prompt gerado, passar pro Claude Desktop)
+- [ ] Adicionar chaves API no n8n: SerpAPI, Tavily, Claude API, PDFShift, GPT-4o
+- [ ] Adicionar coluna cpf na tabela clientes do Supabase (após Stripe habilitar)
+- [ ] Ativar workflows n8n em ordem (WF3→WF1→WF7→WF4→WF5→WF2→WF6→WF8→WF_SUMMARY)
+
+============================================================
+CREDENCIAIS — SALVAS EM PASTA SECRETA
+============================================================
+Ver: /home/felipe/Documents/workspace/refugio-da-pele-interno/secrets.md
+
+============================================================
+Gerado por Claude Code — Refúgio da Pele

@@ -1,0 +1,88 @@
+REFÚGIO DA PELE — RESUMO DA SESSÃO
+Data: 21/03/2026 (Parte 3)
+============================================================
+
+CONTINUAÇÃO DA SESSÃO ANTERIOR
+Arquivo anterior: docs/resumo-sessao-21-03-2026-parte2.txt
+
+============================================================
+ATUALIZAÇÕES E DECISÕES DESTA SESSÃO
+============================================================
+
+1. WF1 — CORREÇÕES E MELHORIAS
+─────────────────────────────────
+- Campo fase_materna: label alterado para "(opcional — para mamães)"
+- Opção padrão: "Não se aplica a mim" (era "Nenhuma das anteriores")
+- Supabase upsert: operação "Create" (Upsert não disponível na versão do n8n)
+- Coluna "origem" adicionada à tabela clientes via SQL
+- Constraints de CHECK removidos das colunas faixa_etaria, fase_materna, preocupacao_pele, status
+- faixa_etaria: expressão ternária converte idade numérica para faixa (13-17, 20-29, etc.)
+- Email: from atualizado para contato@refugiodapele.com.br
+- Enquete 3 dias: adicionada ao fluxo (Wait 3 dias → Z-API Enquete)
+- Google Sheets: adicionadas colunas Idade, Preocupação, Fase Materna
+- Navbar CTA: "Adquirir o Guia" → "Assinar por R$9,90" com link Stripe direto
+
+2. SUPABASE — TABELAS ADICIONADAS
+─────────────────────────────────
+- config: armazena pdf_url_atual (necessária para WF3 e WF7)
+- interacoes: check-ins das clientes via Z-API
+- Coluna origem adicionada à tabela clientes
+- Constraints de CHECK removidos para facilitar inserção
+
+3. WF7 — STRIPE WEBHOOK (NOVO)
+─────────────────────────────────
+- Criado: workflows/wf7-stripe-pagamento.json
+- Fluxo: Webhook → IF checkout.session.completed → Extrair dados
+  → Buscar PDF URL no Supabase → Upsert cliente → Email PDF + Z-API boas-vindas
+- Signing secret: whsec_c0yOstL504LZgfhain0mAIeJ8OqBOWHM
+- Endpoint registrado no Stripe: /webhook/stripe-pagamento
+- Status: INATIVO (aguarda SMTP + substituir SUPABASE_SERVICE_KEY)
+- service_role key Supabase disponível para configurar no WF7
+
+4. STRIPE — BRANDING CONFIGURADO
+─────────────────────────────────
+- Logo: assets/refugio-da-pele-logo-transparente.png (PNG transparente)
+- Ícone: assets/favicon-512.png (gota isolada)
+- Cor da marca: #2c1f18
+- Cor de destaque: #c0513a
+- Produto R$17,90 ARQUIVADO (era valor fixo, não recorrente)
+- Produto ativo: R$9,90/mês recorrente
+
+5. ASSETS DA MARCA
+─────────────────────────────────
+- Extraídos de refugio-da-pele-assets.zip para assets/
+- refugio-da-pele-logo-transparente.png — logo PNG fundo transparente
+- favicon-512.png — ícone da gota
+- favicon-32x32.png, favicon-16x16.png, favicon.ico
+- refugio-da-pele-perfil-facebook.png — foto de perfil FB/Instagram
+- Favicons adicionados ao index.html
+
+6. Z-API — STATUS
+─────────────────────────────────
+- Tentativa de adicionar novo número: plano pago necessário
+- Mantém instância existente: 3F06247099D391366D735EC66E320A44
+- Token: 9FEB7A24EE74CDCBC327832A
+- Client-Token: F212a72ec09cb4f14b062257d320f4573S
+- Webhooks configurados (URLs prontas, workflows a criar):
+  · Ao receber: /webhook/zapi-entrada
+  · Status mensagem: /webhook/zapi-status
+  · Ao conectar: /webhook/zapi-conectar
+  · Ao desconectar: /webhook/zapi-desconectar
+- Botões ativos: rejeitar chamadas, ler mensagens, ler status
+- Config: desabilitar enfileiramento quando desconectado
+
+7. PENDÊNCIAS ATUALIZADAS
+─────────────────────────────────
+PENDENTE:
+  · [ ] Configurar SMTP no n8n (criar email no Hostinger)
+  · [ ] Substituir SUPABASE_SERVICE_KEY no WF7
+  · [ ] Criar produto R$14,90/mês recorrente no Stripe (plano influencer)
+  · [ ] Ativar WF7 após SMTP configurado
+  · [ ] Adicionar chaves SerpAPI + Tavily + Claude API + PDFShift ao n8n
+  · [ ] Criar influencer no Freepik
+  · [ ] Pagar Z-API para usar novo número
+  · [ ] Melhorar layout seção de planos (Claude Desktop)
+  · [ ] Testar WF1 end-to-end completo
+
+============================================================
+Gerado por Claude Code — Refúgio da Pele

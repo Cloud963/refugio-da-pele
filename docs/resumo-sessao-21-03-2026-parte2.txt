@@ -1,0 +1,139 @@
+REFÚGIO DA PELE — RESUMO DA SESSÃO
+Data: 21/03/2026 (Parte 2)
+============================================================
+
+CONTINUAÇÃO DA SESSÃO ANTERIOR
+Arquivo anterior: docs/resumo-sessao-21-03-2026.txt
+
+============================================================
+ATUALIZAÇÕES E DECISÕES DESTA SESSÃO
+============================================================
+
+1. WORKFLOWS CONCLUÍDOS (JSONs gerados e prontos para importar)
+─────────────────────────────────
+WF2 — PDF Semanal
+  · Schedule Segunda 08h → Set Tema → SerpAPI → Tavily → Code(merge) → Claude API
+    → Code(extract) → PDFShift → Set PDF URL → Supabase → Execute WF3
+  · Arquivo: workflows/wf2-pdf-semanal.json
+  · Status: INATIVO (aguarda chaves SerpAPI, Tavily, Claude, PDFShift)
+
+WF3 — Atualização de Link do PDF
+  · Execute Workflow Trigger → Set → Supabase REST PATCH → No Operation
+  · Arquivo: workflows/wf3-atualizacao-link.json
+  · Status: INATIVO (acionado pelo WF2)
+
+WF4 — Ciclo de Vida (Schedule diário 08h)
+  · [A] Aniversário hoje → email por tipo (menor/nova/recorrente)
+  · [B] Completou 18 hoje → FIZ18 (cupom 50% OFF, 30 dias)
+  · [C] 14 dias sem interação → email saudade
+  · [C] 17 dias sem interação → WhatsApp sutil (sem email)
+  · [D] Cancelou → email despedida afetiva
+  · Arquivo: workflows/wf4-ciclo-de-vida.json
+  · Status: IMPORTADO, conectado manualmente no n8n. Credenciais Supabase pendentes (3 nós vermelhos)
+  · Fix aplicado: typeVersion dos nós IF alterado de 3 → 2 (corrigiu "?" nos nós)
+
+WF5 — Eleição de Temas (Schedule Sábado 22h)
+  · Lê aba Feedback → conta temas sugeridos → salva top 3 em "Temas da Semana" → aciona WF2
+  · Arquivo: workflows/wf5-eleicao-temas.json
+  · Status: INATIVO (aguarda abas da planilha)
+
+WF6 — Influencer Domingo (Schedule Domingo 09h)
+  · Lê tema da semana → busca clientes ativas no Supabase → prepara mensagens personalizadas
+    → envia via Z-API em lotes de 10 com espera de 2s entre lotes
+  · Arquivo: workflows/wf6-influencer-domingo.json
+  · Status: INATIVO (aguarda criação da influencer)
+
+2. INDEX.HTML — ATUALIZAÇÕES
+─────────────────────────────────
+- Seção de planos reformulada:
+  · R$14,90 — "Com Presença" (Em breve, esquerda, silhueta misteriosa)
+  · R$9,90 — "Seu Ritual" (ATIVO, centro, featured, único com link de compra)
+  · R$19,90 — "Experiência Completa" (Em breve, direita)
+- Botão "Avise-me quando abrir" nos planos em breve (captura email via modal)
+- Novos campos no formulário: idade, preocupação com a pele, fase materna
+- Quiz corrigido: "Tensa, apertada ou ressecada" → "Ressecada ou com ardência"
+- Modal legal: max-width 860px, padding 36px (era 960px/48px — muito largo)
+
+3. SUPABASE
+─────────────────────────────────
+- URL: https://aftrvqwazdiumibdfjjy.supabase.co
+- 3 tabelas criadas: clientes, cupons, cancelamentos
+- Schema: docs/supabase-schema.sql
+- Credencial no n8n: "Refugio da Pele — Supabase"
+- Pendente: tabela config (link PDF atual) e tabela interacoes
+
+4. PLANILHA GOOGLE SHEETS
+─────────────────────────────────
+- ID: 1RJREELqinbpue4-jkIXkb-Bi_pWMot3oI_Sk4GVQc7o
+- Abas criadas nesta sessão: Feedback, Temas da Semana, Cupons, Cancelamentos
+- Aba existente: "Aba 01 - Leads"
+
+5. META ADS / INSTAGRAM
+─────────────────────────────────
+- Business Manager criado (com dados de Portugal — país de faturamento fixo, não pode alterar)
+- Conta de anúncio criada
+- Instagram criado e associado ao BM via Portfolio
+- Bio do Instagram definida: foco em skincare íntimo feminino
+- Bio do Facebook definida
+- 3 posts orgânicos criados (textos prontos para publicar)
+- Nome pessoal no Instagram: substituir por "Refúgio da Pele" em Editar Perfil → Nome
+- Conta do Facebook pessoal estava restrita → usou conta separada para BM
+- Lista com 200k emails/telefones: mantida de lado por ora (LGPD, usar como Customer Match futuramente)
+
+6. INFLUENCER VIRTUAL
+─────────────────────────────────
+- 1 influencer única por faixa etária (decidido: 1 principal + 1 para 50+)
+- Vídeos curtos (15–40s) via Freepik + Seedance/Hailuo
+- Distribuição exclusiva via Z-API (WhatsApp)
+- Personalização por dados do Supabase (faixa etária, fase materna, preocupação, dias como assinante)
+- Estrutura semanal: Segunda(reset) Terça(educação) Quarta(conexão) Quinta(ajuste) Sexta(progresso)
+  Sábado(autocuidado) Domingo(emocional)
+- Modos: leve(1x/dia) / acompanhamento(2x/dia) / intensivo(3x/dia)
+- XQuAD: NÃO usar (dataset de QA em múltiplos idiomas, não serve para marketing)
+
+7. REPOSITÓRIOS
+─────────────────────────────────
+- Fork do MiroFish: github.com/Cloud963/MiroFish
+- Repo de ferramentas: github.com/Cloud963/cloud963-tools (submódulos: aiox-core, awesome-claude-code-subagents, MiroFish)
+- Localmente em: workspace/tools/
+
+8. PENDÊNCIAS ATUALIZADAS (21/03/2026 — Parte 2)
+─────────────────────────────────
+CONCLUÍDO NESTA SESSÃO:
+  · [x] Criar WF5 e WF6 (JSONs prontos)
+  · [x] Reformular seção de planos no index.html
+  · [x] Adicionar campos novos no formulário (idade, preocupação, fase materna)
+  · [x] Corrigir quiz ("Ressecada ou com ardência")
+  · [x] Corrigir modal (max-width/padding)
+  · [x] Criar abas Feedback, Temas da Semana, Cupons, Cancelamentos na planilha
+  · [x] Criar BM, conta de anúncio, associar Instagram
+  · [x] WF4 conectado manualmente no n8n, IF nodes corrigidos
+
+PENDENTE TÉCNICO:
+  · [ ] Configurar SMTP no n8n (criar email no Hostinger primeiro)
+  · [ ] Corrigir 3 nós Supabase vermelhos no WF4 (selecionar credencial manualmente)
+  · [ ] Ativar WF4 após corrigir credenciais
+  · [ ] Criar tabela config no Supabase (para link do PDF)
+  · [ ] Criar tabela interacoes no Supabase
+  · [ ] Adicionar chaves SerpAPI + Tavily + Claude API + PDFShift ao n8n
+  · [ ] Importar WF2, WF3, WF5, WF6 no n8n
+  · [ ] Atualizar WF1 com novos campos (idade, preocupação, fase materna) → Google Sheets
+  · [ ] Adicionar enquete 3 dias após entrega ao WF1
+  · [ ] Integrar Stripe webhook → n8n → entrega PDF
+  · [ ] Testar WF1 completo end-to-end
+  · [ ] Criar influencer no Freepik (aparência fixa)
+  · [ ] Criar imagens estáticas da influencer para o site
+  · [ ] Definir sistema de cupons no checkout
+  · [ ] Configurar Z-API webhook de entrada (receber respostas das clientes)
+  · [ ] Remover nome pessoal do Instagram (Editar Perfil → Nome → "Refúgio da Pele")
+  · [ ] Criar conteúdo visual (Canva) para posts e anúncios
+  · [ ] Conectar domínio de email ao n8n via SMTP
+
+REMOVIDO (decisão definitiva):
+  · Caixa postal — não agora
+  · CNPJ — não agora
+  · Regra de 45 dias de inatividade (substituída por 14/17 dias)
+  · XQuAD como fonte de conteúdo (dataset inadequado)
+
+============================================================
+Gerado por Claude Code — Refúgio da Pele
