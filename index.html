@@ -2335,6 +2335,19 @@ Uma rotina simples de 3 passos que respeita quem você já é.
         .plan-notify-input:focus { border-color:rgba(196,104,62,0.5); }
         .plan-notify-sent { font-size:11px; color:var(--sage); text-align:center; padding:12px 0; letter-spacing:0.06em; }
         .plans-guarantee { text-align:center; font-size:11px; color:rgba(107,87,68,0.4); letter-spacing:0.1em; display:flex; align-items:center; justify-content:center; gap:6px; padding-top:4px; }
+        /* ── CARD PREMIUM R$19,90 ── */
+        .plan-card-premium { border-color:rgba(200,164,140,0.35); background:linear-gradient(170deg,rgba(247,240,230,0.65) 0%,rgba(200,164,140,0.1) 100%); }
+        .plan-card-premium:hover { border-color:rgba(200,164,140,0.55); }
+        .plan-badge-premium { position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:linear-gradient(90deg,#c0513a 0%,#C8A48C 48%,#c0513a 100%); color:white; font-size:9px; letter-spacing:0.18em; text-transform:uppercase; font-family:'DM Sans',sans-serif; font-weight:600; padding:4px 16px; white-space:nowrap; }
+        .plan-premium-icon { width:64px; height:64px; margin:0 auto 16px; position:relative; display:flex; align-items:center; justify-content:center; }
+        .premium-ring-outer { position:absolute; inset:0; border:1px solid rgba(200,164,140,0.5); border-radius:50%; }
+        .premium-ring-inner { position:absolute; inset:10px; border:1px solid rgba(192,81,58,0.2); border-radius:50%; }
+        .premium-glyph { font-size:20px; color:#C8A48C; position:relative; z-index:1; line-height:1; }
+        .premium-leaf { position:absolute; font-size:9px; color:rgba(192,81,58,0.45); line-height:1; }
+        .premium-leaf-1 { top:8px; left:50%; transform:translateX(-50%); }
+        .premium-leaf-2 { bottom:8px; left:50%; transform:translateX(-50%); }
+        .plan-cta-premium { width:100%; padding:13px 16px; border:1.5px solid rgba(200,164,140,0.4); cursor:pointer; font-family:'DM Sans',sans-serif; font-size:11px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; transition:all 0.2s; background:transparent; color:rgba(107,87,68,0.6); }
+        .plan-cta-premium:hover { border-color:#C8A48C; color:#c0513a; background:rgba(200,164,140,0.08); }
         @media(max-width:580px){ .plans-grid{grid-template-columns:1fr;} }
       </style>
       <script>
@@ -2400,27 +2413,33 @@ Uma rotina simples de 3 passos que respeita quem você já é.
         </div>
 
         <!-- PLANO 3 - R$19,90 - EM BREVE -->
-        <div class="plan-card locked">
-          <div class="plan-badge-soon">🔒 Em breve</div>
-          <div class="plan-icon" style="opacity:0.25">✨</div>
+        <div class="plan-card locked plan-card-premium">
+          <div class="plan-badge-premium">✦ Em Breve</div>
+          <div class="plan-premium-icon">
+            <div class="premium-ring-outer"></div>
+            <div class="premium-ring-inner"></div>
+            <span class="premium-glyph">✦</span>
+            <span class="premium-leaf premium-leaf-1">◈</span>
+            <span class="premium-leaf premium-leaf-2">◈</span>
+          </div>
           <div class="plan-name">Experiência Completa</div>
-          <div class="plan-tagline">A versão mais completa do Refúgio</div>
+          <div class="plan-tagline">Não é mais conteúdo. É uma relação com a sua pele.</div>
           <div class="plan-price">
             <span class="plan-price-val">R$19,90</span>
             <span class="plan-price-period">por mês · assinatura</span>
           </div>
           <ul class="plan-features">
-            <li><span class="check">✦</span> Tudo dos planos anteriores</li>
-            <li><span class="check">✦</span> <strong>Conteúdo exclusivo premium</strong></li>
-            <li><span class="check">✦</span> Acesso prioritário a novidades</li>
-            <li><span class="check">✦</span> Comunidade fechada de assinantes</li>
-            <li><span class="check">✦</span> Cancele a qualquer momento</li>
+            <li><span class="check">✦</span> Tudo do plano anterior</li>
+            <li><span class="check">✦</span> <strong>Influencer semanal no seu WhatsApp</strong></li>
+            <li><span class="check">✦</span> Comunidade privada exclusiva</li>
+            <li><span class="check">✦</span> Guia completo sempre atualizado</li>
+            <li><span class="check">✦</span> Conteúdo premium em primeira mão</li>
           </ul>
           <div class="plan-notify" id="notify-form-3">
             <input type="email" id="notify-email-3" class="plan-notify-input" placeholder="seu@email.com">
             <button class="plan-cta plan-cta-soon" onclick="submitNotify(3,'Experiência Completa')">Quero ser avisada →</button>
           </div>
-          <button class="plan-cta plan-cta-soon" id="notify-btn-3" onclick="notifyPlan(3)">Avise-me quando abrir</button>
+          <button class="plan-cta plan-cta-premium" id="notify-btn-3" onclick="notifyPlan(3)">Quero a Experiência →</button>
         </div>
 
       </div>
