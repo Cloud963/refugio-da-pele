@@ -2335,6 +2335,13 @@ Uma rotina simples de 3 passos que respeita quem você já é.
         .plan-notify-input:focus { border-color:rgba(196,104,62,0.5); }
         .plan-notify-sent { font-size:11px; color:var(--sage); text-align:center; padding:12px 0; letter-spacing:0.06em; }
         .plans-guarantee { text-align:center; font-size:11px; color:rgba(107,87,68,0.4); letter-spacing:0.1em; display:flex; align-items:center; justify-content:center; gap:6px; padding-top:4px; }
+        /* ── CARD R$14,90 — SILHUETA CSS ── */
+        .plan-silhouette-css { width:100%; height:160px; margin:0 0 0; position:relative; overflow:hidden; background:linear-gradient(180deg,rgba(61,43,31,0.04) 0%,rgba(196,104,62,0.09) 100%); }
+        .plan-silhouette-css::before { content:''; position:absolute; bottom:-10px; left:50%; transform:translateX(-50%); width:90px; height:148px; background:linear-gradient(180deg,rgba(61,43,31,0.28) 0%,rgba(61,43,31,0.12) 100%); border-radius:48% 48% 0 0; filter:blur(10px); }
+        .plan-silhouette-css::after { content:''; position:absolute; top:14px; left:50%; transform:translateX(-50%); width:34px; height:38px; background:rgba(61,43,31,0.32); border-radius:50%; filter:blur(7px); }
+        .plan-silhouette-glow { position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:130px; height:50px; background:radial-gradient(ellipse,rgba(196,104,62,0.22) 0%,transparent 70%); pointer-events:none; }
+        .plan-silhouette-label { position:absolute; bottom:10px; left:0; right:0; text-align:center; font-family:'Cormorant Garamond',serif; font-size:11px; font-style:italic; color:rgba(196,104,62,0.55); letter-spacing:0.12em; }
+        .plan-waiting { font-size:10px; color:rgba(107,87,68,0.45); text-align:center; letter-spacing:0.06em; margin:10px 0 14px; font-family:'DM Sans',sans-serif; }
         /* ── CARD PREMIUM R$19,90 ── */
         .plan-card-premium { border-color:rgba(200,164,140,0.35); background:linear-gradient(170deg,rgba(247,240,230,0.65) 0%,rgba(200,164,140,0.1) 100%); }
         .plan-card-premium:hover { border-color:rgba(200,164,140,0.55); }
@@ -2369,9 +2376,11 @@ Uma rotina simples de 3 passos que respeita quem você já é.
         <!-- PLANO 1 - R$14,90 - EM BREVE (influencer) -->
         <div class="plan-card locked">
           <div class="plan-badge-soon">🔒 Em breve</div>
-          <div class="plan-silhouette" style="width:100%;height:160px;margin:0 0 14px;padding:0;background:none;border:none;border-radius:0;overflow:hidden;">
-            <img src="assets/influencer-silhueta.jpg" alt="Com Presença" style="width:100%;height:100%;object-fit:cover;object-position:center top;filter:brightness(0.92);display:block;">
+          <div class="plan-silhouette-css">
+            <div class="plan-silhouette-glow"></div>
+            <div class="plan-silhouette-label">ela está chegando.</div>
           </div>
+          <div class="plan-waiting">✦ 247 pessoas já na espera</div>
           <div class="plan-name">Com Presença</div>
           <div class="plan-tagline">Alguém especial faz parte deste plano</div>
           <div class="plan-price">
@@ -2389,7 +2398,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
             <input type="email" id="notify-email-1" class="plan-notify-input" placeholder="seu@email.com">
             <button class="plan-cta plan-cta-soon" onclick="submitNotify(1,'Com Presença')">Quero ser avisada →</button>
           </div>
-          <button class="plan-cta plan-cta-soon" id="notify-btn-1" onclick="notifyPlan(1)">Avise-me quando abrir</button>
+          <button class="plan-cta plan-cta-soon" id="notify-btn-1" onclick="notifyPlan(1)">Quero saber antes →</button>
         </div>
 
         <!-- PLANO 2 - R$9,90 - ATIVO (featured, centro) -->
