@@ -9,10 +9,7 @@
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
-      "position": [
-        208,
-        16
-      ],
+      "position": [208, 16],
       "id": "8862ffe4-a97d-4b00-8f3d-6f64964931ef",
       "name": "Webhook",
       "webhookId": "d721210c-0536-40c0-b36d-03547488de6d"
@@ -24,7 +21,7 @@
             {
               "id": "56a5be6e-07bb-45de-85bf-2007814bc385",
               "name": "nome",
-              "value": "=  {{$json.body.nome}}",
+              "value": "={{$json.body.nome}}",
               "type": "string"
             },
             {
@@ -38,6 +35,24 @@
               "name": "whatsapp",
               "value": "={{$json.body.whatsapp}}",
               "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-1001-1001-1001-100000000001",
+              "name": "idade",
+              "value": "={{$json.body.idade}}",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-1001-1001-1001-100000000002",
+              "name": "preocupacao",
+              "value": "={{$json.body.preocupacao}}",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-1001-1001-1001-100000000003",
+              "name": "fase_materna",
+              "value": "={{$json.body.fase_materna}}",
+              "type": "string"
             }
           ]
         },
@@ -46,79 +61,39 @@
       },
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [
-        352,
-        16
-      ],
+      "position": [400, 16],
       "id": "e431be52-756f-4a78-8c33-7d2d3963ed42",
       "name": "Organizar Lead"
     },
     {
       "parameters": {
-        "fromEmail": "refugiodapele@gmail.com",
-        "toEmail": "={{$json.email}}",
-        "subject": "=Seu Protocolo Gratuito Chegou! 🌿 - Refúgio da Pele",
-        "html": "= <div style=\"font-family: Georgia, serif; max-width: 520px; margin: 0 auto; background: #fff8f5; padding: 40px 32px; border-radius: 12px;\">\n\n    <img src=\"https://refugiodapele.com.br/logo.png\" alt=\"Refúgio da Pele\" style=\"width: 120px; margin-bottom: 32px; display: block;\">\n\n    <h2 style=\"color: #7a3b2e; font-size: 22px; margin: 0 0 16px;\">\n      Olá, {{$json.nome}} 🌿\n    </h2>\n\n    <p style=\"color: #5a3a2e; font-size: 15px; line-height: 1.7; margin: 0 0 20px;\">\n      Seu <strong>Protocolo Gratuito de 3 Passos para Pele Sensível</strong> está aqui.\n      Preparamos esse guia com muito cuidado para te ajudar a criar uma rotina simples,\n      natural e eficiente.\n    </p>\n\n    <a href=\"https://raw.githubusercontent.com/Cloud963/refugio-da-pele/main/downloads/guia-gratuito.pdf\"\n       style=\"display: inline-block; background: #c0513a; color: #fff; text-decoration: none;\n              padding: 14px 28px; border-radius: 8px; font-size: 14px; font-weight: bold;\n              letter-spacing: 0.05em; margin-bottom: 28px;\">\n      📥 Baixar meu Protocolo\n    </a>\n\n    <p style=\"color: #5a3a2e; font-size: 14px; line-height: 1.7; margin: 0 0 8px;\">\n      Se tiver qualquer dúvida, é só responder este email. Estamos aqui. 💚\n    </p>\n\n    <hr style=\"border: none; border-top: 1px solid #e8d5cc; margin: 28px 0;\">\n\n    <p style=\"color: #b08070; font-size: 12px; text-align: center; margin: 0;\">\n      Refúgio da Pele · refugiodapele.com.br\n    </p>\n\n  </div>",
-        "options": {
-          "attachments": "data"
+        "operation": "upsert",
+        "tableId": "clientes",
+        "fieldsUi": {
+          "fieldValues": [
+            { "fieldId": "nome", "fieldValue": "={{$json.nome}}" },
+            { "fieldId": "email", "fieldValue": "={{$json.email}}" },
+            { "fieldId": "telefone", "fieldValue": "={{$json.whatsapp}}" },
+            { "fieldId": "faixa_etaria", "fieldValue": "={{$json.idade}}" },
+            { "fieldId": "preocupacao_pele", "fieldValue": "={{$json.preocupacao}}" },
+            { "fieldId": "fase_materna", "fieldValue": "={{$json.fase_materna}}" },
+            { "fieldId": "origem", "fieldValue": "={{$json.origem}}" },
+            { "fieldId": "status", "fieldValue": "ativa" },
+            { "fieldId": "ultima_interacao", "fieldValue": "={{$now}}" }
+          ]
         }
       },
-      "type": "n8n-nodes-base.emailSend",
-      "typeVersion": 2.1,
-      "position": [
-        768,
-        112
-      ],
-      "id": "e5a7eb1a-02d4-4168-91c0-5d4a0d5450e8",
-      "name": "Send an Email",
-      "webhookId": "d5c281f7-a94b-492e-8a53-8292d5d45f74",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [600, 16],
+      "id": "a1b2c3d4-2001-2001-2001-200000000001",
+      "name": "Supabase — Upsert Cliente",
       "credentials": {
-        "smtp": {
-          "id": "LQzuLvKBJ7VqTETa",
-          "name": "SMTP account"
+        "supabaseApi": {
+          "id": "SUPABASE_CREDENTIAL_ID",
+          "name": "Refugio da Pele — Supabase"
         }
       }
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://api.z-api.io/instances/3F06247099D391366D735EC66E320A44/token/9FEB7A24EE74CDCBC327832A/send-text",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Client-Token",
-              "value": " F212a72ec09cb4f14b062257d320f4573S"
-            },
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        },
-        "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "phone",
-              "value": "={{$json.whatsapp}}"
-            },
-            {
-              "name": "message",
-              "value": "=Olá, {{$json.nome}}! 🌿\\n\\nSeu Protocolo Gratuito de 3 Passos para Pele Sensível foi enviado para *{{$json.email}}*.\\n\\nCaso não encontre, verifique a caixa de spam.  │     │         │ 📩\\n\\nQualquer dúvida é só falar aqui. 💚\\n\\n— Refúgio da Pele "
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
-      "position": [
-        768,
-        -64
-      ],
-      "id": "5d2866a5-9106-4ddf-85c9-a73b00baed9c",
-      "name": "HTTP Request"
     },
     {
       "parameters": {
@@ -139,68 +114,26 @@
           "mappingMode": "defineBelow",
           "value": {
             "Data": "={{$json.data}}",
-            "Nome": "={{$json.nome}} ",
-            "Email": "={{$json.email}} ",
-            "WhatsApp": "={{$json.whatsapp}} ",
-            "Origem": "={{$json.origem}} ",
-            "PDF da Semana": "={{$json.pagina}} "
+            "Nome": "={{$json.nome}}",
+            "Email": "={{$json.email}}",
+            "WhatsApp": "={{$json.whatsapp}}",
+            "Idade": "={{$json.idade}}",
+            "Preocupação": "={{$json.preocupacao}}",
+            "Fase Materna": "={{$json.fase_materna}}",
+            "Origem": "={{$json.origem}}",
+            "PDF da Semana": "={{$json.pagina}}"
           },
           "matchingColumns": [],
           "schema": [
-            {
-              "id": "Data",
-              "displayName": "Data",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Nome",
-              "displayName": "Nome",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Email",
-              "displayName": "Email",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "WhatsApp",
-              "displayName": "WhatsApp",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Origem",
-              "displayName": "Origem",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "PDF da Semana",
-              "displayName": "PDF da Semana",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            }
+            { "id": "Data", "displayName": "Data", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "Nome", "displayName": "Nome", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "Email", "displayName": "Email", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "WhatsApp", "displayName": "WhatsApp", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "Idade", "displayName": "Idade", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "Preocupação", "displayName": "Preocupação", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "Fase Materna", "displayName": "Fase Materna", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "Origem", "displayName": "Origem", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "PDF da Semana", "displayName": "PDF da Semana", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true }
           ],
           "attemptToConvertTypes": false,
           "convertFieldsToString": false
@@ -209,10 +142,7 @@
       },
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
-      "position": [
-        528,
-        16
-      ],
+      "position": [800, 16],
       "id": "1fb42cdd-4114-4d95-a908-6bec57e31c6a",
       "name": "Append row in sheet",
       "credentials": {
@@ -221,47 +151,115 @@
           "name": "Google Sheets account"
         }
       }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.z-api.io/instances/3F06247099D391366D735EC66E320A44/token/9FEB7A24EE74CDCBC327832A/send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Client-Token", "value": "F212a72ec09cb4f14b062257d320f4573S" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "phone", "value": "={{$json.whatsapp}}" },
+            { "name": "message", "value": "=Olá, {{$json.nome}}! 🌿\n\nSeu Protocolo Gratuito de 3 Passos para Pele Sensível foi enviado para *{{$json.email}}*.\n\nCaso não encontre, verifique a caixa de spam. 📩\n\nQualquer dúvida é só falar aqui. 💚\n\n— Refúgio da Pele" }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [1000, -100],
+      "id": "5d2866a5-9106-4ddf-85c9-a73b00baed9c",
+      "name": "Z-API — Confirmação WhatsApp"
+    },
+    {
+      "parameters": {
+        "fromEmail": "contato@refugiodapele.com.br",
+        "toEmail": "={{$json.email}}",
+        "subject": "=Seu Protocolo Gratuito Chegou! 🌿 - Refúgio da Pele",
+        "html": "=<div style=\"font-family: Georgia, serif; max-width: 520px; margin: 0 auto; background: #fff8f5; padding: 40px 32px; border-radius: 12px;\">\n\n  <img src=\"https://refugiodapele.com.br/logo.png\" alt=\"Refúgio da Pele\" style=\"width: 120px; margin-bottom: 32px; display: block;\">\n\n  <h2 style=\"color: #7a3b2e; font-size: 22px; margin: 0 0 16px;\">\n    Olá, {{$json.nome}} 🌿\n  </h2>\n\n  <p style=\"color: #5a3a2e; font-size: 15px; line-height: 1.7; margin: 0 0 20px;\">\n    Seu <strong>Protocolo Gratuito de 3 Passos para Pele Sensível</strong> está aqui.\n    Preparamos esse guia com muito cuidado para te ajudar a criar uma rotina simples,\n    natural e eficiente.\n  </p>\n\n  <a href=\"https://raw.githubusercontent.com/Cloud963/refugio-da-pele/main/downloads/guia-gratuito.pdf\"\n     style=\"display: inline-block; background: #c0513a; color: #fff; text-decoration: none;\n            padding: 14px 28px; border-radius: 8px; font-size: 14px; font-weight: bold;\n            letter-spacing: 0.05em; margin-bottom: 28px;\">\n    📥 Baixar meu Protocolo\n  </a>\n\n  <p style=\"color: #5a3a2e; font-size: 14px; line-height: 1.7; margin: 0 0 8px;\">\n    Se tiver qualquer dúvida, é só responder este email. Estamos aqui. 💚\n  </p>\n\n  <hr style=\"border: none; border-top: 1px solid #e8d5cc; margin: 28px 0;\">\n\n  <p style=\"color: #b08070; font-size: 12px; text-align: center; margin: 0;\">\n    Refúgio da Pele · refugiodapele.com.br\n  </p>\n\n</div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1000, 150],
+      "id": "e5a7eb1a-02d4-4168-91c0-5d4a0d5450e8",
+      "name": "Send an Email",
+      "credentials": {
+        "smtp": {
+          "id": "LQzuLvKBJ7VqTETa",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resume": "timeInterval",
+        "unit": "days",
+        "amount": 3
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [1200, 150],
+      "id": "a1b2c3d4-3001-3001-3001-300000000001",
+      "name": "Aguardar 3 Dias",
+      "webhookId": "a1b2c3d4-3001-3001-3001-300000000002"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.z-api.io/instances/3F06247099D391366D735EC66E320A44/token/9FEB7A24EE74CDCBC327832A/send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Client-Token", "value": "F212a72ec09cb4f14b062257d320f4573S" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "phone", "value": "={{$json.whatsapp}}" },
+            { "name": "message", "value": "=Oi, {{$json.nome}}! 🌿\n\nJá faz 3 dias desde que você recebeu o seu guia. O que achou?\n\n1️⃣ Amei — continue assim\n2️⃣ Pode melhorar\n3️⃣ Tenho uma sugestão de tema\n\nResponda aqui com o número da sua opinião 💛\n— Refúgio da Pele" }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [1400, 150],
+      "id": "a1b2c3d4-4001-4001-4001-400000000001",
+      "name": "Z-API — Enquete 3 Dias"
     }
   ],
   "pinData": {},
   "connections": {
     "Webhook": {
-      "main": [
-        [
-          {
-            "node": "Organizar Lead",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Organizar Lead", "type": "main", "index": 0 }]]
     },
     "Organizar Lead": {
-      "main": [
-        [
-          {
-            "node": "Append row in sheet",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Supabase — Upsert Cliente", "type": "main", "index": 0 }]]
+    },
+    "Supabase — Upsert Cliente": {
+      "main": [[{ "node": "Append row in sheet", "type": "main", "index": 0 }]]
     },
     "Append row in sheet": {
-      "main": [
-        [
-          {
-            "node": "HTTP Request",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Send an Email",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[
+        { "node": "Z-API — Confirmação WhatsApp", "type": "main", "index": 0 },
+        { "node": "Send an Email", "type": "main", "index": 0 }
+      ]]
+    },
+    "Send an Email": {
+      "main": [[{ "node": "Aguardar 3 Dias", "type": "main", "index": 0 }]]
+    },
+    "Aguardar 3 Dias": {
+      "main": [[{ "node": "Z-API — Enquete 3 Dias", "type": "main", "index": 0 }]]
     }
   },
   "active": false,

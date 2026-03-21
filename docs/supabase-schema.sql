@@ -63,3 +63,34 @@ CREATE POLICY "service role full access cupons"
 CREATE POLICY "service role full access cancelamentos"
   ON public.cancelamentos FOR ALL
   USING (true);
+
+-- TABELA: config (armazena configurações dinâmicas, ex: link do PDF atual)
+CREATE TABLE public.config (
+  key TEXT PRIMARY KEY,
+  value TEXT,
+  atualizado_em TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Inserir chave inicial do PDF
+INSERT INTO public.config (key, value) VALUES ('pdf_url_atual', '');
+
+ALTER TABLE public.config ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "service role full access config"
+  ON public.config FOR ALL
+  USING (true);
+
+-- TABELA: interacoes (check-ins das clientes via Z-API)
+CREATE TABLE public.interacoes (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  cliente_email TEXT REFERENCES public.clientes(email) ON DELETE CASCADE,
+  tipo TEXT CHECK (tipo IN ('check-in','resposta-enquete','resposta-whatsapp','abertura-email')),
+  conteudo TEXT,
+  criado_em TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+ALTER TABLE public.interacoes ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "service role full access interacoes"
+  ON public.interacoes FOR ALL
+  USING (true);
