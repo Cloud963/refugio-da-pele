@@ -1,0 +1,45 @@
+REFÚGIO DA PELE — RESUMO DA SESSÃO
+Data: 21/03/2026 (Parte 4)
+============================================================
+
+CONTINUAÇÃO DA SESSÃO ANTERIOR
+Arquivo anterior: docs/resumo-sessao-21-03-2026-parte3.txt
+
+============================================================
+ATUALIZAÇÕES E DECISÕES DESTA SESSÃO
+============================================================
+
+1. PROMPTS GERADOS PARA CLAUDE DESKTOP
+─────────────────────────────────
+Dois prompts criados para enviar ao Claude Desktop para edição do index.html:
+
+PROMPT 1 — Layout geral dos planos:
+- Melhorar presença visual e elegância da seção de planos
+- Plano central R$9,90 mais imponente
+- Planos Em breve com aparência de mistério e antecipação
+- Manter funcionalidades JS intactas
+- Commit + push no branch main
+
+PROMPT 2 — Cards individuais dos planos Em breve:
+- R$14,90 "Com Presença": silhueta feminina desfocada/sombra da influencer
+  ainda não revelada, gatilhos de curiosidade/ansiedade/desejo,
+  contagem regressiva decorativa, "X pessoas na lista de espera"
+- R$19,90 "Experiência Completa": fusão visual PDF + influencer + premium,
+  sensação de completude, "para quem leva a pele a sério"
+- Paleta, tipografia e regras técnicas detalhadas
+
+2. BACKUP DO PROJETO
+─────────────────────────────────
+- Todos os resumos de sessão salvos em docs/
+- Memória do projeto copiada para docs/memory-project.md
+- Índice de memórias copiado para docs/memory-index.md
+
+3. DECISÕES CONFIRMADAS
+─────────────────────────────────
+- PDF semanal: chamada fixa no produto Stripe (não muda a cada semana)
+  WF2→WF3 cuidam da atualização do link automaticamente
+- Produto R$17,90 arquivado no Stripe (era valor fixo, não recorrente)
+- PENDENTE: criar produto R$14,90/mês recorrente quando lançar influencer
+
+============================================================
+Gerado por Claude Code — Refúgio da Pele
