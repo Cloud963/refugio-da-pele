@@ -74,7 +74,7 @@
             { "fieldId": "nome", "fieldValue": "={{$json.nome}}" },
             { "fieldId": "email", "fieldValue": "={{$json.email}}" },
             { "fieldId": "telefone", "fieldValue": "={{$json.whatsapp}}" },
-            { "fieldId": "faixa_etaria", "fieldValue": "={{$json.idade}}" },
+            { "fieldId": "faixa_etaria", "fieldValue": "={{ Number($json.idade) <= 17 ? '13-17' : Number($json.idade) <= 29 ? '20-29' : Number($json.idade) <= 39 ? '30-39' : Number($json.idade) <= 49 ? '40-49' : Number($json.idade) <= 59 ? '50+' : '60+' }}" },
             { "fieldId": "preocupacao_pele", "fieldValue": "={{$json.preocupacao}}" },
             { "fieldId": "fase_materna", "fieldValue": "={{$json.fase_materna}}" },
             { "fieldId": "origem", "fieldValue": "={{$json.origem}}" },
