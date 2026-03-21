@@ -1,0 +1,250 @@
+{
+  "name": "WF7 — Stripe Webhook (Pagamento)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "stripe-pagamento",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [200, 300],
+      "id": "wf7-0001-0001-0001-000000000001",
+      "name": "Webhook — Stripe",
+      "webhookId": "wf7-0001-0001-0001-000000000002"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "wf7-cond-001",
+              "leftValue": "={{ $json.body.type }}",
+              "rightValue": "checkout.session.completed",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [420, 300],
+      "id": "wf7-0002-0002-0002-000000000001",
+      "name": "IF — checkout.session.completed"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "wf7-set-001",
+              "name": "email",
+              "value": "={{ $json.body.data.object.customer_email }}",
+              "type": "string"
+            },
+            {
+              "id": "wf7-set-002",
+              "name": "nome",
+              "value": "={{ $json.body.data.object.customer_details.name }}",
+              "type": "string"
+            },
+            {
+              "id": "wf7-set-003",
+              "name": "telefone",
+              "value": "={{ $json.body.data.object.customer_details.phone }}",
+              "type": "string"
+            },
+            {
+              "id": "wf7-set-004",
+              "name": "stripe_session_id",
+              "value": "={{ $json.body.data.object.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [640, 220],
+      "id": "wf7-0003-0003-0003-000000000001",
+      "name": "Extrair Dados do Pagamento"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://aftrvqwazdiumibdfjjy.supabase.co/rest/v1/config?key=eq.pdf_url_atual&select=value",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "SUPABASE_SERVICE_KEY" },
+            { "name": "Authorization", "value": "Bearer SUPABASE_SERVICE_KEY" }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [860, 220],
+      "id": "wf7-0004-0004-0004-000000000001",
+      "name": "Supabase — Buscar PDF URL"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "wf7-set-005",
+              "name": "pdf_url",
+              "value": "={{ $json[0].value || 'https://raw.githubusercontent.com/Cloud963/refugio-da-pele/main/downloads/guia-gratuito.pdf' }}",
+              "type": "string"
+            },
+            {
+              "id": "wf7-set-006",
+              "name": "email",
+              "value": "={{ $('Extrair Dados do Pagamento').item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "wf7-set-007",
+              "name": "nome",
+              "value": "={{ $('Extrair Dados do Pagamento').item.json.nome }}",
+              "type": "string"
+            },
+            {
+              "id": "wf7-set-008",
+              "name": "telefone",
+              "value": "={{ $('Extrair Dados do Pagamento').item.json.telefone }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1080, 220],
+      "id": "wf7-0005-0005-0005-000000000001",
+      "name": "Montar Payload Final"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://aftrvqwazdiumibdfjjy.supabase.co/rest/v1/clientes",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "SUPABASE_SERVICE_KEY" },
+            { "name": "Authorization", "value": "Bearer SUPABASE_SERVICE_KEY" },
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Prefer", "value": "resolution=merge-duplicates" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={{ JSON.stringify({ email: $json.email, nome: $json.nome, telefone: $json.telefone, status: 'ativa', ultima_interacao: new Date().toISOString() }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1300, 220],
+      "id": "wf7-0006-0006-0006-000000000001",
+      "name": "Supabase — Upsert Cliente Assinante"
+    },
+    {
+      "parameters": {
+        "fromEmail": "contato@refugiodapele.com.br",
+        "toEmail": "={{ $json.email }}",
+        "subject": "Bem-vinda ao Refúgio da Pele 🌿 Seu primeiro guia chegou!",
+        "html": "=<div style=\"font-family: Georgia, serif; max-width: 520px; margin: 0 auto; background: #fff8f5; padding: 40px 32px; border-radius: 12px;\">\n\n  <img src=\"https://refugiodapele.com.br/logo.png\" alt=\"Refúgio da Pele\" style=\"width: 120px; margin-bottom: 32px; display: block;\">\n\n  <h2 style=\"color: #7a3b2e; font-size: 22px; margin: 0 0 16px;\">\n    Bem-vinda, {{ $json.nome }} 🌸\n  </h2>\n\n  <p style=\"color: #5a3a2e; font-size: 15px; line-height: 1.7; margin: 0 0 20px;\">\n    Sua assinatura foi confirmada com sucesso! Preparamos o seu primeiro guia com muito carinho.\n    Todo conteúdo foi pensado para a <strong>sua pele</strong>, com dicas naturais, práticas e sem complicação.\n  </p>\n\n  <a href=\"{{ $json.pdf_url }}\"\n     style=\"display: inline-block; background: #c0513a; color: #fff; text-decoration: none;\n            padding: 14px 28px; border-radius: 8px; font-size: 14px; font-weight: bold;\n            letter-spacing: 0.05em; margin-bottom: 28px;\">\n    📥 Acessar meu guia\n  </a>\n\n  <p style=\"color: #5a3a2e; font-size: 14px; line-height: 1.7; margin: 0 0 8px;\">\n    A cada semana você recebe um novo guia atualizado. Fique à vontade para responder este email com dúvidas ou sugestões 💚\n  </p>\n\n  <hr style=\"border: none; border-top: 1px solid #e8d5cc; margin: 28px 0;\">\n\n  <p style=\"color: #b08070; font-size: 12px; text-align: center; margin: 0;\">\n    Refúgio da Pele · refugiodapele.com.br\n  </p>\n\n</div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1520, 140],
+      "id": "wf7-0007-0007-0007-000000000001",
+      "name": "Email — Entregar PDF ao Assinante",
+      "credentials": {
+        "smtp": {
+          "id": "LQzuLvKBJ7VqTETa",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.z-api.io/instances/3F06247099D391366D735EC66E320A44/token/9FEB7A24EE74CDCBC327832A/send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Client-Token", "value": "F212a72ec09cb4f14b062257d320f4573S" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={{ JSON.stringify({ phone: '55' + $json.telefone.replace(/\\D/g, ''), message: 'Olá, ' + $json.nome + '! 🌿\\n\\nSua assinatura do Refúgio da Pele foi confirmada! 🎉\\n\\nSeu guia foi enviado para ' + $json.email + '.\\n\\nA cada semana você recebe conteúdo novo. Qualquer dúvida é só falar aqui 💛\\n\\n— Refúgio da Pele' }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1520, 320],
+      "id": "wf7-0008-0008-0008-000000000001",
+      "name": "Z-API — Boas-vindas WhatsApp"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [640, 440],
+      "id": "wf7-0009-0009-0009-000000000001",
+      "name": "Ignorar — Evento Inválido"
+    }
+  ],
+  "connections": {
+    "Webhook — Stripe": {
+      "main": [[{ "node": "IF — checkout.session.completed", "type": "main", "index": 0 }]]
+    },
+    "IF — checkout.session.completed": {
+      "main": [
+        [{ "node": "Extrair Dados do Pagamento", "type": "main", "index": 0 }],
+        [{ "node": "Ignorar — Evento Inválido", "type": "main", "index": 0 }]
+      ]
+    },
+    "Extrair Dados do Pagamento": {
+      "main": [[{ "node": "Supabase — Buscar PDF URL", "type": "main", "index": 0 }]]
+    },
+    "Supabase — Buscar PDF URL": {
+      "main": [[{ "node": "Montar Payload Final", "type": "main", "index": 0 }]]
+    },
+    "Montar Payload Final": {
+      "main": [[{ "node": "Supabase — Upsert Cliente Assinante", "type": "main", "index": 0 }]]
+    },
+    "Supabase — Upsert Cliente Assinante": {
+      "main": [[
+        { "node": "Email — Entregar PDF ao Assinante", "type": "main", "index": 0 },
+        { "node": "Z-API — Boas-vindas WhatsApp", "type": "main", "index": 0 }
+      ]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "wf7-stripe-0001-0001-0001",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b3f36ad4b8a579dd86116dc9449ee81a2e4c05ad27fc75bf5538fe5592ed48cb"
+  },
+  "id": "WF7StripePagamentoRefugio",
+  "tags": []
+}
