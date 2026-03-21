@@ -14,7 +14,7 @@ ORQUESTRADOR: Claude (você está lendo isso)
 
 | Horário | Workflow | Ação |
 |---------|----------|------|
-| Sáb 22h | WF5 | Elege temas da semana seguinte |
+| Sáb 22h | WF5 | Pesquisa clima + elege temas da semana seguinte |
 | Dom 06h | WF2 | Gera PDF + upload Google Drive |
 | Dom 09h | WF6 | Influencer envia mensagem semanal via Z-API |
 | Dom 17h | WF_SUMMARY | Claude envia resumo semanal ao dono via WhatsApp |
@@ -56,6 +56,23 @@ Dom 17h — Dona revisa no resumo semanal
 Dom 20h — Deadline para APROVAR ou CANCELAR
 Seg 08h (semana seguinte) — Conteúdo publicado/enviado
 ```
+
+---
+
+## Regra do Clima (WF5 — obrigatório)
+
+O WF5 deve sempre combinar **3 elementos** para compor o tema semanal:
+
+1. **Tema principal** — escolhido com base no calendário, histórico e perfil das assinantes
+2. **Curiosidade** — dado ou fato surpreendente sobre skincare relacionado ao tema
+3. **Clima da semana** — previsão do tempo pesquisada via SerpAPI/Tavily para o Brasil (região principal da base)
+
+O clima **deve ter coerência** com o tema escolhido:
+- Semana fria/seca → hidratação profunda, óleos, rotina noturna intensa
+- Semana quente/úmida → leveza, oil control, protetor solar, pele sensível ao calor
+- Transição de estação → adaptação da rotina, ingredientes de transição
+
+O tema final salvo no Supabase (`tema_semana_atual`) deve incluir o contexto climático para que WF2 (Claude PDF) e WF8 (GPT social) produzam conteúdo coerente com a realidade da cliente naquela semana.
 
 ---
 
