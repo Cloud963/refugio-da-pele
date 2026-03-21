@@ -1,0 +1,129 @@
+{
+  "name": "WF_SUMMARY — Resumo Semanal Domingo 17h",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 17 * * 0" }]
+        }
+      },
+      "id": "wfs-0001-0001-0001-000000000001",
+      "name": "Schedule — Domingo 17h",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://aftrvqwazdiumibdfjjy.supabase.co/rest/v1/config?key=eq.pdf_url_atual&select=value",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "SUPABASE_SERVICE_KEY" },
+            { "name": "Authorization", "value": "Bearer SUPABASE_SERVICE_KEY" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "wfs-0002-0002-0002-000000000001",
+      "name": "Supabase — Buscar PDF da Semana",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [420, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://aftrvqwazdiumibdfjjy.supabase.co/rest/v1/clientes?select=count&status=eq.ativa",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "SUPABASE_SERVICE_KEY" },
+            { "name": "Authorization", "value": "Bearer SUPABASE_SERVICE_KEY" },
+            { "name": "Prefer", "value": "count=exact" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "wfs-0003-0003-0003-000000000001",
+      "name": "Supabase — Total Clientes Ativas",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [420, 460]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "documentId": {
+          "__rl": true,
+          "value": "1RJREELqinbpue4-jkIXkb-Bi_pWMot3oI_Sk4GVQc7o",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Aba 01 - Leads"
+        },
+        "options": { "returnAllMatches": false }
+      },
+      "id": "wfs-0004-0004-0004-000000000001",
+      "name": "Sheets — Leads da Semana",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [420, 620],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DzhWrB0cOwGmCaUD",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const pdfData = $('Supabase — Buscar PDF da Semana').first().json;\nconst pdf_url = pdfData[0]?.value || 'Não gerado ainda';\n\nconst leads = $('Sheets — Leads da Semana').all();\nconst hoje = new Date();\nconst seteDiasAtras = new Date(hoje.getTime() - 7 * 24 * 60 * 60 * 1000);\nconst leadsNovos = leads.filter(l => {\n  const data = new Date(l.json.Data);\n  return data >= seteDiasAtras;\n}).length;\n\nconst totalLeads = leads.length;\n\nconst agora = new Date();\nconst diasSemana = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];\nconst meses = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];\nconst dataFormatada = `${agora.getDate()} de ${meses[agora.getMonth()]} de ${agora.getFullYear()}`;\n\nconst mensagem = `🌿 *Refúgio da Pele — Resumo Semanal*\n📅 ${dataFormatada}\n\n📊 *Métricas da semana:*\n• Novos leads: *${leadsNovos}*\n• Total de leads: *${totalLeads}*\n\n📄 *PDF desta semana:*\n${pdf_url}\n\n✅ *Para aprovar e publicar na segunda às 08h:*\nResponda *APROVAR* aqui\n\n❌ *Para cancelar o envio:*\nResponda *CANCELAR*\n\n— Claude, seu orquestrador 🤖`;\n\nreturn [{ json: { mensagem, pdf_url, leadsNovos, totalLeads } }];"
+      },
+      "id": "wfs-0005-0005-0005-000000000001",
+      "name": "Montar Resumo Semanal",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 440]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.z-api.io/instances/3F06247099D391366D735EC66E320A44/token/9FEB7A24EE74CDCBC327832A/send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Client-Token", "value": "F212a72ec09cb4f14b062257d320f4573S" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={{ JSON.stringify({ phone: '351926856955', message: $json.mensagem }) }}",
+        "options": {}
+      },
+      "id": "wfs-0006-0006-0006-000000000001",
+      "name": "Z-API — Enviar Resumo para Dono",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [940, 440]
+    }
+  ],
+  "connections": {
+    "Schedule — Domingo 17h": { "main": [[{ "node": "Supabase — Buscar PDF da Semana", "type": "main", "index": 0 }, { "node": "Supabase — Total Clientes Ativas", "type": "main", "index": 0 }, { "node": "Sheets — Leads da Semana", "type": "main", "index": 0 }]] },
+    "Supabase — Buscar PDF da Semana": { "main": [[{ "node": "Montar Resumo Semanal", "type": "main", "index": 0 }]] },
+    "Supabase — Total Clientes Ativas": { "main": [[{ "node": "Montar Resumo Semanal", "type": "main", "index": 0 }]] },
+    "Sheets — Leads da Semana": { "main": [[{ "node": "Montar Resumo Semanal", "type": "main", "index": 0 }]] },
+    "Montar Resumo Semanal": { "main": [[{ "node": "Z-API — Enviar Resumo para Dono", "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1", "binaryMode": "separate", "availableInMCP": false },
+  "versionId": "wfs-1111-2222-3333-444444444444",
+  "meta": { "instanceId": "b3f36ad4b8a579dd86116dc9449ee81a2e4c05ad27fc75bf5538fe5592ed48cb" },
+  "id": "WFSummaryRefugio",
+  "tags": []
+}

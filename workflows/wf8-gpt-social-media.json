@@ -1,0 +1,109 @@
+{
+  "name": "WF8 — GPT Social Media + Influencer",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 8 * * 1" }]
+        }
+      },
+      "id": "wf8-0001-0001-0001-000000000001",
+      "name": "Schedule — Segunda 08h",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://aftrvqwazdiumibdfjjy.supabase.co/rest/v1/config?key=eq.pdf_url_atual&select=value",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "SUPABASE_SERVICE_KEY" },
+            { "name": "Authorization", "value": "Bearer SUPABASE_SERVICE_KEY" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "wf8-0002-0002-0002-000000000001",
+      "name": "Supabase — Buscar Tema e PDF",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [420, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer GPT_API_KEY_PLACEHOLDER" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={{ JSON.stringify({ model: 'gpt-4o', max_tokens: 3000, messages: [{ role: 'system', content: 'Você é a social media manager do Refúgio da Pele, marca de skincare íntimo feminino. Tom: acolhedor, empoderador, feminino, natural. Nunca clínico ou técnico demais. Use emojis com moderação.' }, { role: 'user', content: 'Tema da semana: ' + $json[0].value + '\\n\\nCrie o seguinte conteúdo em JSON válido:\\n{\\n  \"instagram\": [\\n    {\"dia\": \"Segunda\", \"legenda\": \"...\", \"hashtags\": \"...\", \"cta\": \"...\"},\\n    {\"dia\": \"Quarta\", \"legenda\": \"...\", \"hashtags\": \"...\", \"cta\": \"...\"},\\n    {\"dia\": \"Sexta\", \"legenda\": \"...\", \"hashtags\": \"...\", \"cta\": \"...\"}\\n  ],\\n  \"facebook\": [\\n    {\"dia\": \"Terça\", \"texto\": \"...\"},\\n    {\"dia\": \"Quinta\", \"texto\": \"...\"}\\n  ],\\n  \"influencer_scripts\": [\\n    {\"dia\": \"Segunda\", \"tema\": \"RESET\", \"script\": \"...\", \"duracao\": \"30s\"},\\n    {\"dia\": \"Terça\", \"tema\": \"EDUCAÇÃO\", \"script\": \"...\", \"duracao\": \"40s\"},\\n    {\"dia\": \"Quarta\", \"tema\": \"CONEXÃO\", \"script\": \"...\", \"duracao\": \"30s\"},\\n    {\"dia\": \"Quinta\", \"tema\": \"AJUSTE\", \"script\": \"...\", \"duracao\": \"30s\"},\\n    {\"dia\": \"Sexta\", \"tema\": \"PROGRESSO\", \"script\": \"...\", \"duracao\": \"35s\"},\\n    {\"dia\": \"Sábado\", \"tema\": \"AUTOCUIDADO\", \"script\": \"...\", \"duracao\": \"40s\"},\\n    {\"dia\": \"Domingo\", \"tema\": \"EMOCIONAL\", \"script\": \"...\", \"duracao\": \"40s\"}\\n  ]\\n}' }] }) }}",
+        "options": {}
+      },
+      "id": "wf8-0003-0003-0003-000000000001",
+      "name": "GPT — Gerar Conteúdo Semanal",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [640, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $input.first().json;\nconst content = response.choices[0].message.content;\nlet parsed;\ntry {\n  parsed = JSON.parse(content);\n} catch(e) {\n  const match = content.match(/\\{[\\s\\S]*\\}/);\n  parsed = match ? JSON.parse(match[0]) : { error: 'Parse failed', raw: content };\n}\nreturn [{ json: parsed }];"
+      },
+      "id": "wf8-0004-0004-0004-000000000001",
+      "name": "Extrair Conteúdo GPT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [860, 300]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": { "__rl": true, "value": "1RJREELqinbpue4-jkIXkb-Bi_pWMot3oI_Sk4GVQc7o", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Conteúdo da Semana", "mode": "list" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Data": "={{ $now.toISO() }}",
+            "Instagram": "={{ JSON.stringify($json.instagram) }}",
+            "Facebook": "={{ JSON.stringify($json.facebook) }}",
+            "Scripts Influencer": "={{ JSON.stringify($json.influencer_scripts) }}",
+            "Status": "aguardando_revisao"
+          }
+        },
+        "options": {}
+      },
+      "id": "wf8-0005-0005-0005-000000000001",
+      "name": "Sheets — Salvar para Revisão",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [1080, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DzhWrB0cOwGmCaUD",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule — Segunda 08h": { "main": [[{ "node": "Supabase — Buscar Tema e PDF", "type": "main", "index": 0 }]] },
+    "Supabase — Buscar Tema e PDF": { "main": [[{ "node": "GPT — Gerar Conteúdo Semanal", "type": "main", "index": 0 }]] },
+    "GPT — Gerar Conteúdo Semanal": { "main": [[{ "node": "Extrair Conteúdo GPT", "type": "main", "index": 0 }]] },
+    "Extrair Conteúdo GPT": { "main": [[{ "node": "Sheets — Salvar para Revisão", "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1", "binaryMode": "separate", "availableInMCP": false },
+  "versionId": "wf8-1111-2222-3333-444444444444",
+  "meta": { "instanceId": "b3f36ad4b8a579dd86116dc9449ee81a2e4c05ad27fc75bf5538fe5592ed48cb" },
+  "id": "WF8GPTSocialRefugio",
+  "tags": []
+}
