@@ -39,9 +39,30 @@ ORQUESTRADOR: Claude (você está lendo isso)
 - WhatsApp: +351926856955
 - **PENDENTE: associar ao Z-API**
 
+## Regra dos 7 Dias de Antecedência (Influencer)
+
+O conteúdo da influencer deve ser preparado com **1 semana de antecedência**:
+
+- WF8 gera scripts da influencer toda **segunda** para a semana *seguinte*
+- Exemplo: segunda 21/04 → gera scripts para 28/04–04/05
+- Scripts ficam no Google Sheets ("Conteúdo da Semana") aguardando revisão
+- Dona aprova no domingo antes da publicação
+- Isso garante tempo para gravar, editar e agendar antes do prazo
+
+### Fluxo de Produção da Influencer
+```
+Seg 08h — WF8 gera scripts da semana seguinte
+Dom 17h — Dona revisa no resumo semanal
+Dom 20h — Deadline para APROVAR ou CANCELAR
+Seg 08h (semana seguinte) — Conteúdo publicado/enviado
+```
+
+---
+
 ## Regras Gerais dos Agentes
 - Nenhum agente publica ou envia conteúdo para clientes sem passar pelo WF_SUMMARY
 - GPT (WF8) é responsável exclusivo por redes sociais e scripts da influencer
 - Claude API (WF2) é responsável exclusivo pelo PDF semanal
 - Dados sensíveis (chaves de API) nunca vão para o repo público
 - Auto-save no git a cada ~15 min durante sessões ativas
+- Scripts da influencer sempre gerados com 7 dias de antecedência (ver regra acima)

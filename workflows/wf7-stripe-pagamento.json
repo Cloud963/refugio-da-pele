@@ -9,7 +9,10 @@
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
-      "position": [200, 300],
+      "position": [
+        200,
+        300
+      ],
       "id": "wf7-0001-0001-0001-000000000001",
       "name": "Webhook — Stripe",
       "webhookId": "wf7-0001-0001-0001-000000000002"
@@ -17,13 +20,20 @@
     {
       "parameters": {
         "conditions": {
-          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
           "conditions": [
             {
               "id": "wf7-cond-001",
               "leftValue": "={{ $json.body.type }}",
               "rightValue": "checkout.session.completed",
-              "operator": { "type": "string", "operation": "equals" }
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
             }
           ],
           "combinator": "and"
@@ -32,7 +42,10 @@
       },
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [420, 300],
+      "position": [
+        420,
+        300
+      ],
       "id": "wf7-0002-0002-0002-000000000001",
       "name": "IF — checkout.session.completed"
     },
@@ -71,7 +84,10 @@
       },
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [640, 220],
+      "position": [
+        640,
+        220
+      ],
       "id": "wf7-0003-0003-0003-000000000001",
       "name": "Extrair Dados do Pagamento"
     },
@@ -82,15 +98,24 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "apikey", "value": "SUPABASE_SERVICE_KEY" },
-            { "name": "Authorization", "value": "Bearer SUPABASE_SERVICE_KEY" }
+            {
+              "name": "apikey",
+              "value": "SUPABASE_SERVICE_KEY"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer SUPABASE_SERVICE_KEY"
+            }
           ]
         },
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [860, 220],
+      "position": [
+        860,
+        220
+      ],
       "id": "wf7-0004-0004-0004-000000000001",
       "name": "Supabase — Buscar PDF URL"
     },
@@ -129,7 +154,10 @@
       },
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [1080, 220],
+      "position": [
+        1080,
+        220
+      ],
       "id": "wf7-0005-0005-0005-000000000001",
       "name": "Montar Payload Final"
     },
@@ -140,10 +168,22 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "apikey", "value": "SUPABASE_SERVICE_KEY" },
-            { "name": "Authorization", "value": "Bearer SUPABASE_SERVICE_KEY" },
-            { "name": "Content-Type", "value": "application/json" },
-            { "name": "Prefer", "value": "resolution=merge-duplicates" }
+            {
+              "name": "apikey",
+              "value": "SUPABASE_SERVICE_KEY"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer SUPABASE_SERVICE_KEY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates"
+            }
           ]
         },
         "sendBody": true,
@@ -153,7 +193,10 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1300, 220],
+      "position": [
+        1300,
+        220
+      ],
       "id": "wf7-0006-0006-0006-000000000001",
       "name": "Supabase — Upsert Cliente Assinante"
     },
@@ -161,13 +204,16 @@
       "parameters": {
         "fromEmail": "contato@refugiodapele.com.br",
         "toEmail": "={{ $json.email }}",
-        "subject": "Bem-vinda ao Refúgio da Pele 🌿 Seu primeiro guia chegou!",
-        "html": "=<div style=\"font-family: Georgia, serif; max-width: 520px; margin: 0 auto; background: #fff8f5; padding: 40px 32px; border-radius: 12px;\">\n\n  <img src=\"https://refugiodapele.com.br/logo.png\" alt=\"Refúgio da Pele\" style=\"width: 120px; margin-bottom: 32px; display: block;\">\n\n  <h2 style=\"color: #7a3b2e; font-size: 22px; margin: 0 0 16px;\">\n    Bem-vinda, {{ $json.nome }} 🌸\n  </h2>\n\n  <p style=\"color: #5a3a2e; font-size: 15px; line-height: 1.7; margin: 0 0 20px;\">\n    Sua assinatura foi confirmada com sucesso! Preparamos o seu primeiro guia com muito carinho.\n    Todo conteúdo foi pensado para a <strong>sua pele</strong>, com dicas naturais, práticas e sem complicação.\n  </p>\n\n  <a href=\"{{ $json.pdf_url }}\"\n     style=\"display: inline-block; background: #c0513a; color: #fff; text-decoration: none;\n            padding: 14px 28px; border-radius: 8px; font-size: 14px; font-weight: bold;\n            letter-spacing: 0.05em; margin-bottom: 28px;\">\n    📥 Acessar meu guia\n  </a>\n\n  <p style=\"color: #5a3a2e; font-size: 14px; line-height: 1.7; margin: 0 0 8px;\">\n    A cada semana você recebe um novo guia atualizado. Fique à vontade para responder este email com dúvidas ou sugestões 💚\n  </p>\n\n  <hr style=\"border: none; border-top: 1px solid #e8d5cc; margin: 28px 0;\">\n\n  <p style=\"color: #b08070; font-size: 12px; text-align: center; margin: 0;\">\n    Refúgio da Pele · refugiodapele.com.br\n  </p>\n\n</div>",
+        "subject": "Bem-vinda ao Refúgio da Pele 🌿 — Seu guia da semana chegou!",
+        "html": "=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"pt-BR\">\n<head>\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n  <meta name=\"x-apple-disable-message-reformatting\" />\n  <title>Bem-vinda ao Refúgio da Pele 🌿</title>\n  <style type=\"text/css\">\n    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }\n    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }\n    img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; display: block; }\n    a[x-apple-data-detectors] { color: inherit !important; text-decoration: none !important; }\n    u + #body a { color: inherit; text-decoration: none; }\n    @media only screen and (max-width: 600px) {\n      .wrapper { width: 100% !important; max-width: 100% !important; }\n      .container { width: 100% !important; padding: 20px 16px !important; }\n      .cta-btn { width: 100% !important; display: block !important; text-align: center !important; box-sizing: border-box; }\n    }\n  </style>\n</head>\n<body id=\"body\" style=\"margin:0;padding:0;background-color:#F0E8E1;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;width:100%;\">\n\n  <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse:collapse;background-color:#F0E8E1;\">\n    <tr>\n      <td align=\"center\" style=\"padding:32px 16px;\">\n\n        <!-- CONTAINER -->\n        <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"560\" class=\"wrapper\" style=\"border-collapse:collapse;max-width:560px;width:100%;background-color:#FAF3EE;\">\n\n          <!-- HEADER -->\n          <tr>\n            <td align=\"center\" style=\"background-color:#3d2b1f;padding:36px 32px 28px 32px;\">\n              <p style=\"margin:0 0 4px 0;font-family:Georgia,serif;font-size:11px;color:#c0513a;letter-spacing:5px;text-transform:uppercase;\">Refúgio</p>\n              <p style=\"margin:0;font-family:Georgia,serif;font-size:26px;font-weight:normal;color:#FAF3EE;letter-spacing:2px;font-style:italic;\">da Pele</p>\n              <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"40\" style=\"border-collapse:collapse;margin:16px auto 0 auto;\">\n                <tr><td style=\"height:1px;background-color:#c0513a;font-size:0;line-height:0;\">&nbsp;</td></tr>\n              </table>\n            </td>\n          </tr>\n\n          <!-- HERO BAND -->\n          <tr>\n            <td style=\"background-color:#c0513a;padding:10px 0;text-align:center;\">\n              <p style=\"margin:0;font-family:Georgia,serif;font-size:15px;color:#FAF3EE;font-style:italic;\">Bem-vinda ao seu refúgio ✨</p>\n            </td>\n          </tr>\n\n          <!-- BODY -->\n          <tr>\n            <td style=\"background-color:#FAF3EE;padding:40px 40px 32px 40px;\" class=\"container\">\n\n              <!-- Greeting -->\n              <p style=\"margin:0 0 24px 0;font-family:Georgia,serif;font-size:22px;font-weight:normal;color:#3d2b1f;line-height:1.4;\">\n                Olá, <span style=\"font-style:italic;color:#c0513a;\">={{ $json.nome }}</span> 🌸\n              </p>\n\n              <!-- Main para -->\n              <p style=\"margin:0 0 16px 0;font-family:Arial,sans-serif;font-size:15px;color:#6b5744;line-height:1.7;\">\n                Sua assinatura foi confirmada com sucesso. É uma alegria ter você como parte do <strong style=\"color:#3d2b1f;\">Refúgio da Pele</strong>.\n              </p>\n\n              <p style=\"margin:0 0 28px 0;font-family:Arial,sans-serif;font-size:15px;color:#6b5744;line-height:1.7;\">\n                O <strong style=\"color:#3d2b1f;\">guia desta semana</strong> está aqui embaixo — preparado com cuidado, pensando exatamente em mulheres como você.\n              </p>\n\n              <!-- CTA BUTTON PRIMARY -->\n              <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse:collapse;margin:0 0 32px 0;\">\n                <tr>\n                  <td align=\"center\">\n                    <!--[if mso]>\n                    <v:roundrect xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:w=\"urn:schemas-microsoft-com:office:word\"\n                      href=\"={{ $json.pdf_url }}\"\n                      style=\"height:52px;v-text-anchor:middle;width:260px;\"\n                      arcsize=\"4%\"\n                      stroke=\"f\"\n                      fillcolor=\"#c0513a\">\n                      <w:anchorlock/>\n                      <center style=\"color:#ffffff;font-family:Arial,sans-serif;font-size:14px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;\">\n                        Acessar Meu Guia da Semana\n                      </center>\n                    </v:roundrect>\n                    <![endif]-->\n                    <!--[if !mso]><!-->\n                    <a href=\"={{ $json.pdf_url }}\" target=\"_blank\" class=\"cta-btn\"\n                       style=\"display:inline-block;background-color:#c0513a;color:#ffffff;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;text-decoration:none;padding:16px 40px;letter-spacing:2px;text-transform:uppercase;mso-hide:all;\">\n                      Acessar Meu Guia da Semana →\n                    </a>\n                    <!--<![endif]-->\n                  </td>\n                </tr>\n              </table>\n\n              <!-- Divider -->\n              <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse:collapse;margin-bottom:28px;\">\n                <tr><td style=\"height:1px;background-color:rgba(192,81,58,0.15);font-size:0;line-height:0;\">&nbsp;</td></tr>\n              </table>\n\n              <!-- Benefits block -->\n              <p style=\"margin:0 0 16px 0;font-family:Georgia,serif;font-size:16px;color:#3d2b1f;\">O que você recebe toda semana</p>\n\n              <!-- Benefit 1 -->\n              <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse:collapse;margin-bottom:14px;\">\n                <tr>\n                  <td width=\"28\" valign=\"top\" style=\"padding-top:2px;font-family:Arial,sans-serif;font-size:16px;color:#c0513a;\">🌿</td>\n                  <td valign=\"top\" style=\"padding-left:8px;\">\n                    <p style=\"margin:0;font-family:Arial,sans-serif;font-size:14px;color:#6b5744;line-height:1.6;\">\n                      <strong style=\"color:#3d2b1f;\">Guia semanal em PDF</strong> — rotinas, ingredientes e rituais personalizados, entregues toda segunda-feira\n                    </p>\n                  </td>\n                </tr>\n              </table>\n\n              <!-- Benefit 2 -->\n              <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse:collapse;margin-bottom:14px;\">\n                <tr>\n                  <td width=\"28\" valign=\"top\" style=\"padding-top:2px;font-family:Arial,sans-serif;font-size:16px;color:#c0513a;\">💌</td>\n                  <td valign=\"top\" style=\"padding-left:8px;\">\n                    <p style=\"margin:0;font-family:Arial,sans-serif;font-size:14px;color:#6b5744;line-height:1.6;\">\n                      <strong style=\"color:#3d2b1f;\">Mensagem de domingo</strong> — um momento de conexão e motivação para começar a semana com intenção\n                    </p>\n                  </td>\n                </tr>\n              </table>\n\n              <!-- Benefit 3 -->\n              <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse:collapse;margin-bottom:32px;\">\n                <tr>\n                  <td width=\"28\" valign=\"top\" style=\"padding-top:2px;font-family:Arial,sans-serif;font-size:16px;color:#c0513a;\">✨</td>\n                  <td valign=\"top\" style=\"padding-left:8px;\">\n                    <p style=\"margin:0;font-family:Arial,sans-serif;font-size:14px;color:#6b5744;line-height:1.6;\">\n                      <strong style=\"color:#3d2b1f;\">Conteúdo exclusivo</strong> — dicas, tendências e cuidados que vão além do básico\n                    </p>\n                  </td>\n                </tr>\n              </table>\n\n              <!-- Divider -->\n              <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse:collapse;margin-bottom:24px;\">\n                <tr><td style=\"height:1px;background-color:rgba(192,81,58,0.15);font-size:0;line-height:0;\">&nbsp;</td></tr>\n              </table>\n\n              <!-- Portal link -->\n              <p style=\"margin:0 0 8px 0;font-family:Arial,sans-serif;font-size:13px;color:#6b5744;line-height:1.6;\">\n                Para gerenciar ou cancelar sua assinatura a qualquer momento:\n              </p>\n              <p style=\"margin:0 0 32px 0;\">\n                <a href=\"https://billing.stripe.com\" target=\"_blank\"\n                   style=\"font-family:Arial,sans-serif;font-size:13px;color:#c0513a;text-decoration:underline;\">\n                  Acessar portal da assinante →\n                </a>\n              </p>\n\n              <!-- Closing -->\n              <p style=\"margin:0;font-family:Georgia,serif;font-size:15px;color:#6b5744;line-height:1.7;font-style:italic;\">\n                Com muito carinho,<br>\n                <strong style=\"font-style:normal;color:#3d2b1f;\">Equipe Refúgio da Pele</strong>\n              </p>\n\n            </td>\n          </tr>\n\n          <!-- FOOTER -->\n          <tr>\n            <td style=\"background-color:#3d2b1f;padding:28px 32px 32px 32px;\" align=\"center\">\n              <p style=\"margin:0 0 12px 0;font-family:Georgia,serif;font-size:11px;color:#c0513a;letter-spacing:3px;text-transform:uppercase;\">Siga-nos</p>\n              <a href=\"https://www.instagram.com/refugiodapele\" target=\"_blank\"\n                 style=\"font-family:Arial,sans-serif;font-size:12px;color:#FAF3EE;text-decoration:none;letter-spacing:1px;\">\n                @refugiodapele\n              </a>\n              <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"40\" style=\"border-collapse:collapse;margin:16px auto;\">\n                <tr><td style=\"height:1px;background-color:rgba(192,81,58,0.3);font-size:0;line-height:0;\">&nbsp;</td></tr>\n              </table>\n              <p style=\"margin:0 0 6px 0;font-family:Arial,sans-serif;font-size:11px;color:rgba(250,243,238,0.5);line-height:1.6;\">\n                Você recebeu este email porque assinou o plano Refúgio da Pele em refugiodapele.com.br\n              </p>\n              <a href=\"https://billing.stripe.com\" target=\"_blank\"\n                 style=\"font-family:Arial,sans-serif;font-size:11px;color:rgba(192,81,58,0.7);text-decoration:underline;\">\n                Gerenciar assinatura\n              </a>\n              <p style=\"margin:16px 0 0 0;font-family:Arial,sans-serif;font-size:10px;color:rgba(250,243,238,0.25);letter-spacing:2px;text-transform:uppercase;\">\n                © 2026 Refúgio da Pele\n              </p>\n            </td>\n          </tr>\n\n        </table>\n        <!-- END CONTAINER -->\n\n      </td>\n    </tr>\n  </table>\n\n</body>\n</html>\n",
         "options": {}
       },
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
-      "position": [1520, 140],
+      "position": [
+        1520,
+        140
+      ],
       "id": "wf7-0007-0007-0007-000000000001",
       "name": "Email — Entregar PDF ao Assinante",
       "credentials": {
@@ -184,8 +230,14 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "Client-Token", "value": "F212a72ec09cb4f14b062257d320f4573S" },
-            { "name": "Content-Type", "value": "application/json" }
+            {
+              "name": "Client-Token",
+              "value": "F212a72ec09cb4f14b062257d320f4573S"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
           ]
         },
         "sendBody": true,
@@ -195,7 +247,10 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1520, 320],
+      "position": [
+        1520,
+        320
+      ],
       "id": "wf7-0008-0008-0008-000000000001",
       "name": "Z-API — Boas-vindas WhatsApp"
     },
@@ -203,35 +258,92 @@
       "parameters": {},
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
-      "position": [640, 440],
+      "position": [
+        640,
+        440
+      ],
       "id": "wf7-0009-0009-0009-000000000001",
       "name": "Ignorar — Evento Inválido"
     }
   ],
   "connections": {
     "Webhook — Stripe": {
-      "main": [[{ "node": "IF — checkout.session.completed", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "IF — checkout.session.completed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "IF — checkout.session.completed": {
       "main": [
-        [{ "node": "Extrair Dados do Pagamento", "type": "main", "index": 0 }],
-        [{ "node": "Ignorar — Evento Inválido", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Extrair Dados do Pagamento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ignorar — Evento Inválido",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Extrair Dados do Pagamento": {
-      "main": [[{ "node": "Supabase — Buscar PDF URL", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Supabase — Buscar PDF URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Supabase — Buscar PDF URL": {
-      "main": [[{ "node": "Montar Payload Final", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Montar Payload Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Montar Payload Final": {
-      "main": [[{ "node": "Supabase — Upsert Cliente Assinante", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Supabase — Upsert Cliente Assinante",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Supabase — Upsert Cliente Assinante": {
-      "main": [[
-        { "node": "Email — Entregar PDF ao Assinante", "type": "main", "index": 0 },
-        { "node": "Z-API — Boas-vindas WhatsApp", "type": "main", "index": 0 }
-      ]]
+      "main": [
+        [
+          {
+            "node": "Email — Entregar PDF ao Assinante",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Z-API — Boas-vindas WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
