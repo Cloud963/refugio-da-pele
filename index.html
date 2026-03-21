@@ -34,7 +34,7 @@
 <meta name="twitter:image" content="https://refugiodapele.com.br/assets/refugio-da-pele-perfil-facebook.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=Playfair+Display:wght@300;400&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -2314,7 +2314,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
         .plan-tagline { font-size:11px; color:var(--terracotta); font-style:italic; text-align:center; margin-bottom:20px; font-family:'Cormorant Garamond',serif; }
         .plan-card.featured .plan-tagline { color:rgba(247,240,230,0.6); }
         .plan-price { text-align:center; margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid rgba(196,104,62,0.15); }
-        .plan-price-val { font-family:'Cormorant Garamond',serif; font-size:38px; font-weight:300; color:var(--deep); line-height:1; }
+        .plan-price-val { font-family:'Playfair Display',serif; font-size:38px; font-weight:300; color:var(--deep); line-height:1; }
         .plan-card.featured .plan-price-val { color:var(--cream); }
         .plan-price-period { font-size:11px; color:rgba(107,87,68,0.5); letter-spacing:0.1em; text-transform:uppercase; font-family:'DM Sans',sans-serif; display:block; margin-top:4px; }
         .plan-card.featured .plan-price-period { color:rgba(247,240,230,0.4); }
@@ -2355,6 +2355,22 @@ Uma rotina simples de 3 passos que respeita quem você já é.
         .premium-leaf-2 { bottom:8px; left:50%; transform:translateX(-50%); }
         .plan-cta-premium { width:100%; padding:13px 16px; border:1.5px solid rgba(200,164,140,0.4); cursor:pointer; font-family:'DM Sans',sans-serif; font-size:11px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; transition:all 0.2s; background:transparent; color:rgba(107,87,68,0.6); }
         .plan-cta-premium:hover { border-color:#C8A48C; color:#c0513a; background:rgba(200,164,140,0.08); }
+        @keyframes featglow {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(196,104,62,0); }
+          50% { box-shadow: 0 0 22px 5px rgba(196,104,62,0.18); }
+        }
+        @keyframes btnsheen {
+          0% { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+        @keyframes ppulse {
+          0%, 100% { opacity:0.28; transform:translateX(-50%) scale(1); }
+          50% { opacity:0.46; transform:translateX(-50%) scale(1.07); }
+        }
+        .plan-card.featured { animation: featglow 3.5s ease-in-out infinite; }
+        .plan-cta-filled { background-size:200% auto; animation: none; }
+        .plan-cta-filled:hover { background: linear-gradient(90deg,#c0513a,#e06040,#c0513a); background-size:200% auto; animation: btnsheen 1.2s linear infinite; }
+        .plan-silhouette-css::before { animation: ppulse 2.8s ease-in-out infinite; }
         @media(max-width:580px){ .plans-grid{grid-template-columns:1fr;} }
       </style>
       <script>
@@ -2366,7 +2382,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
           var email = document.getElementById('notify-email-'+id).value.trim();
           if (!email || !email.includes('@')) { document.getElementById('notify-email-'+id).focus(); return; }
           document.getElementById('notify-form-'+id).innerHTML='<div class="plan-notify-sent">✦ Avisaremos você em primeira mão!</div>';
-          // fetch('WEBHOOK_N8N_PLACEHOLDER', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, plano})});
+          fetch('https://refugiodapele.app.n8n.cloud/webhook/lead-refugio', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, plano, origem: 'avise-me'})}).catch(()=>{});
         }
       </script>
       <h2 class="plans-title">Escolha o seu <em>cuidado</em></h2>
@@ -2388,7 +2404,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
             <span class="plan-price-period">por mês · assinatura</span>
           </div>
           <ul class="plan-features">
-            <li><span class="check">✦</span> Tudo do plano Seu Ritual</li>
+            <li><span class="check">✦</span> Tudo do plano A Semente</li>
             <li><span class="check">✦</span> <strong>Presença semanal de uma especialista</strong></li>
             <li><span class="check">✦</span> Vídeos exclusivos toda semana no WhatsApp</li>
             <li><span class="check">✦</span> Acompanhamento próximo e personalizado</li>
@@ -2405,8 +2421,8 @@ Uma rotina simples de 3 passos que respeita quem você já é.
         <div class="plan-card featured">
           <div class="plan-badge">✦ Disponível agora</div>
           <div class="plan-icon">🌸</div>
-          <div class="plan-name">Seu Ritual</div>
-          <div class="plan-tagline">O primeiro passo para uma pele que respira</div>
+          <div class="plan-name">A Semente</div>
+          <div class="plan-tagline">Uma semente plantada com intenção vira raiz.</div>
           <div class="plan-price">
             <span class="plan-price-val">R$9,90</span>
             <span class="plan-price-period">por mês · cancele quando quiser</span>
