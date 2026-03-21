@@ -1,0 +1,398 @@
+{
+  "name": "WF2 — PDF Semanal",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * 1"
+            }
+          ]
+        }
+      },
+      "id": "a1b2c3d4-0001-0001-0001-000000000001",
+      "name": "Schedule Trigger — Segunda 08h",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "field-tema",
+              "name": "tema_semana",
+              "value": "placeholder — substituir por lógica de tema",
+              "type": "string"
+            },
+            {
+              "id": "field-clima",
+              "name": "clima_semana",
+              "value": "placeholder",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-0001-0001-0001-000000000002",
+      "name": "Set Tema da Semana",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://serpapi.com/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $json.tema_semana }} cuidados pele mulheres mundo"
+            },
+            {
+              "name": "api_key",
+              "value": "SERPAPI_KEY_PLACEHOLDER"
+            },
+            {
+              "name": "num",
+              "value": "10"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-0001-0001-0001-000000000003",
+      "name": "SerpAPI — Busca Skincare",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendBody": true,
+        "contentType": "json",
+        "body": {
+          "query": "={{ $('Set Tema da Semana').item.json.tema_semana }} skincare women international traditions {{ $('Set Tema da Semana').item.json.clima_semana }}",
+          "api_key": "TAVILY_KEY_PLACEHOLDER",
+          "max_results": 5
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-0001-0001-0001-000000000004",
+      "name": "Tavily — Práticas Internacionais",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Merge SerpAPI and Tavily results into a single context string\nconst serpData = $('SerpAPI — Busca Skincare').item.json;\nconst tavilyData = $input.first().json;\n\nlet contextParts = [];\n\n// Extract SerpAPI organic results\nif (serpData.organic_results && Array.isArray(serpData.organic_results)) {\n  const serpSnippets = serpData.organic_results\n    .slice(0, 10)\n    .map((r, i) => `[Fonte ${i + 1}] ${r.title || ''}:\\n${r.snippet || ''}\\nURL: ${r.link || ''}`)\n    .join('\\n\\n');\n  contextParts.push('=== Resultados SerpAPI ===\\n' + serpSnippets);\n}\n\n// Extract Tavily results\nif (tavilyData.results && Array.isArray(tavilyData.results)) {\n  const tavilySnippets = tavilyData.results\n    .slice(0, 5)\n    .map((r, i) => `[Tavily ${i + 1}] ${r.title || ''}:\\n${r.content || ''}\\nURL: ${r.url || ''}`)\n    .join('\\n\\n');\n  contextParts.push('=== Resultados Tavily ===\\n' + tavilySnippets);\n}\n\nconst contexto_pesquisa = contextParts.join('\\n\\n');\nconst tema_semana = $('Set Tema da Semana').item.json.tema_semana;\nconst clima_semana = $('Set Tema da Semana').item.json.clima_semana;\n\nreturn [{ json: { contexto_pesquisa, tema_semana, clima_semana } }];"
+      },
+      "id": "a1b2c3d4-0001-0001-0001-000000000005",
+      "name": "Merge Resultados de Pesquisa",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "CLAUDE_KEY_PLACEHOLDER"
+            },
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": {
+          "model": "claude-sonnet-4-6",
+          "max_tokens": 4000,
+          "messages": [
+            {
+              "role": "user",
+              "content": "={{ 'Você é redatora especialista em skincare feminino e bem-estar. Com base nas pesquisas abaixo, crie um PDF semanal completo em português brasileiro para o projeto Refúgio da Pele.\\n\\nTema da semana: ' + $json.tema_semana + '\\nClima predominante: ' + $json.clima_semana + '\\n\\nPesquisas realizadas:\\n' + $json.contexto_pesquisa + '\\n\\nCrie o conteúdo em HTML estruturado com:\\n\\n1. SETE TEMAS DIÁRIOS (um para cada dia da semana, de segunda a domingo). Cada tema deve ter:\\n   - <h2>Dia X — [Título do Dia]</h2>\\n   - <p>[Conteúdo: 2-3 parágrafos sobre o tema do dia relacionado ao tema semanal]</p>\\n   - <h3>Dicas do Dia</h3>\\n   - <ul><li>[3 a 5 dicas práticas de skincare]</li></ul>\\n\\n2. SEÇÃO MOMENTO CURIOSIDADE (até 3 páginas):\\n   - <h2>Momento Curiosidade — Mulheres ao Redor do Mundo</h2>\\n   - Descreva como mulheres de 3 culturas diferentes cuidam da pele, com práticas, ingredientes e rituais específicos de cada cultura.\\n   - Use <h3> para o nome de cada cultura/país e <p> para os detalhes.\\n\\nFormate tudo como HTML semântico, com cabeçalhos, parágrafos e listas bem estruturados. Não inclua <html>, <head> ou <body> — apenas o conteúdo interno.' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-0001-0001-0001-000000000006",
+      "name": "Claude — Gerar Conteúdo PDF",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1340, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract text content from Claude API response\nconst response = $input.first().json;\n\nlet html_content = '';\n\nif (response.content && Array.isArray(response.content) && response.content.length > 0) {\n  html_content = response.content[0].text || '';\n} else {\n  throw new Error('Claude API did not return expected content structure: ' + JSON.stringify(response));\n}\n\n// Wrap with minimal styling for PDF\nconst html_wrapped = `<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n  <meta charset=\"UTF-8\">\n  <style>\n    body { font-family: 'Georgia', serif; color: #3a2a1e; margin: 40px; line-height: 1.7; }\n    h1 { color: #8b5e3c; font-size: 2em; border-bottom: 2px solid #e8c9a0; padding-bottom: 10px; }\n    h2 { color: #8b5e3c; font-size: 1.5em; margin-top: 2em; }\n    h3 { color: #a0714f; font-size: 1.2em; }\n    p { margin: 0.8em 0; }\n    ul { margin: 0.5em 0 1em 1.5em; }\n    li { margin: 0.3em 0; }\n  </style>\n</head>\n<body>\n  <h1>Refúgio da Pele — PDF Semanal</h1>\n  ${html_content}\n</body>\n</html>`;\n\nreturn [{ json: { html_content: html_wrapped } }];"
+      },
+      "id": "a1b2c3d4-0001-0001-0001-000000000007",
+      "name": "Extrair Conteúdo Claude",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1560, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pdfshift.io/v3/convert/pdf",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "json",
+        "body": {
+          "source": "={{ $json.html_content }}",
+          "landscape": false,
+          "use_print": true
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "a1b2c3d4-0001-0001-0001-000000000008",
+      "name": "PDFShift — Converter HTML para PDF — CONFIGURAR CREDENCIAL",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1780, 300],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "pdfshift-basic-auth",
+          "name": "PDFShift Basic Auth — CONFIGURAR"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "field-pdf-url",
+              "name": "pdf_url",
+              "value": "https://drive.google.com/PLACEHOLDER_PDF_URL — substituir por upload real ao Google Drive",
+              "type": "string"
+            },
+            {
+              "id": "field-nota",
+              "name": "nota",
+              "value": "CONFIGURAR: Implementar upload para Google Drive usando node Google Drive ou HTTP Request com OAuth2. O binário do PDF está disponível no nó anterior.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-0001-0001-0001-000000000009",
+      "name": "Set PDF URL — CONFIGURAR GOOGLE DRIVE",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [2000, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://aftrvqwazdiumibdfjjy.supabase.co/rest/v1/config",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "SUPABASE_SERVICE_KEY_PLACEHOLDER"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer SUPABASE_SERVICE_KEY_PLACEHOLDER"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": {
+          "key": "pdf_url_atual",
+          "value": "={{ $json.pdf_url }}"
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-0001-0001-0001-000000000010",
+      "name": "Supabase — Salvar URL do PDF — CRIAR TABELA config",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2220, 300]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "WF3_ID_PLACEHOLDER",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "id": "a1b2c3d4-0001-0001-0001-000000000011",
+      "name": "Executar WF3 — Atualização de Link",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [2440, 300]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger — Segunda 08h": {
+      "main": [
+        [
+          {
+            "node": "Set Tema da Semana",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Tema da Semana": {
+      "main": [
+        [
+          {
+            "node": "SerpAPI — Busca Skincare",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI — Busca Skincare": {
+      "main": [
+        [
+          {
+            "node": "Tavily — Práticas Internacionais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tavily — Práticas Internacionais": {
+      "main": [
+        [
+          {
+            "node": "Merge Resultados de Pesquisa",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Resultados de Pesquisa": {
+      "main": [
+        [
+          {
+            "node": "Claude — Gerar Conteúdo PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude — Gerar Conteúdo PDF": {
+      "main": [
+        [
+          {
+            "node": "Extrair Conteúdo Claude",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrair Conteúdo Claude": {
+      "main": [
+        [
+          {
+            "node": "PDFShift — Converter HTML para PDF — CONFIGURAR CREDENCIAL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PDFShift — Converter HTML para PDF — CONFIGURAR CREDENCIAL": {
+      "main": [
+        [
+          {
+            "node": "Set PDF URL — CONFIGURAR GOOGLE DRIVE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set PDF URL — CONFIGURAR GOOGLE DRIVE": {
+      "main": [
+        [
+          {
+            "node": "Supabase — Salvar URL do PDF — CRIAR TABELA config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase — Salvar URL do PDF — CRIAR TABELA config": {
+      "main": [
+        [
+          {
+            "node": "Executar WF3 — Atualização de Link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "a1b2c3d4-1111-2222-3333-444444444444",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b3f36ad4b8a579dd86116dc9449ee81a2e4c05ad27fc75bf5538fe5592ed48cb"
+  },
+  "id": "WF2PdfSemanalRefugio",
+  "tags": []
+}

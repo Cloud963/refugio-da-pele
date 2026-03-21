@@ -712,6 +712,19 @@
     outline: none; transition: border-color 0.2s;
   }
   .field-group input:focus { border-color: var(--terracotta); }
+  .field-group select {
+    padding: 14px 16px;
+    border: 1.5px solid var(--cream-dark);
+    background: white; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; color: var(--deep);
+    outline: none; transition: border-color 0.2s;
+    appearance: none; cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b5744' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 16px center;
+    padding-right: 40px;
+  }
+  .field-group select:focus { border-color: var(--terracotta); }
+  .field-hint { font-size: 11px; color: rgba(107,87,68,0.5); margin-top: -2px; }
   .privacy-note {
     font-size: 11px; color: #aaa; text-align: center;
     display: flex; align-items: center; justify-content: center; gap: 6px;
@@ -1724,6 +1737,34 @@ Uma rotina simples de 3 passos que respeita quem você já é.
           <input type="email" id="quizEmail" placeholder="seuemail@email.com">
         </div>
 
+        <div class="field-group">
+          <label>Sua idade <span style="color:var(--terracotta)">*</span></label>
+          <p class="field-hint">Para enviarmos conteúdos personalizados para a sua fase de vida</p>
+          <input type="number" id="quizAge" placeholder="Ex: 28" min="13" max="100">
+        </div>
+
+        <div class="field-group">
+          <label>Principal preocupação com sua pele <span style="color:var(--terracotta)">*</span></label>
+          <select id="quizConcern">
+            <option value="">Selecione...</option>
+            <option value="ressecamento">Ressecamento / irritação</option>
+            <option value="odor-ph">Odor / pH</option>
+            <option value="menopausa">Menopausa / mudanças hormonais</option>
+            <option value="primeira-rotina">Primeira rotina de cuidado</option>
+            <option value="envelhecimento">Envelhecimento da pele íntima</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label>Você está em alguma dessas fases?</label>
+          <select id="quizMaternal">
+            <option value="nenhuma">Nenhuma das anteriores</option>
+            <option value="gravida">Grávida</option>
+            <option value="pos-parto">Pós-parto (até 2 anos)</option>
+            <option value="amamentando">Amamentando</option>
+          </select>
+        </div>
+
         <!-- PHONE FIELD HIGHLIGHT -->
         <div class="phone-highlight-wrap">
           <div class="phone-highlight-badge">🎁 CONTEÚDO EXCLUSIVO GRÁTIS</div>
@@ -1798,12 +1839,37 @@ Uma rotina simples de 3 passos que respeita quem você já é.
           <label>Seu e-mail</label>
           <input type="email" id="pdfEmail" placeholder="seuemail@email.com">
         </div>
-        <div class="field-group" style="margin-bottom:4px;">
+        <div class="field-group" style="margin-bottom:12px;">
           <label>Seu WhatsApp</label>
           <div style="position:relative;">
             <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--mid);">🇧🇷 +55</span>
             <input type="tel" id="pdfPhoneDirect" placeholder="(11) 99999-9999" style="padding-left:68px;" inputmode="numeric" onkeypress="return /[0-9]/.test(event.key)" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
           </div>
+        </div>
+        <div class="field-group" style="margin-bottom:12px;">
+          <label>Sua idade <span style="color:var(--terracotta)">*</span></label>
+          <p class="field-hint">Para enviarmos conteúdos personalizados para a sua fase de vida</p>
+          <input type="number" id="pdfAge" placeholder="Ex: 28" min="13" max="100">
+        </div>
+        <div class="field-group" style="margin-bottom:12px;">
+          <label>Principal preocupação com sua pele <span style="color:var(--terracotta)">*</span></label>
+          <select id="pdfConcern">
+            <option value="">Selecione...</option>
+            <option value="ressecamento">Ressecamento / irritação</option>
+            <option value="odor-ph">Odor / pH</option>
+            <option value="menopausa">Menopausa / mudanças hormonais</option>
+            <option value="primeira-rotina">Primeira rotina de cuidado</option>
+            <option value="envelhecimento">Envelhecimento da pele íntima</option>
+          </select>
+        </div>
+        <div class="field-group" style="margin-bottom:4px;">
+          <label>Você está em alguma dessas fases?</label>
+          <select id="pdfMaternal">
+            <option value="nenhuma">Nenhuma das anteriores</option>
+            <option value="gravida">Grávida</option>
+            <option value="pos-parto">Pós-parto (até 2 anos)</option>
+            <option value="amamentando">Amamentando</option>
+          </select>
         </div>
         <p style="font-size:11px;color:rgba(107,87,68,0.5);margin-top:8px;">🔒 Seus dados são protegidos. Zero spam, só dicas e conteúdos úteis.</p>
       </div>
@@ -1918,8 +1984,13 @@ Uma rotina simples de 3 passos que respeita quem você já é.
   function showResult() {
     const name = document.getElementById('quizName').value.trim();
     const email = document.getElementById('quizEmail').value.trim();
+    const age = document.getElementById('quizAge').value.trim();
+    const concern = document.getElementById('quizConcern').value;
+    const maternal = document.getElementById('quizMaternal').value;
     if (!name || !email) { showToast('Preenche nome e e-mail para continuar 💌'); return; }
     if (!/\S+@\S+\.\S+/.test(email)) { showToast('E-mail parece inválido, verifica!'); return; }
+    if (!age) { showToast('Informe sua idade para continuar 😊'); return; }
+    if (!concern) { showToast('Selecione sua principal preocupação 🌸'); return; }
 
     const total = Object.values(scores).reduce((a, b) => a + b, 0);
 
@@ -1993,6 +2064,9 @@ Uma rotina simples de 3 passos que respeita quem você já é.
         nome: name,
         email: email,
         whatsapp: phone,
+        idade: age,
+        preocupacao_pele: concern,
+        fase_materna: maternal,
         resultado_pele: type,
         data: new Date().toISOString()
       })
@@ -2005,14 +2079,22 @@ Uma rotina simples de 3 passos que respeita quem você já é.
       const name = document.getElementById('pdfName').value.trim();
       const email = document.getElementById('pdfEmail').value.trim();
       const phone = document.getElementById('pdfPhoneDirect').value.trim();
+      const age = document.getElementById('pdfAge').value.trim();
+      const concern = document.getElementById('pdfConcern').value;
+      const maternal = document.getElementById('pdfMaternal').value;
       if (!name) { showToast('Preenche seu nome para continuar 😊'); return; }
       if (!email || !/\S+@\S+\.\S+/.test(email)) { showToast('E-mail inválido, verifica!'); return; }
       if (!phone) { showToast('Adiciona seu WhatsApp para receber o guia 📱'); return; }
+      if (!age) { showToast('Informe sua idade para continuar 😊'); return; }
+      if (!concern) { showToast('Selecione sua principal preocupação 🌸'); return; }
       enviarLead({
         origem: 'protocolo_pdf',
         nome: name,
         email: email,
         whatsapp: phone,
+        idade: age,
+        preocupacao_pele: concern,
+        fase_materna: maternal,
         pagina: window.location.href,
         data: new Date().toISOString()
       });
@@ -2175,7 +2257,12 @@ Uma rotina simples de 3 passos que respeita quem você já é.
         .plan-card { border:1.5px solid rgba(196,104,62,0.15); padding:28px 24px; position:relative; display:flex; flex-direction:column; gap:0; background:rgba(247,240,230,0.5); transition:border-color 0.3s, transform 0.3s; }
         .plan-card:hover { border-color:rgba(196,104,62,0.4); transform:translateY(-4px); }
         .plan-card.featured { border-color:var(--terracotta); background:var(--deep); }
+        .plan-card.locked { opacity:0.82; }
+        .plan-card.locked:hover { transform:none; border-color:rgba(196,104,62,0.2); }
         .plan-badge { position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:var(--terracotta); color:white; font-size:9px; letter-spacing:0.18em; text-transform:uppercase; font-family:'DM Sans',sans-serif; font-weight:600; padding:4px 14px; white-space:nowrap; }
+        .plan-badge-soon { position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:rgba(107,87,68,0.15); color:rgba(107,87,68,0.6); font-size:9px; letter-spacing:0.18em; text-transform:uppercase; font-family:'DM Sans',sans-serif; font-weight:600; padding:4px 14px; white-space:nowrap; border:1px solid rgba(107,87,68,0.2); }
+        .plan-silhouette { width:60px; height:72px; margin:0 auto 14px; background:linear-gradient(160deg, rgba(196,104,62,0.12) 0%, rgba(107,87,68,0.08) 100%); border-radius:50% 50% 38% 38%; display:flex; align-items:center; justify-content:center; border:1px dashed rgba(196,104,62,0.2); }
+        .plan-silhouette span { font-size:22px; opacity:0.35; }
         .plan-icon { font-size:32px; text-align:center; margin-bottom:14px; }
         .plan-name { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:400; color:var(--deep); text-align:center; margin-bottom:4px; }
         .plan-card.featured .plan-name { color:var(--cream); }
@@ -2193,80 +2280,104 @@ Uma rotina simples de 3 passos que respeita quem você já é.
         .plan-features li strong { color:var(--terracotta); }
         .plan-card.featured .plan-features li strong { color:#f0c080; }
         .plan-cta { width:100%; padding:13px 16px; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; font-size:11px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; transition:all 0.2s; }
-        .plan-cta-outline { background:transparent; color:var(--terracotta); border:1.5px solid rgba(196,104,62,0.4); }
-        .plan-cta-outline:hover { background:var(--terracotta); color:white; }
         .plan-cta-filled { background:var(--terracotta); color:white; box-shadow:0 4px 16px rgba(196,104,62,0.3); }
         .plan-cta-filled:hover { background:#a03a1e; box-shadow:0 6px 24px rgba(196,104,62,0.45); }
+        .plan-cta-soon { background:transparent; color:rgba(107,87,68,0.5); border:1.5px solid rgba(107,87,68,0.2); cursor:pointer; width:100%; padding:13px 16px; font-family:'DM Sans',sans-serif; font-size:11px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; transition:all 0.2s; }
+        .plan-cta-soon:hover { border-color:rgba(196,104,62,0.4); color:var(--terracotta); background:rgba(196,104,62,0.04); }
+        .plan-notify { display:none; flex-direction:column; gap:8px; margin-top:auto; }
+        .plan-notify-input { width:100%; padding:10px 14px; border:1.5px solid rgba(196,104,62,0.25); background:transparent; font-family:'DM Sans',sans-serif; font-size:11px; color:var(--mid); outline:none; box-sizing:border-box; }
+        .plan-notify-input::placeholder { color:rgba(107,87,68,0.35); }
+        .plan-notify-input:focus { border-color:rgba(196,104,62,0.5); }
+        .plan-notify-sent { font-size:11px; color:var(--sage); text-align:center; padding:12px 0; letter-spacing:0.06em; }
         .plans-guarantee { text-align:center; font-size:11px; color:rgba(107,87,68,0.4); letter-spacing:0.1em; display:flex; align-items:center; justify-content:center; gap:6px; padding-top:4px; }
         @media(max-width:580px){ .plans-grid{grid-template-columns:1fr;} }
       </style>
+      <script>
+        function notifyPlan(id) {
+          document.getElementById('notify-form-'+id).style.display='flex';
+          document.getElementById('notify-btn-'+id).style.display='none';
+        }
+        function submitNotify(id, plano) {
+          var email = document.getElementById('notify-email-'+id).value.trim();
+          if (!email || !email.includes('@')) { document.getElementById('notify-email-'+id).focus(); return; }
+          document.getElementById('notify-form-'+id).innerHTML='<div class="plan-notify-sent">✦ Avisaremos você em primeira mão!</div>';
+          // fetch('WEBHOOK_N8N_PLACEHOLDER', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, plano})});
+        }
+      </script>
       <h2 class="plans-title">Escolha o seu <em>cuidado</em></h2>
       <div class="plans-divider"><span>Planos Refúgio da Pele</span></div>
       <div class="plans-grid">
 
-        <!-- PLANO 1 - Assinatura R$9,90 -->
-        <div class="plan-card">
+        <!-- PLANO 1 - R$14,90 - EM BREVE (influencer) -->
+        <div class="plan-card locked">
+          <div class="plan-badge-soon">🔒 Em breve</div>
+          <div class="plan-silhouette"><span>✦</span></div>
+          <div class="plan-name">Com Presença</div>
+          <div class="plan-tagline">Alguém especial faz parte deste plano</div>
+          <div class="plan-price">
+            <span class="plan-price-val">R$14,90</span>
+            <span class="plan-price-period">por mês · assinatura</span>
+          </div>
+          <ul class="plan-features">
+            <li><span class="check">✦</span> Tudo do plano Seu Ritual</li>
+            <li><span class="check">✦</span> <strong>Presença semanal de uma especialista</strong></li>
+            <li><span class="check">✦</span> Vídeos exclusivos toda semana no WhatsApp</li>
+            <li><span class="check">✦</span> Acompanhamento próximo e personalizado</li>
+            <li><span class="check">✦</span> Cancele a qualquer momento</li>
+          </ul>
+          <div class="plan-notify" id="notify-form-1">
+            <input type="email" id="notify-email-1" class="plan-notify-input" placeholder="seu@email.com">
+            <button class="plan-cta plan-cta-soon" onclick="submitNotify(1,'Com Presença')">Quero ser avisada →</button>
+          </div>
+          <button class="plan-cta plan-cta-soon" id="notify-btn-1" onclick="notifyPlan(1)">Avise-me quando abrir</button>
+        </div>
+
+        <!-- PLANO 2 - R$9,90 - ATIVO (featured, centro) -->
+        <div class="plan-card featured">
+          <div class="plan-badge">✦ Disponível agora</div>
           <div class="plan-icon">🌸</div>
-          <div class="plan-name">Assinatura</div>
-          <div class="plan-tagline">Dicas frescas toda semana</div>
+          <div class="plan-name">Seu Ritual</div>
+          <div class="plan-tagline">O primeiro passo para uma pele que respira</div>
           <div class="plan-price">
             <span class="plan-price-val">R$9,90</span>
             <span class="plan-price-period">por mês · cancele quando quiser</span>
           </div>
           <ul class="plan-features">
-            <li><span class="check">✦</span> Guia básico semanal toda semana</li>
+            <li><span class="check">✦</span> PDF semanal personalizado para sua pele</li>
             <li><span class="check">✦</span> Dicas naturais com ingredientes caseiros</li>
-            <li><span class="check">✦</span> Novos conteúdos toda semana</li>
-            <li><span class="check">✦</span> Acesso enquanto a assinatura estiver ativa</li>
+            <li><span class="check">✦</span> Conteúdo novo toda semana</li>
+            <li><span class="check">✦</span> Receitas e rotinas práticas</li>
             <li><span class="check">✦</span> Cancele a qualquer momento</li>
           </ul>
-          <a href="https://buy.stripe.com/bJe7sM2sma0c7Cmbb26wE03" target="_blank" class="plan-cta plan-cta-outline" onclick="closeLegalModal()">Quero este plano →</a>
+          <a href="https://buy.stripe.com/bJe7sM2sma0c7Cmbb26wE03" target="_blank" class="plan-cta plan-cta-filled" onclick="closeLegalModal()">Começar agora →</a>
         </div>
 
-        <!-- PLANO 2 - Guia Completo R$17,90 -->
-        <div class="plan-card">
-          <div class="plan-icon">🌿</div>
-          <div class="plan-name">Guia Completo</div>
-          <div class="plan-tagline">O primeiro passo real para a sua pele</div>
-          <div class="plan-price">
-            <span class="plan-price-val">R$17,90</span>
-            <span class="plan-price-period">compra única</span>
-          </div>
-          <ul class="plan-features">
-            <li><span class="check">✦</span> PDF completo entregue por e-mail imediatamente</li>
-            <li><span class="check">✦</span> Rotinas manhã e noite por tipo de pele</li>
-            <li><span class="check">✦</span> Lista de ingredientes naturais que funcionam</li>
-            <li><span class="check">✦</span> Receitas caseiras testadas</li>
-            <li><span class="check">✦</span> <strong>1 mês de atualizações semanais incluso</strong></li>
-            <li><span class="check">✦</span> Seu para sempre</li>
-          </ul>
-          <a href="https://buy.stripe.com/7sY28s8QKegs1dY1As6wE02" target="_blank" class="plan-cta plan-cta-outline" onclick="closeLegalModal()">Quero este plano →</a>
-        </div>
-
-        <!-- PLANO 3 - FEATURED -->
-        <div class="plan-card featured">
-          <div class="plan-badge">⭐ Mais completo</div>
-          <div class="plan-icon">✨</div>
-          <div class="plan-name">Cuidado ao Máximo</div>
-          <div class="plan-tagline">A experiência completa do Refúgio</div>
+        <!-- PLANO 3 - R$19,90 - EM BREVE -->
+        <div class="plan-card locked">
+          <div class="plan-badge-soon">🔒 Em breve</div>
+          <div class="plan-icon" style="opacity:0.25">✨</div>
+          <div class="plan-name">Experiência Completa</div>
+          <div class="plan-tagline">A versão mais completa do Refúgio</div>
           <div class="plan-price">
             <span class="plan-price-val">R$19,90</span>
-            <span class="plan-price-period">por mês · cancele quando quiser</span>
+            <span class="plan-price-period">por mês · assinatura</span>
           </div>
-          <div style="font-size:11px;color:rgba(247,240,230,0.6);margin:-8px 0 12px;font-style:italic;">Por R$2 a mais que o guia único — com tudo sempre atualizado</div>
           <ul class="plan-features">
-            <li><span class="check">✦</span> <strong>Guia Completo sempre atualizado</strong></li>
-            <li><span class="check">✦</span> Rotinas e ingredientes por tipo de pele</li>
-            <li><span class="check">✦</span> <strong>Atualizações semanais exclusivas</strong></li>
-            <li><span class="check">✦</span> Todos os materiais mensais inclusos</li>
-            <li><span class="check">✦</span> Acesso a todo conteúdo novo em primeira mão</li>
+            <li><span class="check">✦</span> Tudo dos planos anteriores</li>
+            <li><span class="check">✦</span> <strong>Conteúdo exclusivo premium</strong></li>
+            <li><span class="check">✦</span> Acesso prioritário a novidades</li>
+            <li><span class="check">✦</span> Comunidade fechada de assinantes</li>
             <li><span class="check">✦</span> Cancele a qualquer momento</li>
           </ul>
-          <a href="https://buy.stripe.com/fZueVe2sm6O009Ufri6wE01" target="_blank" class="plan-cta plan-cta-filled" onclick="closeLegalModal()">Começar agora →</a>
+          <div class="plan-notify" id="notify-form-3">
+            <input type="email" id="notify-email-3" class="plan-notify-input" placeholder="seu@email.com">
+            <button class="plan-cta plan-cta-soon" onclick="submitNotify(3,'Experiência Completa')">Quero ser avisada →</button>
+          </div>
+          <button class="plan-cta plan-cta-soon" id="notify-btn-3" onclick="notifyPlan(3)">Avise-me quando abrir</button>
         </div>
 
       </div>
-      <div class="plans-guarantee">🔒 Garantia de 7 dias em todos os planos · Sem perguntas</div>`
+      <div class="plans-guarantee">🔒 Garantia de 7 dias · Cancele a qualquer momento · Sem perguntas</div>`
     },
     faq: {
       title: 'Perguntas Frequentes',

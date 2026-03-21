@@ -1,0 +1,237 @@
+{
+  "name": "WF6 — Influencer Domingo 09h",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * 0"
+            }
+          ]
+        }
+      },
+      "id": "f6a7b8c9-0006-0006-0006-000000000001",
+      "name": "Schedule Trigger — Domingo 09h",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "documentId": {
+          "__rl": true,
+          "value": "1RJREELqinbpue4-jkIXkb-Bi_pWMot3oI_Sk4GVQc7o",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Temas da Semana",
+          "mode": "name"
+        },
+        "filters": {},
+        "options": {
+          "returnAllMatches": true
+        }
+      },
+      "id": "f6a7b8c9-0006-0006-0006-000000000002",
+      "name": "Google Sheets — Ler Tema da Semana",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [460, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DzhWrB0cOwGmCaUD",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "clientes",
+        "returnAll": true,
+        "filterType": "string",
+        "filterString": "status=eq.ativa"
+      },
+      "id": "f6a7b8c9-0006-0006-0006-000000000003",
+      "name": "Supabase — Buscar Clientes Ativas",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [680, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-refugio-da-pele",
+          "name": "Refugio da Pele — Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const temas = $('Google Sheets — Ler Tema da Semana').first().json;\nconst clientes = $input.all().map(i => i.json).filter(c => c.telefone && c.status === 'ativa');\nreturn clientes.map(c => ({\n  json: {\n    telefone: c.telefone,\n    nome: c.nome ? c.nome.split(' ')[0] : 'querida',\n    tema: temas['Tema'] || 'cuidados com a pele',\n    mensagem: `Bom dia, ${c.nome ? c.nome.split(' ')[0] : 'querida'}! 🌸\\n\\nEsta semana vamos falar sobre *${temas['Tema'] || 'cuidados com a pele'}*.\\n\\nPreparei algo especial para você — fique de olho nas próximas mensagens 💛\\n\\n— Refúgio da Pele`\n  }\n}));"
+      },
+      "id": "f6a7b8c9-0006-0006-0006-000000000004",
+      "name": "Preparar Mensagens WhatsApp",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "batchSize": 10,
+        "options": {}
+      },
+      "id": "f6a7b8c9-0006-0006-0006-000000000005",
+      "name": "Split In Batches — 10 por vez",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.z-api.io/instances/3F06247099D391366D735EC66E320A44/token/9FEB7A24EE74CDCBC327832A/send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Client-Token",
+              "value": "F212a72ec09cb4f14b062257d320f4573S"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $json.telefone }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.mensagem }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f6a7b8c9-0006-0006-0006-000000000006",
+      "name": "Z-API — Enviar WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1340, 300]
+    },
+    {
+      "parameters": {
+        "unit": "seconds",
+        "resume": "timeInterval",
+        "value": 2
+      },
+      "id": "f6a7b8c9-0006-0006-0006-000000000007",
+      "name": "Wait — 2 Segundos",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [1560, 300],
+      "webhookId": "f6a7b8c9-wait-0006-0006-000000000007"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger — Domingo 09h": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets — Ler Tema da Semana",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets — Ler Tema da Semana": {
+      "main": [
+        [
+          {
+            "node": "Supabase — Buscar Clientes Ativas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase — Buscar Clientes Ativas": {
+      "main": [
+        [
+          {
+            "node": "Preparar Mensagens WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Mensagens WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches — 10 por vez",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches — 10 por vez": {
+      "main": [
+        [
+          {
+            "node": "Z-API — Enviar WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Z-API — Enviar WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Wait — 2 Segundos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait — 2 Segundos": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches — 10 por vez",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "f6a7b8c9-6666-7777-8888-999999999999",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b3f36ad4b8a579dd86116dc9449ee81a2e4c05ad27fc75bf5538fe5592ed48cb"
+  },
+  "id": "WF6InfluencerDomingoRefugio",
+  "tags": []
+}

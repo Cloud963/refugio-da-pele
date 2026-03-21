@@ -1,0 +1,446 @@
+{
+  "name": "WF5 — Eleição de Temas",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 22 * * 6"
+            }
+          ]
+        }
+      },
+      "id": "e5f6a7b8-0005-0005-0005-000000000001",
+      "name": "Schedule Trigger — Sábado 22h",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "documentId": {
+          "__rl": true,
+          "value": "1RJREELqinbpue4-jkIXkb-Bi_pWMot3oI_Sk4GVQc7o",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Feedback",
+          "mode": "name"
+        },
+        "options": {
+          "returnAllMatches": true
+        }
+      },
+      "id": "e5f6a7b8-0005-0005-0005-000000000002",
+      "name": "Google Sheets — Ler Feedback",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [460, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DzhWrB0cOwGmCaUD",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const hoje = new Date();\nconst semana = `${hoje.getFullYear()}-W${String(Math.ceil((hoje.getDate() - hoje.getDay() + 10) / 7)).padStart(2,'0')}`;\nconst rows = $input.all().map(i => i.json).filter(r => r.semana === semana && r.tema_sugerido);\nconst contagem = {};\nrows.forEach(r => { contagem[r.tema_sugerido] = (contagem[r.tema_sugerido] || 0) + 1; });\nconst ordenados = Object.entries(contagem).sort((a,b) => b[1]-a[1]).slice(0,3);\nreturn [{ json: {\n  semana,\n  tema1: ordenados[0]?.[0] || 'hidratação',\n  tema2: ordenados[1]?.[0] || 'rotina noturna',\n  tema3: ordenados[2]?.[0] || 'ingredientes naturais',\n  votos1: ordenados[0]?.[1] || 0,\n  votos2: ordenados[1]?.[1] || 0,\n  votos3: ordenados[2]?.[1] || 0\n}}];"
+      },
+      "id": "e5f6a7b8-0005-0005-0005-000000000003",
+      "name": "Apurar Top 3 Temas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1RJREELqinbpue4-jkIXkb-Bi_pWMot3oI_Sk4GVQc7o",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Temas da Semana",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Tema": "={{ $json.tema1 }}",
+            "Tema Usado": "Não",
+            "Tema Novo": "Sim",
+            "Votos Clientes": "={{ $json.votos1 }}",
+            "Semana Usada": "={{ $json.semana }}",
+            "Fonte": "Cliente"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Tema",
+              "displayName": "Tema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tema Usado",
+              "displayName": "Tema Usado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tema Novo",
+              "displayName": "Tema Novo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Votos Clientes",
+              "displayName": "Votos Clientes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Semana Usada",
+              "displayName": "Semana Usada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fonte",
+              "displayName": "Fonte",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "e5f6a7b8-0005-0005-0005-000000000004",
+      "name": "Sheets — Salvar Tema 1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [900, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DzhWrB0cOwGmCaUD",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1RJREELqinbpue4-jkIXkb-Bi_pWMot3oI_Sk4GVQc7o",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Temas da Semana",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Tema": "={{ $('Apurar Top 3 Temas').item.json.tema2 }}",
+            "Tema Usado": "Não",
+            "Tema Novo": "Sim",
+            "Votos Clientes": "={{ $('Apurar Top 3 Temas').item.json.votos2 }}",
+            "Semana Usada": "={{ $('Apurar Top 3 Temas').item.json.semana }}",
+            "Fonte": "Cliente"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Tema",
+              "displayName": "Tema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tema Usado",
+              "displayName": "Tema Usado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tema Novo",
+              "displayName": "Tema Novo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Votos Clientes",
+              "displayName": "Votos Clientes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Semana Usada",
+              "displayName": "Semana Usada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fonte",
+              "displayName": "Fonte",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "e5f6a7b8-0005-0005-0005-000000000005",
+      "name": "Sheets — Salvar Tema 2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [1120, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DzhWrB0cOwGmCaUD",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1RJREELqinbpue4-jkIXkb-Bi_pWMot3oI_Sk4GVQc7o",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Temas da Semana",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Tema": "={{ $('Apurar Top 3 Temas').item.json.tema3 }}",
+            "Tema Usado": "Não",
+            "Tema Novo": "Sim",
+            "Votos Clientes": "={{ $('Apurar Top 3 Temas').item.json.votos3 }}",
+            "Semana Usada": "={{ $('Apurar Top 3 Temas').item.json.semana }}",
+            "Fonte": "Cliente"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Tema",
+              "displayName": "Tema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tema Usado",
+              "displayName": "Tema Usado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tema Novo",
+              "displayName": "Tema Novo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Votos Clientes",
+              "displayName": "Votos Clientes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Semana Usada",
+              "displayName": "Semana Usada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fonte",
+              "displayName": "Fonte",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "e5f6a7b8-0005-0005-0005-000000000006",
+      "name": "Sheets — Salvar Tema 3",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [1340, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DzhWrB0cOwGmCaUD",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://refugiodapele.app.n8n.cloud/webhook/WF2_WEBHOOK_PLACEHOLDER",
+        "options": {}
+      },
+      "id": "e5f6a7b8-0005-0005-0005-000000000007",
+      "name": "HTTP — Executar WF2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1560, 300]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger — Sábado 22h": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets — Ler Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets — Ler Feedback": {
+      "main": [
+        [
+          {
+            "node": "Apurar Top 3 Temas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apurar Top 3 Temas": {
+      "main": [
+        [
+          {
+            "node": "Sheets — Salvar Tema 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheets — Salvar Tema 1": {
+      "main": [
+        [
+          {
+            "node": "Sheets — Salvar Tema 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheets — Salvar Tema 2": {
+      "main": [
+        [
+          {
+            "node": "Sheets — Salvar Tema 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheets — Salvar Tema 3": {
+      "main": [
+        [
+          {
+            "node": "HTTP — Executar WF2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "e5f6a7b8-5555-6666-7777-888888888888",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b3f36ad4b8a579dd86116dc9449ee81a2e4c05ad27fc75bf5538fe5592ed48cb"
+  },
+  "id": "WF5EleicaoTemasRefugio",
+  "tags": []
+}
