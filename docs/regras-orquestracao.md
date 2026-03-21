@@ -76,6 +76,52 @@ O tema final salvo no Supabase (`tema_semana_atual`) deve incluir o contexto cli
 
 ---
 
+## Escopo Temático — "Pele" é o corpo inteiro
+
+Não limitar conteúdo ao rosto. Qualquer parte do corpo é válida:
+cotovelos, joelhos, calcanhares, mãos, colo, couro cabeludo, virilha, etc.
+Isso garante volume de conteúdo e relevância o ano todo.
+
+---
+
+## Estrutura Obrigatória do PDF Semanal (WF2)
+
+Todo PDF deve conter, além do conteúdo do tema:
+- **1 a 3 receitas/remédios naturais** — ingredientes caseiros e acessíveis
+- **3 a 4 produtos gerais** — de prateleira, relacionados ao tema da semana
+
+---
+
+## Tom e Voz — Regras Absolutas
+
+### Obrigatório em todo conteúdo:
+- **Leveza** — nunca pesado ou denso
+- **Simpatia e carisma** — voz de amiga que entende de pele
+- **Transparência** — honesta sobre o que funciona
+- **Afeto genuíno** — nunca forçado
+- **Sátiras curtas com licença poética** — humor que abraça, arrancar sorrisos sem perder elegância
+
+### Proibido em todo conteúdo:
+- Mencionar gênero ("mulheres fazem X", "homens Y")
+- Mencionar pessoas reais ou celebridades
+- Comparações envolvendo animais
+- Abordagem negativa (especialmente no início)
+- Tom clínico ou técnico demais
+
+### Público: mulheres — acolhedor, empoderador, feminino, natural.
+
+---
+
+## Papel do Claude como Orquestrador
+
+Claude é o **braço direito** do dono e filtro final de qualidade:
+- Supervisiona WF5 (temas), WF2 (PDF) e WF8 (social/influencer)
+- Rejeita conteúdo fora do tom ou do escopo
+- Garante coerência: clima + tema + curiosidade + voz da marca
+- Aplica licença poética com inteligência
+
+---
+
 ## Regras Gerais dos Agentes
 - Nenhum agente publica ou envia conteúdo para clientes sem passar pelo WF_SUMMARY
 - GPT (WF8) é responsável exclusivo por redes sociais e scripts da influencer
