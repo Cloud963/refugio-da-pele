@@ -2115,14 +2115,21 @@ Uma rotina simples de 3 passos que respeita quem você já é.
       if (!name) { showToast('Preenche seu nome para continuar 😊'); return; }
       if (!email || !/\S+@\S+\.\S+/.test(email)) { showToast('E-mail inválido, verifica!'); return; }
       if (!phone) { showToast('Adiciona seu WhatsApp para receber o guia 📱'); return; }
-      enviarLead({
-        origem: 'protocolo_pdf',
-        nome: name,
-        email: email,
-        whatsapp: phone,
-        pagina: window.location.href,
-        data: new Date().toISOString()
-      });
+      fetch('https://refugiodapele.app.n8n.cloud/webhook/lead-refugio', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          origem: 'protocolo_pdf',
+          nome: name,
+          email: email,
+          whatsapp: phone,
+          idade: age,
+          preocupacao_pele: concern,
+          fase_materna: maternal,
+          pagina: window.location.href,
+          data: new Date().toISOString()
+        })
+      }).catch(function() {});
     }
     const skinLabels = { sensivel: 'Pele Sensível', oleosa: 'Pele Oleosa', acneica: 'Pele Acneica' };
     showToast(`Perfeito! Sua rotina para ${skinLabels[selectedSkin]} vai chegar em instantes ✅`);
