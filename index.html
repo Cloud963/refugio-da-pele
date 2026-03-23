@@ -1574,32 +1574,61 @@ Uma rotina simples de 3 passos que respeita quem você já é.
   .plans-cards-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; transition:filter 0.4s ease; }
   .plans-cards-grid.blurred { filter:blur(5px) brightness(0.55); pointer-events:none; }
 
-  /* Card: imagem em cima, info box em baixo */
-  .showcase-card { position:relative; display:flex; flex-direction:column; background:#fff; border:1px solid rgba(196,104,62,0.12); overflow:hidden; }
-  .showcase-card:hover .showcase-img { transform:scale(1.03); }
+  /* Card: editorial full-bleed — imagem cobre o card inteiro */
+  .showcase-card {
+    position:relative; overflow:hidden; cursor:pointer;
+    height:540px;
+    transition:transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94), box-shadow 0.4s;
+    box-shadow:0 4px 24px rgba(42,26,36,0.14);
+  }
+  .showcase-card:hover { transform:translateY(-6px); box-shadow:0 16px 48px rgba(42,26,36,0.24); }
+  .showcase-card:hover .showcase-img { transform:scale(1.05); }
 
-  .showcase-img-wrap { position:relative; overflow:hidden; flex:1; min-height:340px; background:#1a0f0a; }
-  .showcase-img { width:100%; height:100%; object-fit:cover; object-position:center top; display:block; transition:transform 0.6s ease; position:absolute; inset:0; }
+  /* Imagem ocupa o card inteiro */
+  .showcase-img-wrap { position:absolute; inset:0; overflow:hidden; background:#1a0f0a; }
+  .showcase-img { width:100%; height:100%; object-fit:cover; object-position:center top; display:block; transition:transform 0.6s ease; }
+
+  /* Gradiente editorial — de baixo para cima */
+  .showcase-card::after {
+    content:''; position:absolute; inset:0; pointer-events:none; z-index:1;
+    background:linear-gradient(to top,
+      rgba(15,8,5,0.95) 0%,
+      rgba(15,8,5,0.72) 35%,
+      rgba(15,8,5,0.18) 65%,
+      transparent 100%);
+  }
 
   /* Em breve badge sobre a imagem */
-  .showcase-soon { position:absolute; top:14px; right:14px; z-index:2; background:rgba(26,15,10,0.72); color:rgba(250,243,238,0.8); font-size:8px; letter-spacing:0.2em; text-transform:uppercase; font-family:'DM Sans',sans-serif; padding:4px 10px; backdrop-filter:blur(6px); }
+  .showcase-soon { position:absolute; top:16px; right:16px; z-index:3; background:rgba(15,8,5,0.55); color:rgba(250,243,238,0.8); font-size:8px; letter-spacing:0.2em; text-transform:uppercase; font-family:'DM Sans',sans-serif; padding:4px 12px; backdrop-filter:blur(6px); border:1px solid rgba(250,243,238,0.12); }
 
-  /* Info box — fundo claro, centralizado */
-  .showcase-info { padding:22px 20px 20px; text-align:center; background:#faf3ee; border-top:1px solid rgba(196,104,62,0.1); display:flex; flex-direction:column; align-items:center; gap:6px; }
-  .showcase-name { font-family:'Cormorant Garamond',serif; font-size:24px; font-weight:400; color:var(--deep); letter-spacing:0.01em; line-height:1.1; }
-  .showcase-price { font-family:'DM Sans',sans-serif; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--terracotta); margin-bottom:4px; }
+  /* Info box — overlay no rodapé do card */
+  .showcase-info {
+    position:absolute; bottom:0; left:0; right:0; z-index:2;
+    padding:24px 24px 22px;
+    background:none; border-top:none;
+    display:flex; flex-direction:column; align-items:center; gap:5px; text-align:center;
+  }
+  /* Divisor fino antes do texto */
+  .showcase-info::before { content:''; display:block; width:32px; height:1px; background:rgba(196,104,62,0.5); margin-bottom:8px; }
 
-  /* Saiba Mais — contido, centralizado */
-  .showcase-saiba { background:transparent; border:1.5px solid rgba(196,104,62,0.45); color:var(--terracotta); font-family:'DM Sans',sans-serif; font-size:9px; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; padding:9px 24px; cursor:pointer; transition:all 0.25s; width:auto; }
-  .showcase-saiba:hover:not(:disabled) { background:var(--terracotta); color:#fff; border-color:var(--terracotta); }
-  .showcase-saiba:disabled { opacity:0.35; cursor:not-allowed; }
+  .showcase-name { font-family:'Cormorant Garamond',serif; font-size:26px; font-weight:300; color:#FAF3EE; letter-spacing:0.01em; line-height:1.1; text-shadow:0 1px 8px rgba(0,0,0,0.3); }
+  .showcase-price { font-family:'DM Sans',sans-serif; font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:rgba(247,240,230,0.5); margin-bottom:12px; }
+
+  /* Saiba Mais — compacto, alinhado à esquerda */
+  .showcase-saiba { background:rgba(247,240,230,0.1); border:1px solid rgba(247,240,230,0.25); color:rgba(247,240,230,0.9); font-family:'DM Sans',sans-serif; font-size:9px; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; padding:9px 22px; cursor:pointer; transition:all 0.25s; width:auto; backdrop-filter:blur(6px); animation:neon-gold-card 3s ease-in-out infinite; }
+  .showcase-saiba:hover:not(:disabled) { background:rgba(247,240,230,0.22); color:#FAF3EE; border-color:rgba(212,175,55,0.7); }
+  .showcase-saiba:disabled { opacity:1; cursor:not-allowed; animation:none; background:transparent; border:1px solid rgba(212,175,55,0.45); color:rgba(212,175,55,0.45); }
+  @keyframes neon-gold-card {
+    0%,100% { box-shadow:0 0 6px rgba(212,175,55,0.25), 0 0 14px rgba(212,175,55,0.1); border-color:rgba(212,175,55,0.4); }
+    50%      { box-shadow:0 0 12px rgba(212,175,55,0.5), 0 0 26px rgba(212,175,55,0.2); border-color:rgba(212,175,55,0.7); }
+  }
 
   /* ── DETAIL OVERLAY ── */
   .plan-detail-overlay { position:absolute; inset:0; opacity:0; pointer-events:none; transition:opacity 0.35s ease; display:flex; align-items:stretch; background:var(--deep); z-index:10; }
   .plan-detail-overlay.active { opacity:1; pointer-events:all; }
 
-  .plan-detail-img-col { flex:0 0 38%; position:relative; overflow:hidden; }
-  .plan-detail-img-col img { width:100%; height:100%; object-fit:cover; object-position:center top; display:block; }
+  .plan-detail-img-col { flex:0 0 45%; position:relative; overflow:hidden; }
+  .plan-detail-img-col img { width:100%; height:100%; object-fit:contain; object-position:center center; display:block; background:var(--deep); }
 
   .plan-detail-content { flex:1; display:flex; flex-direction:column; justify-content:center; padding:48px 52px; overflow-y:auto; }
   .plan-detail-close { position:absolute; top:20px; right:24px; background:none; border:none; color:rgba(250,243,238,0.45); font-size:28px; cursor:pointer; line-height:1; z-index:11; transition:color 0.2s; font-family:'DM Sans',sans-serif; }
@@ -1609,14 +1638,20 @@ Uma rotina simples de 3 passos que respeita quem você já é.
   .plan-detail-name { font-family:'Cormorant Garamond',serif; font-size:clamp(28px,3.5vw,42px); font-weight:300; color:#faf3ee; line-height:1.1; margin:0 0 6px; }
   .plan-detail-tagline { font-family:'Cormorant Garamond',serif; font-size:14px; font-style:italic; color:rgba(250,243,238,0.5); margin:0 0 28px; }
   .plan-detail-price-wrap { margin-bottom:28px; padding-bottom:24px; border-bottom:1px solid rgba(196,104,62,0.2); }
-  .plan-detail-price { font-family:'Cormorant Garamond',serif; font-size:48px; font-weight:300; color:#faf3ee; line-height:1; }
-  .plan-detail-period { font-family:'DM Sans',sans-serif; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:rgba(250,243,238,0.35); margin-left:6px; }
+  .plan-detail-price { font-family:'Cormorant Garamond',serif; font-size:58px; font-weight:500; color:#faf3ee; line-height:1; letter-spacing:-0.01em; }
+  .plan-detail-price .price-currency { font-size:28px; font-weight:400; vertical-align:super; line-height:1; margin-right:2px; color:rgba(250,243,238,0.75); }
+  .plan-detail-period { font-family:'DM Sans',sans-serif; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:rgba(250,243,238,0.35); margin-left:8px; }
   .plan-detail-features { list-style:none; padding:0; margin:0 0 32px; display:flex; flex-direction:column; gap:12px; }
   .plan-detail-features li { display:flex; align-items:flex-start; gap:10px; font-size:13px; color:rgba(250,243,238,0.65); line-height:1.55; font-family:'DM Sans',sans-serif; }
   .plan-detail-features li .dchk { color:var(--terracotta); font-size:12px; flex-shrink:0; margin-top:2px; }
   .plan-detail-features li strong { color:rgba(250,243,238,0.9); font-weight:500; }
-  .plan-detail-cta { display:inline-block; width:auto; padding:15px 40px; font-family:'DM Sans',sans-serif; font-size:11px; font-weight:600; letter-spacing:0.15em; text-transform:uppercase; text-decoration:none; background:var(--terracotta); color:white; border:none; cursor:pointer; transition:background 0.2s, box-shadow 0.2s; box-shadow:0 4px 20px rgba(196,104,62,0.3); }
-  .plan-detail-cta:hover { background:#a03a1e; }
+  .plan-detail-cta { display:inline-block; width:auto; align-self:flex-end; margin-top:4px; padding:15px 40px; font-family:'DM Sans',sans-serif; font-size:11px; font-weight:600; letter-spacing:0.15em; text-transform:uppercase; text-decoration:none; background:var(--terracotta); color:white; border:1px solid transparent; cursor:pointer; transition:background 0.2s, box-shadow 0.2s; animation:neon-gold-cta 3s ease-in-out infinite; }
+  .plan-detail-cta:hover { background:#a03a1e; animation:none; box-shadow:0 0 18px rgba(212,175,55,0.6), 0 0 36px rgba(212,175,55,0.25), 0 4px 20px rgba(196,104,62,0.4); }
+  @keyframes neon-gold-cta {
+    0%,100% { box-shadow:0 0 8px rgba(212,175,55,0.3), 0 0 20px rgba(212,175,55,0.12), 0 4px 20px rgba(196,104,62,0.3); border-color:rgba(212,175,55,0.2); }
+    50%      { box-shadow:0 0 16px rgba(212,175,55,0.55), 0 0 36px rgba(212,175,55,0.22), 0 4px 20px rgba(196,104,62,0.3); border-color:rgba(212,175,55,0.45); }
+  }
+  .plan-detail-cta-soon { display:inline-block; align-self:flex-end; margin-top:4px; padding:15px 40px; font-family:'DM Sans',sans-serif; font-size:11px; font-weight:500; letter-spacing:0.15em; text-transform:uppercase; border:1px solid rgba(212,175,55,0.5); color:rgba(212,175,55,0.5); background:transparent; }
 
   .plans-guarantee-main { text-align:center; font-size:11px; color:rgba(107,87,68,0.45); letter-spacing:0.1em; margin:28px 0 0; padding:0 24px; }
 
@@ -1641,7 +1676,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
       <!-- CARD 1 — A Dose R$9,90 -->
       <div class="showcase-card">
         <div class="showcase-img-wrap">
-          <img src="assets/images/ritual-de-pele.jpeg" alt="A Dose" class="showcase-img" />
+          <img src="assets/images/ritual-de-pele.jpeg" alt="A Dose" class="showcase-img" style="object-position:center 18%;" />
         </div>
         <div class="showcase-info">
           <span class="showcase-name">A Dose</span>
@@ -1650,14 +1685,14 @@ Uma rotina simples de 3 passos que respeita quem você já é.
         </div>
       </div>
 
-      <!-- CARD 2 — Com Presença R$14,90 -->
+      <!-- CARD 2 — O Encontro R$14,90 -->
       <div class="showcase-card">
         <div class="showcase-img-wrap">
-          <img src="assets/influencer-silhueta.jpg" alt="Com Presença" class="showcase-img" />
+          <img src="assets/images/influencer-silhueta.jpg" alt="O Encontro" class="showcase-img" />
           <span class="showcase-soon">Em breve</span>
         </div>
         <div class="showcase-info">
-          <span class="showcase-name">Com Presença</span>
+          <span class="showcase-name">O Encontro</span>
           <span class="showcase-price">R$14,90/mês</span>
           <button class="showcase-saiba" disabled>Em breve</button>
         </div>
@@ -1696,15 +1731,45 @@ Uma rotina simples de 3 passos que respeita quem você já é.
       tag: 'Plano Essencial',
       name: 'A Dose',
       tagline: 'O cuidado que cabe na sua rotina.',
-      price: 'R$9,90',
+      price: '<span class="price-currency">R$</span>9,90',
       features: [
-        { text: '<strong>PDF semanal de skincare</strong> com receitas naturais e produtos curados' },
-        { text: 'Ingredientes que você já tem em casa — sem complicação' },
+        { text: '<strong>PDF semanal de skincare</strong> com 2 temas curados da semana' },
+        { text: 'Receitas naturais com ingredientes que você já tem em casa' },
         { text: 'Dicas adaptadas à estação, ao clima e ao seu tipo de pele' },
-        { text: 'Conteúdo novo a cada semana' },
+        { text: 'Conteúdo renovado toda semana, sem fórmulas repetidas' },
         { text: 'Cancele a qualquer momento' },
       ],
       cta: { label: 'Assinar por R$9,90/mês →', href: 'https://buy.stripe.com/bJe7sM2sma0c7Cmbb26wE03', disabled: false }
+    },
+    encontro: {
+      img: 'assets/images/influencer-silhueta.jpg',
+      tag: 'Plano Presença',
+      name: 'O Encontro',
+      tagline: 'Alguém que cuida da sua pele com você.',
+      price: '<span class="price-currency">R$</span>14,90',
+      features: [
+        { text: '<strong>PDF semanal completo</strong> — todos os 7 temas da semana' },
+        { text: 'Rotina personalizada ao seu momento de vida e tipo de pele' },
+        { text: 'Conteúdo exclusivo adaptado à sua fase (hormonal, materna, etária)' },
+        { text: 'Acesso <strong>2h antes</strong> a novidades e lançamentos' },
+        { text: 'Cancele a qualquer momento' },
+      ],
+      cta: { label: 'Em breve', href: '#', disabled: true }
+    },
+    completa: {
+      img: 'assets/images/pele-radiante.jpeg',
+      tag: 'Plano Premium',
+      name: 'Experiência Completa',
+      tagline: 'O cuidado que você merece, sem abrir mão de nada.',
+      price: '<span class="price-currency">R$</span>19,90',
+      features: [
+        { text: '<strong>PDF semanal completo</strong> + e-book mensal temático exclusivo (rituais sazonais, guia de ativos, cuidados por fase...)' },
+        { text: 'Rotina completa personalizada: cuidados de manhã, noite e semanais' },
+        { text: 'Acesso prioritário <strong>2h antes</strong> a lançamentos + cupom exclusivo' },
+        { text: 'Conteúdo aprofundado com análise de ingredientes e comparativos' },
+        { text: 'Cancele a qualquer momento' },
+      ],
+      cta: { label: 'Em breve', href: '#', disabled: true }
     }
   };
 
@@ -1722,7 +1787,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
     ).join('');
 
     const ctaHtml = plan.cta.disabled
-      ? `<span style="font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(250,243,238,0.25);">Em breve</span>`
+      ? `<span class="plan-detail-cta-soon">Em breve</span>`
       : `<a href="${plan.cta.href}" target="_blank" class="plan-detail-cta" onclick="closePlanDetail()">${plan.cta.label}</a>`;
 
     content.innerHTML = `
@@ -1731,7 +1796,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
       <p class="plan-detail-tagline">${plan.tagline}</p>
       <div class="plan-detail-price-wrap">
         <span class="plan-detail-price">${plan.price}</span>
-        <span class="plan-detail-period">por mês · cancele quando quiser</span>
+        <span class="plan-detail-period">por mês</span>
       </div>
       <ul class="plan-detail-features">${featuresHtml}</ul>
       ${ctaHtml}
@@ -1797,7 +1862,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
       <ul>
         <li><a href="#" onclick="openLegal('produto')">A Pele que Você Lembra</a></li>
         <li><a href="#" onclick="openLegal('planos')">Ver planos</a></li>
-        <li><span>Com Presença <span class="soon">em breve</span></span></li>
+        <li><span>O Encontro <span class="soon">em breve</span></span></li>
         <li><a href="#" onclick="openLegal('planos')">Experiência Completa</a></li>
       </ul>
     </div>
@@ -2490,117 +2555,216 @@ Uma rotina simples de 3 passos que respeita quem você já é.
         .plans-divider { display:flex; align-items:center; gap:12px; margin-bottom:32px; justify-content:center; }
         .plans-divider::before, .plans-divider::after { content:''; flex:1; height:1px; background:rgba(196,104,62,0.2); }
         .plans-divider span { font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:rgba(196,104,62,0.5); font-family:'DM Sans',sans-serif; }
-        .plans-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:20px; }
-        .plan-card { border:1.5px solid rgba(196,104,62,0.15); overflow:hidden; position:relative; display:flex; flex-direction:column; gap:0; background:rgba(247,240,230,0.5); transition:border-color 0.3s, transform 0.3s; }
-        .plan-card:hover { border-color:rgba(196,104,62,0.4); transform:translateY(-4px); }
-        .plan-card.featured { border-color:var(--terracotta); background:var(--deep); }
-        .plan-card-body { padding:28px 24px; display:flex; flex-direction:column; flex:1; }
-        .plan-card-img { width:100%; height:160px; object-fit:cover; object-position:center top; display:block; }
-        .plan-card-img-premium { width:100%; height:160px; background:linear-gradient(135deg, #1a0f0a 0%, #2d1a10 40%, #3d2415 60%, #c4683e 100%); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:8px; position:relative; overflow:hidden; }
-        .plan-card-img-premium::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 70% 30%, rgba(196,104,62,0.35) 0%, transparent 65%); }
-        .plan-card-img-premium-ring { width:56px; height:56px; border-radius:50%; border:1.5px solid rgba(196,104,62,0.6); display:flex; align-items:center; justify-content:center; position:relative; z-index:1; }
-        .plan-card-img-premium-ring::after { content:''; position:absolute; width:44px; height:44px; border-radius:50%; border:1px solid rgba(196,104,62,0.3); }
-        .plan-card-img-premium-star { font-size:20px; line-height:1; position:relative; z-index:1; }
-        .plan-card-img-premium-label { font-size:9px; letter-spacing:0.25em; text-transform:uppercase; color:rgba(196,104,62,0.8); font-family:'DM Sans',sans-serif; position:relative; z-index:1; }
-        .plan-badge { position:absolute; top:148px; left:50%; transform:translateX(-50%); background:var(--terracotta); color:white; font-size:9px; letter-spacing:0.18em; text-transform:uppercase; font-family:'DM Sans',sans-serif; font-weight:600; padding:4px 14px; white-space:nowrap; z-index:2; }
-        .plan-badge-soon { position:absolute; top:12px; right:12px; background:rgba(107,87,68,0.7); color:rgba(247,240,230,0.85); font-size:8px; letter-spacing:0.15em; text-transform:uppercase; font-family:'DM Sans',sans-serif; font-weight:600; padding:3px 10px; white-space:nowrap; backdrop-filter:blur(4px); }
-        .plan-icon { font-size:32px; text-align:center; margin-bottom:14px; }
-        .plan-name { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:400; color:var(--deep); text-align:center; margin-bottom:4px; }
-        .plan-card.featured .plan-name { color:var(--cream); }
-        .plan-tagline { font-size:11px; color:var(--terracotta); font-style:italic; text-align:center; margin-bottom:20px; font-family:'Cormorant Garamond',serif; }
-        .plan-card.featured .plan-tagline { color:rgba(247,240,230,0.6); }
-        .plan-price { text-align:center; margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid rgba(196,104,62,0.15); }
-        .plan-price-val { font-family:'Cormorant Garamond',serif; font-size:38px; font-weight:300; color:var(--deep); line-height:1; }
-        .plan-card.featured .plan-price-val { color:var(--cream); }
-        .plan-price-period { font-size:11px; color:rgba(107,87,68,0.5); letter-spacing:0.1em; text-transform:uppercase; font-family:'DM Sans',sans-serif; display:block; margin-top:4px; }
-        .plan-card.featured .plan-price-period { color:rgba(247,240,230,0.4); }
-        .plan-features { list-style:none; padding:0; margin:0 0 24px; display:flex; flex-direction:column; gap:10px; flex:1; }
-        .plan-features li { display:flex; align-items:flex-start; gap:8px; font-size:12.5px; color:var(--mid); line-height:1.55; }
-        .plan-card.featured .plan-features li { color:rgba(247,240,230,0.65); }
-        .plan-features li .check { color:var(--sage); font-size:13px; flex-shrink:0; margin-top:1px; }
-        .plan-features li strong { color:var(--terracotta); }
-        .plan-card.featured .plan-features li strong { color:#f0c080; }
-        .plan-cta { width:100%; padding:13px 16px; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; font-size:11px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; transition:all 0.2s; text-decoration:none; display:block; text-align:center; box-sizing:border-box; }
-        .plan-cta-outline { background:transparent; color:var(--terracotta); border:1.5px solid rgba(196,104,62,0.4); }
-        .plan-cta-outline:hover { background:var(--terracotta); color:white; }
-        .plan-cta-filled { background:var(--terracotta); color:white; box-shadow:0 4px 16px rgba(196,104,62,0.3); }
-        .plan-cta-filled:hover { background:#a03a1e; box-shadow:0 6px 24px rgba(196,104,62,0.45); }
-        .plan-cta-disabled { background:transparent; color:rgba(107,87,68,0.35); border:1.5px solid rgba(196,104,62,0.15); cursor:not-allowed; }
+
+        /* GRID EDITORIAL */
+        .plans-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:20px; align-items:end; }
+
+        /* CARD BASE — editorial full-bleed */
+        .plan-card {
+          position:relative; overflow:hidden; cursor:pointer;
+          transition:transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94), box-shadow 0.4s;
+          box-shadow:0 4px 24px rgba(42,26,36,0.12);
+        }
+        .plan-card:hover { transform:translateY(-6px); box-shadow:0 16px 48px rgba(42,26,36,0.22); }
+
+        /* Altura editorial — card central maior */
+        .plan-card { height:420px; }
+        .plan-card.featured { height:480px; }
+
+        /* IMAGEM / FUNDO cobre o card inteiro */
+        .plan-card-bg {
+          position:absolute; inset:0; width:100%; height:100%;
+          object-fit:cover; object-position:center top;
+          transition:transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
+        }
+        .plan-card:hover .plan-card-bg { transform:scale(1.04); }
+
+        /* Gradiente sobre a imagem — de baixo para cima */
+        .plan-card::after {
+          content:''; position:absolute; inset:0;
+          background:linear-gradient(to top,
+            rgba(20,10,8,0.94) 0%,
+            rgba(20,10,8,0.72) 38%,
+            rgba(20,10,8,0.18) 70%,
+            transparent 100%);
+          pointer-events:none;
+        }
+
+        /* OVERLAY — caixa de texto no rodapé */
+        .plan-card-overlay {
+          position:absolute; bottom:0; left:0; right:0;
+          z-index:2; padding:28px 24px 26px;
+        }
+
+        /* Badge topo */
+        .plan-badge-soon {
+          position:absolute; top:16px; right:16px; z-index:3;
+          background:rgba(20,10,8,0.55); color:rgba(247,240,230,0.8);
+          font-size:8px; letter-spacing:0.2em; text-transform:uppercase;
+          font-family:'DM Sans',sans-serif; font-weight:600;
+          padding:4px 12px; backdrop-filter:blur(6px);
+          border:1px solid rgba(247,240,230,0.15);
+        }
+        .plan-badge-top {
+          position:absolute; top:16px; left:16px; z-index:3;
+          background:var(--terracotta); color:white;
+          font-size:8px; letter-spacing:0.2em; text-transform:uppercase;
+          font-family:'DM Sans',sans-serif; font-weight:600;
+          padding:4px 12px;
+        }
+
+        /* Nome do plano */
+        .plan-name {
+          font-family:'Cormorant Garamond',serif; font-size:26px; font-weight:300;
+          color:#FAF3EE; line-height:1.1; margin-bottom:4px;
+          text-shadow:0 1px 8px rgba(0,0,0,0.4);
+        }
+        .plan-card.featured .plan-name { font-size:30px; }
+
+        /* Tagline */
+        .plan-tagline {
+          font-family:'Cormorant Garamond',serif; font-style:italic;
+          font-size:12px; color:rgba(247,240,230,0.6);
+          margin-bottom:14px; line-height:1.5;
+        }
+
+        /* Preço */
+        .plan-price-row { display:flex; align-items:baseline; gap:8px; margin-bottom:18px; }
+        .plan-price-val {
+          font-family:'Cormorant Garamond',serif; font-size:34px; font-weight:300;
+          color:#FAF3EE; line-height:1;
+        }
+        .plan-card.featured .plan-price-val { font-size:40px; }
+        .plan-price-period {
+          font-size:10px; color:rgba(247,240,230,0.45); letter-spacing:0.1em;
+          text-transform:uppercase; font-family:'DM Sans',sans-serif;
+        }
+
+        /* Divisor */
+        .plan-divider { height:1px; background:rgba(247,240,230,0.12); margin-bottom:18px; }
+
+        /* CTA */
+        .plan-cta {
+          display:block; width:100%; padding:12px 16px; text-align:center;
+          font-family:'DM Sans',sans-serif; font-size:10px; font-weight:600;
+          letter-spacing:0.16em; text-transform:uppercase;
+          text-decoration:none; transition:all 0.25s; box-sizing:border-box; border:none; cursor:pointer;
+        }
+        .plan-cta-glass {
+          background:rgba(247,240,230,0.1); color:rgba(247,240,230,0.9);
+          border:1px solid rgba(247,240,230,0.25); backdrop-filter:blur(8px);
+        }
+        .plan-cta-glass:hover { background:rgba(247,240,230,0.22); color:#FAF3EE; }
+        .plan-cta-filled {
+          background:var(--terracotta); color:white;
+          box-shadow:0 4px 16px rgba(196,104,62,0.35);
+        }
+        .plan-cta-filled:hover { background:#a03a1e; box-shadow:0 6px 24px rgba(196,104,62,0.5); }
+        .plan-cta-disabled {
+          background:rgba(247,240,230,0.06); color:rgba(247,240,230,0.3);
+          border:1px solid rgba(247,240,230,0.1); cursor:not-allowed;
+        }
+
+        /* Fundo CSS editorial para cada card */
+        .plan-bg-semente {
+          background:
+            radial-gradient(ellipse at 30% 0%, rgba(196,120,80,0.6) 0%, transparent 55%),
+            radial-gradient(ellipse at 80% 60%, rgba(143,169,154,0.3) 0%, transparent 50%),
+            linear-gradient(160deg, #1c0f0a 0%, #2e1810 35%, #1a0e08 70%, #0f0a06 100%);
+        }
+        .plan-bg-presenca {
+          background:
+            radial-gradient(ellipse at 60% 15%, rgba(180,140,120,0.45) 0%, transparent 50%),
+            radial-gradient(ellipse at 20% 80%, rgba(196,104,62,0.25) 0%, transparent 45%),
+            linear-gradient(170deg, #0e0a0d 0%, #1e1018 40%, #150d10 75%, #0a0608 100%);
+        }
+        .plan-bg-completa {
+          background:
+            radial-gradient(ellipse at 75% 20%, rgba(196,104,62,0.5) 0%, transparent 50%),
+            radial-gradient(ellipse at 25% 75%, rgba(160,80,40,0.3) 0%, transparent 45%),
+            linear-gradient(145deg, #120a06 0%, #241408 35%, #180f06 65%, #0e0804 100%);
+        }
+
+        /* Silhueta decorativa — "O Encontro" */
+        .plan-silhouette {
+          position:absolute; bottom:0; left:50%; transform:translateX(-50%);
+          width:180px; height:340px; z-index:1; opacity:0.18;
+          background:linear-gradient(to top, rgba(247,240,230,0.9) 0%, rgba(247,240,230,0.3) 60%, transparent 100%);
+          clip-path:polygon(35% 0%, 65% 0%, 78% 15%, 82% 30%, 75% 45%, 72% 60%, 80% 75%, 85% 88%, 80% 100%, 20% 100%, 15% 88%, 20% 75%, 28% 60%, 25% 45%, 18% 30%, 22% 15%);
+          filter:blur(12px);
+        }
+
+        /* Ornamento "Experiência Completa" */
+        .plan-ornament {
+          position:absolute; top:24px; left:50%; transform:translateX(-50%);
+          z-index:3; display:flex; flex-direction:column; align-items:center; gap:6px;
+        }
+        .plan-ornament-ring {
+          width:48px; height:48px; border-radius:50%;
+          border:1px solid rgba(196,104,62,0.5);
+          display:flex; align-items:center; justify-content:center;
+        }
+        .plan-ornament-star { color:rgba(196,104,62,0.8); font-size:18px; }
+
         .plans-guarantee { text-align:center; font-size:11px; color:rgba(107,87,68,0.4); letter-spacing:0.1em; display:flex; align-items:center; justify-content:center; gap:6px; padding-top:4px; }
-        @media(max-width:580px){ .plans-grid{grid-template-columns:1fr;} }
+
+        @media(max-width:640px){
+          .plans-grid { grid-template-columns:1fr; }
+          .plan-card, .plan-card.featured { height:380px; }
+        }
       </style>
       <h2 class="plans-title">Escolha o seu <em>cuidado</em></h2>
       <div class="plans-divider"><span>Planos Refúgio da Pele</span></div>
       <div class="plans-grid">
 
         <!-- PLANO 1 - A Semente R$9,90 -->
-        <div class="plan-card">
-          <div class="plan-card-body">
-            <div class="plan-icon">🌸</div>
+        <div class="plan-card" onclick="openLegal('planos')">
+          <div class="plan-card-bg plan-bg-semente"></div>
+          <div class="plan-card-overlay">
+            <div class="plan-divider"></div>
             <div class="plan-name">A Semente</div>
             <div class="plan-tagline">Uma semente plantada com intenção vira raiz.</div>
-            <div class="plan-price">
+            <div class="plan-price-row">
               <span class="plan-price-val">R$9,90</span>
-              <span class="plan-price-period">por mês · cancele quando quiser</span>
+              <span class="plan-price-period">/ mês</span>
             </div>
-            <ul class="plan-features">
-              <li><span class="check">✦</span> PDF semanal de skincare toda semana</li>
-              <li><span class="check">✦</span> Receitas naturais com ingredientes caseiros</li>
-              <li><span class="check">✦</span> Dicas de produtos de prateleira curados</li>
-              <li><span class="check">✦</span> Conteúdo novo toda semana, sem repetição</li>
-              <li><span class="check">✦</span> Cancele a qualquer momento</li>
-            </ul>
-            <a href="https://buy.stripe.com/bJe7sM2sma0c7Cmbb26wE03" target="_blank" class="plan-cta plan-cta-outline" onclick="closeLegalModal()">Quero este plano →</a>
+            <a href="https://buy.stripe.com/bJe7sM2sma0c7Cmbb26wE03" target="_blank" class="plan-cta plan-cta-glass" onclick="event.stopPropagation()">Saiba mais →</a>
           </div>
         </div>
 
-        <!-- PLANO 2 - Com Presença R$14,90 -->
-        <div class="plan-card">
-          <img src="assets/influencer-silhueta.jpg" alt="Influencer Refúgio da Pele" class="plan-card-img" />
+        <!-- PLANO 2 - O Encontro R$14,90 -->
+        <div class="plan-card" onclick="openLegal('planos')">
+          <div class="plan-card-bg plan-bg-presenca"></div>
+          <div class="plan-silhouette"></div>
           <span class="plan-badge-soon">Em breve</span>
-          <div class="plan-card-body">
-            <div class="plan-name">Com Presença</div>
-            <div class="plan-tagline">Cuide da pele com quem te inspira.</div>
-            <div class="plan-price">
+          <div class="plan-card-overlay">
+            <div class="plan-divider"></div>
+            <div class="plan-name">O Encontro</div>
+            <div class="plan-tagline">Alguém que cuida da sua pele com você.</div>
+            <div class="plan-price-row">
               <span class="plan-price-val">R$14,90</span>
-              <span class="plan-price-period">por mês · cancele quando quiser</span>
+              <span class="plan-price-period">/ mês</span>
             </div>
-            <ul class="plan-features">
-              <li><span class="check">✦</span> Tudo do plano A Semente</li>
-              <li><span class="check">✦</span> <strong>Vídeos exclusivos da influencer toda semana</strong></li>
-              <li><span class="check">✦</span> Rotinas personalizadas por tipo de pele</li>
-              <li><span class="check">✦</span> Conteúdo de autocuidado e presença</li>
-              <li><span class="check">✦</span> Cancele a qualquer momento</li>
-            </ul>
-            <button class="plan-cta plan-cta-disabled" disabled>Em breve →</button>
+            <button class="plan-cta plan-cta-disabled" disabled>Em breve</button>
           </div>
         </div>
 
-        <!-- PLANO 3 - Experiência Completa R$19,90 FEATURED -->
-        <div class="plan-card featured">
-          <div class="plan-card-img-premium">
-            <div class="plan-card-img-premium-ring">
-              <span class="plan-card-img-premium-star">✦</span>
-            </div>
-            <span class="plan-card-img-premium-label">Experiência Completa</span>
+        <!-- PLANO 3 - Experiência Completa R$19,90 -->
+        <div class="plan-card featured" onclick="openLegal('planos')">
+          <div class="plan-card-bg plan-bg-completa"></div>
+          <div class="plan-ornament">
+            <div class="plan-ornament-ring"><span class="plan-ornament-star">✦</span></div>
           </div>
-          <span class="plan-badge">✦ Mais completo</span>
-          <div class="plan-card-body" style="margin-top:12px;">
+          <span class="plan-badge-top">✦ Mais completo</span>
+          <div class="plan-card-overlay">
+            <div class="plan-divider"></div>
             <div class="plan-name">Experiência Completa</div>
             <div class="plan-tagline">Para quem escolheu se colocar em primeiro lugar.</div>
-            <div class="plan-price">
+            <div class="plan-price-row">
               <span class="plan-price-val">R$19,90</span>
-              <span class="plan-price-period">por mês · cancele quando quiser</span>
+              <span class="plan-price-period">/ mês</span>
             </div>
-            <ul class="plan-features">
-              <li><span class="check">✦</span> <strong>Tudo dos dois planos anteriores</strong></li>
-              <li><span class="check">✦</span> Guia completo sempre atualizado</li>
-              <li><span class="check">✦</span> Rotinas e ingredientes por faixa etária</li>
-              <li><span class="check">✦</span> <strong>Acesso a todo conteúdo em primeira mão</strong></li>
-              <li><span class="check">✦</span> Materiais exclusivos mensais inclusos</li>
-              <li><span class="check">✦</span> Cancele a qualquer momento</li>
-            </ul>
-            <a href="https://buy.stripe.com/fZueVe2sm6O009Ufri6wE01" target="_blank" class="plan-cta plan-cta-filled" onclick="closeLegalModal()">Começar agora →</a>
+            <a href="https://buy.stripe.com/fZueVe2sm6O009Ufri6wE01" target="_blank" class="plan-cta plan-cta-filled" onclick="event.stopPropagation()">Começar agora →</a>
           </div>
         </div>
 
