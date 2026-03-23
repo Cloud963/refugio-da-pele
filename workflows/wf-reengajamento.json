@@ -1,0 +1,338 @@
+{
+  "name": "WF_REENGAJAMENTO — Resposta Enquete Dia 5",
+  "nodes": [
+    {
+      "id": "re-001",
+      "name": "Webhook — Resposta Z-API",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "zapi-reengajamento",
+        "options": {}
+      }
+    },
+    {
+      "id": "re-002",
+      "name": "IF — Respondeu Sim",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        460,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "leftValue": "={{ $json.body.pollResponse || $json.body.text || '' }}",
+              "rightValue": "Sim",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "re-003",
+      "name": "IF — Menor (Sim)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        680,
+        160
+      ],
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "leftValue": "={{ $json.body.faixa_etaria || '' }}",
+              "rightValue": "13-17",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "re-004",
+      "name": "Z-API — Preview + Upsell (Adulto)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        80
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.z-api.io/instances/3F06247099D391366D735EC66E320A44/token/9FEB7A24EE74CDCBC327832A/send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Client-Token",
+              "value": "F212a72ec09cb4f14b062257d320f4573S"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": {
+          "phone": "={{ $json.body.phone }}",
+          "message": "Ótimo! 🌿 Te mando a próxima edição assim que sair no domingo.\n\nE se um dia quiser ir além — acesso completo a todos os PDFs toda semana, mais conteúdo e rotinas personalizadas — temos o plano A Semente por apenas R$9,90/mês 🌸\n\nPor ora, te vejo domingo. Cuide-se bem! ✨"
+        }
+      }
+    },
+    {
+      "id": "re-005",
+      "name": "Z-API — Preview Historinha (Menor)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        240
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.z-api.io/instances/3F06247099D391366D735EC66E320A44/token/9FEB7A24EE74CDCBC327832A/send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Client-Token",
+              "value": "F212a72ec09cb4f14b062257d320f4573S"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": {
+          "phone": "={{ $json.body.phone }}",
+          "message": "Que bom! 🌱 Te mando a próxima edição no domingo.\n\nCada semana tem uma historinha nova — sobre como cuidar da pele de forma leve e natural, com curiosidades do mundo todo. Te vejo lá! ✨"
+        }
+      }
+    },
+    {
+      "id": "re-006",
+      "name": "Z-API — Tchau + Pede Feedback (Não)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        680,
+        440
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.z-api.io/instances/3F06247099D391366D735EC66E320A44/token/9FEB7A24EE74CDCBC327832A/send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Client-Token",
+              "value": "F212a72ec09cb4f14b062257d320f4573S"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": {
+          "phone": "={{ $json.body.phone }}",
+          "message": "Tudo bem, caso queira voltar a receber você deve visitar o site novamente. Até breve! 😊\n\nAntes de ir — posso te perguntar o que achou do PDF? Qualquer resposta me ajuda muito (pode ser uma palavra só)."
+        }
+      }
+    },
+    {
+      "id": "re-007",
+      "name": "Supabase — Marcar Reativar 30d",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        440
+      ],
+      "parameters": {
+        "method": "PATCH",
+        "url": "https://aftrvqwazdiumibdfjjy.supabase.co/rest/v1/clientes?telefone=eq.={{ encodeURIComponent($json.body.phone) }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "SUPABASE_ANON_KEY_PLACEHOLDER"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer SUPABASE_ANON_KEY_PLACEHOLDER"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": {
+          "status": "reativar_30d",
+          "ultima_interacao": "={{ new Date().toISOString() }}"
+        }
+      }
+    },
+    {
+      "id": "re-008",
+      "name": "Sheets — Salvar Feedback",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1120,
+        300
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DzhWrB0cOwGmCaUD",
+          "name": "Google Sheets account"
+        }
+      },
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1RJREELqinbpue4-jkIXkb-Bi_pWMot3oI_Sk4GVQc7o",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Feedback",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "nome": "={{ $json.body.nome || '' }}",
+            "whatsapp": "={{ $json.body.phone }}",
+            "faixa_etaria": "={{ $json.body.faixa_etaria || '' }}",
+            "resposta_enquete": "={{ $json.body.pollResponse || $json.body.text || '' }}",
+            "interesse_pele": "={{ $json.body.interestResponse || '' }}",
+            "data": "={{ new Date().toISOString().split('T')[0] }}",
+            "semana": "={{ new Date().toISOString().slice(0,10) }}",
+            "fonte": "Enquete Dia 5"
+          },
+          "matchingColumns": []
+        },
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Webhook — Resposta Z-API": {
+      "main": [
+        [
+          {
+            "node": "IF — Respondeu Sim",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF — Respondeu Sim": {
+      "main": [
+        [
+          {
+            "node": "IF — Menor (Sim)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Z-API — Tchau + Pede Feedback (Não)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF — Menor (Sim)": {
+      "main": [
+        [
+          {
+            "node": "Z-API — Preview + Upsell (Adulto)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Z-API — Preview Historinha (Menor)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Z-API — Preview + Upsell (Adulto)": {
+      "main": [
+        [
+          {
+            "node": "Sheets — Salvar Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Z-API — Preview Historinha (Menor)": {
+      "main": [
+        [
+          {
+            "node": "Sheets — Salvar Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Z-API — Tchau + Pede Feedback (Não)": {
+      "main": [
+        [
+          {
+            "node": "Supabase — Marcar Reativar 30d",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase — Marcar Reativar 30d": {
+      "main": [
+        [
+          {
+            "node": "Sheets — Salvar Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "instanceId": "b3f36ad4b8a579dd86116dc9449ee81a2e4c05ad27fc75bf5538fe5592ed48cb"
+  },
+  "id": "WF_REENGAJAMENTO",
+  "tags": []
+}
