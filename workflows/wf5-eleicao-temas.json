@@ -359,6 +359,436 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [1560, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://serpapi.com/search.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "engine",
+              "value": "google_trends"
+            },
+            {
+              "name": "q",
+              "value": "retinol,niacinamida,argila,ácido hialurônico,peptídeos"
+            },
+            {
+              "name": "date",
+              "value": "now 7-d"
+            },
+            {
+              "name": "geo",
+              "value": "BR"
+            },
+            {
+              "name": "data_type",
+              "value": "RELATED_QUERIES"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $vars.SERPAPI_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e5f6a7b8-0005-0005-0005-000000000101",
+      "name": "SerpAPI — Trends Semana",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 600]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://serpapi.com/search.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "engine",
+              "value": "google_trends"
+            },
+            {
+              "name": "q",
+              "value": "retinol,niacinamida,argila,ácido hialurônico,peptídeos"
+            },
+            {
+              "name": "date",
+              "value": "today 1-m"
+            },
+            {
+              "name": "geo",
+              "value": "BR"
+            },
+            {
+              "name": "data_type",
+              "value": "RELATED_QUERIES"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $vars.SERPAPI_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e5f6a7b8-0005-0005-0005-000000000102",
+      "name": "SerpAPI — Trends Mês",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 600]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://serpapi.com/search.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "engine",
+              "value": "google_trends"
+            },
+            {
+              "name": "q",
+              "value": "retinol,niacinamida,argila,ácido hialurônico,peptídeos"
+            },
+            {
+              "name": "date",
+              "value": "today 12-m"
+            },
+            {
+              "name": "geo",
+              "value": "BR"
+            },
+            {
+              "name": "data_type",
+              "value": "RELATED_QUERIES"
+            },
+            {
+              "name": "api_key",
+              "value": "={{ $vars.SERPAPI_KEY }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e5f6a7b8-0005-0005-0005-000000000103",
+      "name": "SerpAPI — Trends Ano",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 600]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Recebe 3 inputs: [0] Semana, [1] Mês, [2] Ano\n// Cada input é a resposta da SerpAPI com related_queries\nconst hoje = new Date();\nconst semana = `${hoje.getFullYear()}-W${String(Math.ceil((hoje.getDate() - hoje.getDay() + 10) / 7)).padStart(2,'0')}`;\n\nfunction extrairTopTema(inputIndex) {\n  try {\n    const data = $input.all()[inputIndex]?.json;\n    if (!data) return 'sem dados';\n    // SerpAPI google_trends retorna related_queries por keyword\n    // Verificar se existe interest_over_time ou related_queries\n    const rq = data.related_queries;\n    if (rq) {\n      // Pode ser um objeto com chaves por keyword ou array\n      const primeiraChave = Object.keys(rq)[0];\n      if (primeiraChave && rq[primeiraChave]?.top?.length > 0) {\n        return rq[primeiraChave].top[0].query || 'sem dados';\n      }\n    }\n    // Fallback: tentar interest_over_time para pegar keyword com mais interesse\n    const iot = data.interest_over_time;\n    if (iot && iot.averages && iot.averages.length > 0) {\n      const sorted = [...iot.averages].sort((a, b) => b.value - a.value);\n      return sorted[0].query || sorted[0].keyword || 'sem dados';\n    }\n    return 'sem dados';\n  } catch(e) {\n    return 'erro: ' + e.message;\n  }\n}\n\nconst tema_semana = extrairTopTema(0);\nconst tema_mes = extrairTopTema(1);\nconst tema_ano = extrairTopTema(2);\n\nreturn [{ json: { tema_semana, tema_mes, tema_ano, semana } }];"
+      },
+      "id": "e5f6a7b8-0005-0005-0005-000000000104",
+      "name": "Extrair Temas Trends",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 600]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1RJREELqinbpue4-jkIXkb-Bi_pWMot3oI_Sk4GVQc7o",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Temas da Semana",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Tema": "={{ $json.tema_semana }}",
+            "Tema Usado": "Não",
+            "Tema Novo": "Sim",
+            "Votos Clientes": "0",
+            "Semana Usada": "={{ $json.semana }}",
+            "Fonte": "Trends Semana"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Tema",
+              "displayName": "Tema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tema Usado",
+              "displayName": "Tema Usado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tema Novo",
+              "displayName": "Tema Novo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Votos Clientes",
+              "displayName": "Votos Clientes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Semana Usada",
+              "displayName": "Semana Usada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fonte",
+              "displayName": "Fonte",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "e5f6a7b8-0005-0005-0005-000000000105",
+      "name": "Sheets — Salvar Trends Semana",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [1340, 600],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DzhWrB0cOwGmCaUD",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1RJREELqinbpue4-jkIXkb-Bi_pWMot3oI_Sk4GVQc7o",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Temas da Semana",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Tema": "={{ $('Extrair Temas Trends').item.json.tema_mes }}",
+            "Tema Usado": "Não",
+            "Tema Novo": "Sim",
+            "Votos Clientes": "0",
+            "Semana Usada": "={{ $('Extrair Temas Trends').item.json.semana }}",
+            "Fonte": "Trends Mês"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Tema",
+              "displayName": "Tema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tema Usado",
+              "displayName": "Tema Usado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tema Novo",
+              "displayName": "Tema Novo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Votos Clientes",
+              "displayName": "Votos Clientes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Semana Usada",
+              "displayName": "Semana Usada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fonte",
+              "displayName": "Fonte",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "e5f6a7b8-0005-0005-0005-000000000106",
+      "name": "Sheets — Salvar Trends Mês",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [1560, 600],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DzhWrB0cOwGmCaUD",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1RJREELqinbpue4-jkIXkb-Bi_pWMot3oI_Sk4GVQc7o",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Temas da Semana",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Tema": "={{ $('Extrair Temas Trends').item.json.tema_ano }}",
+            "Tema Usado": "Não",
+            "Tema Novo": "Sim",
+            "Votos Clientes": "0",
+            "Semana Usada": "={{ $('Extrair Temas Trends').item.json.semana }}",
+            "Fonte": "Trends Ano"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Tema",
+              "displayName": "Tema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tema Usado",
+              "displayName": "Tema Usado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tema Novo",
+              "displayName": "Tema Novo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Votos Clientes",
+              "displayName": "Votos Clientes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Semana Usada",
+              "displayName": "Semana Usada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fonte",
+              "displayName": "Fonte",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "e5f6a7b8-0005-0005-0005-000000000107",
+      "name": "Sheets — Salvar Trends Ano",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [1780, 600],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DzhWrB0cOwGmCaUD",
+          "name": "Google Sheets account"
+        }
+      }
     }
   ],
   "connections": {
@@ -367,6 +797,11 @@
         [
           {
             "node": "Google Sheets — Ler Feedback",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SerpAPI — Trends Semana",
             "type": "main",
             "index": 0
           }
@@ -422,6 +857,72 @@
         [
           {
             "node": "HTTP — Executar WF2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI — Trends Semana": {
+      "main": [
+        [
+          {
+            "node": "SerpAPI — Trends Mês",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI — Trends Mês": {
+      "main": [
+        [
+          {
+            "node": "SerpAPI — Trends Ano",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI — Trends Ano": {
+      "main": [
+        [
+          {
+            "node": "Extrair Temas Trends",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrair Temas Trends": {
+      "main": [
+        [
+          {
+            "node": "Sheets — Salvar Trends Semana",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheets — Salvar Trends Semana": {
+      "main": [
+        [
+          {
+            "node": "Sheets — Salvar Trends Mês",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheets — Salvar Trends Mês": {
+      "main": [
+        [
+          {
+            "node": "Sheets — Salvar Trends Ano",
             "type": "main",
             "index": 0
           }
