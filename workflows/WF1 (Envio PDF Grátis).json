@@ -383,6 +383,201 @@
       ],
       "id": "a1b2c3d4-4001-4001-4001-400000000001",
       "name": "Z-API — Enquete 3 Dias"
+    },
+    {
+      "id": "wf1-d5-001",
+      "name": "Aguardar 2 Dias (Dia 5)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1600,
+        150
+      ],
+      "parameters": {
+        "amount": 2,
+        "unit": "days"
+      }
+    },
+    {
+      "id": "wf1-d5-002",
+      "name": "IF — Menor de Idade",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1800,
+        150
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $('Organizar Lead').item.json.faixa_etaria }}",
+              "rightValue": "13-17",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "wf1-d5-003",
+      "name": "Z-API — Enquete Dia 5 (Adulto)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2000,
+        50
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.z-api.io/instances/3F06247099D391366D735EC66E320A44/token/9FEB7A24EE74CDCBC327832A/send-poll",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Client-Token",
+              "value": "F212a72ec09cb4f14b062257d320f4573S"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": {
+          "phone": "={{ $('Organizar Lead').item.json.whatsapp }}",
+          "message": "Oi, {{ $('Organizar Lead').item.json.nome.split(' ')[0] }}! 🌿 Espero que tenha gostado do PDF. A próxima edição sai domingo — quer que eu te mande direto aqui, sem precisar voltar ao site?",
+          "pollName": "Próxima edição",
+          "pollOptions": [
+            "Sim, quero!",
+            "Não, obrigada"
+          ]
+        }
+      }
+    },
+    {
+      "id": "wf1-d5-004",
+      "name": "Z-API — Enquete Dia 5 (Menor)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2000,
+        270
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.z-api.io/instances/3F06247099D391366D735EC66E320A44/token/9FEB7A24EE74CDCBC327832A/send-poll",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Client-Token",
+              "value": "F212a72ec09cb4f14b062257d320f4573S"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": {
+          "phone": "={{ $('Organizar Lead').item.json.whatsapp }}",
+          "message": "Oi, {{ $('Organizar Lead').item.json.nome.split(' ')[0] }}! 🌱 Espero que tenha curtido o PDF. Toda semana tem uma historinha nova sobre como cuidar da pele — quer continuar recebendo direto aqui?",
+          "pollName": "Continuar recebendo",
+          "pollOptions": [
+            "Sim, quero!",
+            "Não, obrigada"
+          ]
+        }
+      }
+    },
+    {
+      "id": "wf1-d5-005",
+      "name": "Aguardar Resposta (Adulto)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2200,
+        50
+      ],
+      "parameters": {
+        "amount": 72,
+        "unit": "hours"
+      }
+    },
+    {
+      "id": "wf1-d5-006",
+      "name": "Aguardar Resposta (Menor)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2200,
+        270
+      ],
+      "parameters": {
+        "amount": 72,
+        "unit": "hours"
+      }
+    },
+    {
+      "id": "wf1-d5-007",
+      "name": "Z-API — Pergunta Interesse Pele (Adulto)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2400,
+        50
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.z-api.io/instances/3F06247099D391366D735EC66E320A44/token/9FEB7A24EE74CDCBC327832A/send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Client-Token",
+              "value": "F212a72ec09cb4f14b062257d320f4573S"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": {
+          "phone": "={{ $('Organizar Lead').item.json.whatsapp }}",
+          "message": "Que bom, te vejo na próxima edição 😊\n\nMe conta uma coisa rápida — qual parte da pele você mais quer cuidar agora? (pode responder com suas próprias palavras)"
+        }
+      }
+    },
+    {
+      "id": "wf1-d5-008",
+      "name": "Z-API — Pergunta Interesse Pele (Menor)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2400,
+        270
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.z-api.io/instances/3F06247099D391366D735EC66E320A44/token/9FEB7A24EE74CDCBC327832A/send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Client-Token",
+              "value": "F212a72ec09cb4f14b062257d320f4573S"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": {
+          "phone": "={{ $('Organizar Lead').item.json.whatsapp }}",
+          "message": "Que bom, te vejo na próxima edição 😊\n\nMe conta — qual parte da pele você mais quer aprender a cuidar? (pode responder com suas palavras)"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -452,6 +647,90 @@
         [
           {
             "node": "Z-API — Enquete 3 Dias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Z-API — Enquete 3 Dias": {
+      "main": [
+        [
+          {
+            "node": "Aguardar 2 Dias (Dia 5)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aguardar 2 Dias (Dia 5)": {
+      "main": [
+        [
+          {
+            "node": "IF — Menor de Idade",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF — Menor de Idade": {
+      "main": [
+        [
+          {
+            "node": "Z-API — Enquete Dia 5 (Adulto)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Z-API — Enquete Dia 5 (Menor)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Z-API — Enquete Dia 5 (Adulto)": {
+      "main": [
+        [
+          {
+            "node": "Aguardar Resposta (Adulto)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Z-API — Enquete Dia 5 (Menor)": {
+      "main": [
+        [
+          {
+            "node": "Aguardar Resposta (Menor)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aguardar Resposta (Adulto)": {
+      "main": [
+        [
+          {
+            "node": "Z-API — Pergunta Interesse Pele (Adulto)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aguardar Resposta (Menor)": {
+      "main": [
+        [
+          {
+            "node": "Z-API — Pergunta Interesse Pele (Menor)",
             "type": "main",
             "index": 0
           }
