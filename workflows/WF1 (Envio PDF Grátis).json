@@ -578,6 +578,61 @@
           "message": "Que bom, te vejo na próxima edição 😊\n\nMe conta — qual parte da pele você mais quer aprender a cuidar? (pode responder com suas palavras)"
         }
       }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-menor-email",
+              "leftValue": "={{ $json.faixa_etaria }}",
+              "rightValue": "13-17",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "wf1-email-if",
+      "name": "IF — Menor de Idade (Email)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        780,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "contato@refugiodapele.com.br",
+        "toEmail": "={{$json.email}}",
+        "subject": "Bem-vinda! ☀️ Tudo que você precisa saber sobre protetor solar — Refúgio da Pele",
+        "html": "=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"pt-BR\">\n<head>\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n  <title>Bem-vinda ao Refúgio da Pele</title>\n  <style type=\"text/css\">\n    body,table,td,a{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;}\n    img{border:0;outline:none;text-decoration:none;display:block;}\n    @media only screen and (max-width:600px){\n      .wrapper{width:100%!important;max-width:100%!important;}\n      .container{width:100%!important;padding:20px 16px!important;}\n      .cta-btn{width:100%!important;display:block!important;text-align:center!important;box-sizing:border-box;}\n    }\n  </style>\n</head>\n<body style=\"margin:0;padding:0;background-color:#F0E8E1;width:100%;\">\n<table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse:collapse;background-color:#F0E8E1;\">\n  <tr>\n    <td align=\"center\" style=\"padding:32px 16px;\">\n      <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"560\" class=\"wrapper\" style=\"border-collapse:collapse;max-width:560px;width:100%;background-color:#FAF3EE;\">\n\n        <!-- HEADER -->\n        <tr>\n          <td align=\"center\" style=\"background-color:#3d2b1f;padding:36px 32px 28px 32px;\">\n            <p style=\"margin:0 0 4px 0;font-family:Georgia,serif;font-size:11px;color:#c0513a;letter-spacing:5px;text-transform:uppercase;\">Refúgio</p>\n            <p style=\"margin:0;font-family:Georgia,serif;font-size:26px;font-weight:normal;color:#FAF3EE;letter-spacing:2px;font-style:italic;\">da Pele</p>\n            <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"40\" style=\"border-collapse:collapse;margin:16px auto 0 auto;\">\n              <tr><td style=\"height:1px;background-color:#c0513a;font-size:0;line-height:0;\">&nbsp;</td></tr>\n            </table>\n          </td>\n        </tr>\n\n        <!-- HERO BAND -->\n        <tr>\n          <td style=\"background-color:#B8697A;padding:8px 0;text-align:center;\">\n            <p style=\"margin:0;font-family:Arial,sans-serif;font-size:11px;color:#FAF3EE;letter-spacing:4px;text-transform:uppercase;\">Bem-vinda ao seu espaço de cuidado ☀️</p>\n          </td>\n        </tr>\n\n        <!-- BODY -->\n        <tr>\n          <td style=\"background-color:#FAF3EE;padding:40px 40px 32px 40px;\" class=\"container\">\n\n            <!-- Greeting -->\n            <p style=\"margin:0 0 20px 0;font-family:Georgia,serif;font-size:22px;font-weight:normal;color:#3d2b1f;line-height:1.4;\">\n              Oi, <span style=\"font-style:italic;color:#B8697A;\">={{ $json.nome }}</span>! 🌸\n            </p>\n\n            <p style=\"margin:0 0 16px 0;font-family:Arial,sans-serif;font-size:15px;color:#6b5744;line-height:1.7;\">\n              Que bom que você chegou aqui. O Refúgio da Pele é um espaço pensado para quem quer aprender a cuidar da pele com carinho — e a gente fica muito feliz em te ter com a gente.\n            </p>\n\n            <!-- Divider -->\n            <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse:collapse;margin:24px 0;\">\n              <tr><td style=\"height:1px;background-color:rgba(184,105,122,0.2);font-size:0;line-height:0;\">&nbsp;</td></tr>\n            </table>\n\n            <!-- SPF Section title -->\n            <p style=\"margin:0 0 12px 0;font-family:Georgia,serif;font-size:17px;color:#3d2b1f;\">\n              ☀️ O tema desta semana: <strong style=\"color:#B8697A;\">Protetor Solar</strong>\n            </p>\n\n            <p style=\"margin:0 0 16px 0;font-family:Arial,sans-serif;font-size:15px;color:#6b5744;line-height:1.7;\">\n              Sabia que o protetor solar é o produto mais importante na rotina de skincare — independente da idade? A Luna, nossa personagem, vai te explicar:\n            </p>\n\n            <!-- Luna quote box -->\n            <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse:collapse;margin:0 0 24px 0;\">\n              <tr>\n                <td style=\"background-color:#fdf3ec;border-left:4px solid #B8697A;padding:16px 20px;border-radius:0 4px 4px 0;\">\n                  <p style=\"margin:0;font-family:Georgia,serif;font-size:14px;color:#5a3a2a;font-style:italic;line-height:1.7;\">\n                    \"O sol é incrível — mas os raios UV chegam na pele mesmo em dias nublados. Usar FPS 30 ou mais todo dia é o maior presente que você pode dar à sua pele agora!\"\n                  </p>\n                  <p style=\"margin:8px 0 0 0;font-family:Arial,sans-serif;font-size:12px;color:#B8697A;font-weight:bold;\">— Luna</p>\n                </td>\n              </tr>\n            </table>\n\n            <!-- 3 SPF facts -->\n            <p style=\"margin:0 0 14px 0;font-family:Georgia,serif;font-size:16px;color:#3d2b1f;\">3 fatos que a Luna quer que você saiba:</p>\n\n            <!-- Fact 1 -->\n            <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse:collapse;margin-bottom:14px;\">\n              <tr>\n                <td width=\"32\" valign=\"top\" style=\"padding-top:1px;\">\n                  <div style=\"width:24px;height:24px;background-color:#B8697A;border-radius:50%;text-align:center;line-height:24px;\">\n                    <span style=\"font-family:Arial,sans-serif;font-size:11px;font-weight:bold;color:#fff;\">1</span>\n                  </div>\n                </td>\n                <td valign=\"top\" style=\"padding-left:10px;\">\n                  <p style=\"margin:0;font-family:Arial,sans-serif;font-size:14px;color:#6b5744;line-height:1.6;\">\n                    <strong style=\"color:#3d2b1f;\">FPS ≠ só verão.</strong> O protetor deve ser usado todos os dias — dentro de casa também, perto de janelas com sol ou tela de computador.\n                  </p>\n                </td>\n              </tr>\n            </table>\n\n            <!-- Fact 2 -->\n            <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse:collapse;margin-bottom:14px;\">\n              <tr>\n                <td width=\"32\" valign=\"top\" style=\"padding-top:1px;\">\n                  <div style=\"width:24px;height:24px;background-color:#B8697A;border-radius:50%;text-align:center;line-height:24px;\">\n                    <span style=\"font-family:Arial,sans-serif;font-size:11px;font-weight:bold;color:#fff;\">2</span>\n                  </div>\n                </td>\n                <td valign=\"top\" style=\"padding-left:10px;\">\n                  <p style=\"margin:0;font-family:Arial,sans-serif;font-size:14px;color:#6b5744;line-height:1.6;\">\n                    <strong style=\"color:#3d2b1f;\">Pele com melanina também precisa de proteção.</strong> O mito de que pele morena \"não queima\" é falso — os danos do UV acontecem em todos os tons.\n                  </p>\n                </td>\n              </tr>\n            </table>\n\n            <!-- Fact 3 -->\n            <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse:collapse;margin-bottom:32px;\">\n              <tr>\n                <td width=\"32\" valign=\"top\" style=\"padding-top:1px;\">\n                  <div style=\"width:24px;height:24px;background-color:#B8697A;border-radius:50%;text-align:center;line-height:24px;\">\n                    <span style=\"font-family:Arial,sans-serif;font-size:11px;font-weight:bold;color:#fff;\">3</span>\n                  </div>\n                </td>\n                <td valign=\"top\" style=\"padding-left:10px;\">\n                  <p style=\"margin:0;font-family:Arial,sans-serif;font-size:14px;color:#6b5744;line-height:1.6;\">\n                    <strong style=\"color:#3d2b1f;\">Quanto usar?</strong> Para o rosto: uma \"bolinha\" do tamanho de uma ervilha generosa. Para o corpo: não economize — aplique bastante e reaplicar após 2h ao sol é essencial.\n                  </p>\n                </td>\n              </tr>\n            </table>\n\n            <!-- PDF CTA -->\n            <p style=\"margin:0 0 16px 0;font-family:Arial,sans-serif;font-size:15px;color:#6b5744;line-height:1.7;\">\n              Seu guia gratuito dessa semana está pronto — clica no botão abaixo para acessar:\n            </p>\n            <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse:collapse;margin:0 0 32px 0;\">\n              <tr>\n                <td align=\"center\">\n                  <a href=\"={{ $json.pdf_url }}\" target=\"_blank\" class=\"cta-btn\"\n                     style=\"display:inline-block;background-color:#B8697A;color:#ffffff;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;text-decoration:none;padding:16px 40px;letter-spacing:2px;text-transform:uppercase;\">\n                    Acessar Meu Guia →\n                  </a>\n                </td>\n              </tr>\n            </table>\n\n            <!-- Divider -->\n            <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse:collapse;margin-bottom:24px;\">\n              <tr><td style=\"height:1px;background-color:rgba(184,105,122,0.2);font-size:0;line-height:0;\">&nbsp;</td></tr>\n            </table>\n\n            <!-- Next week teaser -->\n            <p style=\"margin:0 0 8px 0;font-family:Georgia,serif;font-size:15px;color:#3d2b1f;\">Na próxima semana:</p>\n            <p style=\"margin:0 0 24px 0;font-family:Arial,sans-serif;font-size:14px;color:#6b5744;line-height:1.7;font-style:italic;\">\n              A Luna vai te contar sobre a <strong style=\"font-style:normal;color:#B8697A;\">barreira cutânea</strong> — o escudo natural da sua pele e como protegê-lo dos produtos errados. Fique de olho 👀\n            </p>\n\n            <!-- Closing -->\n            <p style=\"margin:0;font-family:Georgia,serif;font-size:15px;color:#6b5744;line-height:1.7;font-style:italic;\">\n              Com carinho,<br>\n              <strong style=\"font-style:normal;color:#3d2b1f;\">Equipe Refúgio da Pele</strong>\n            </p>\n\n          </td>\n        </tr>\n\n        <!-- FOOTER -->\n        <tr>\n          <td style=\"background-color:#3d2b1f;padding:28px 32px 32px 32px;\" align=\"center\">\n            <p style=\"margin:0 0 12px 0;font-family:Georgia,serif;font-size:11px;color:#c0513a;letter-spacing:3px;text-transform:uppercase;\">Siga-nos</p>\n            <a href=\"https://www.instagram.com/refugiodapele\" target=\"_blank\"\n               style=\"font-family:Arial,sans-serif;font-size:12px;color:#FAF3EE;text-decoration:none;letter-spacing:1px;\">@refugiodapele</a>\n            <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"40\" style=\"border-collapse:collapse;margin:16px auto;\">\n              <tr><td style=\"height:1px;background-color:rgba(192,81,58,0.3);font-size:0;line-height:0;\">&nbsp;</td></tr>\n            </table>\n            <p style=\"margin:0 0 6px 0;font-family:Arial,sans-serif;font-size:11px;color:rgba(250,243,238,0.5);line-height:1.6;\">\n              Você recebeu este email porque se cadastrou em refugiodapele.com.br\n            </p>\n            <a href=\"https://refugiodapele.com.br\" style=\"font-family:Arial,sans-serif;font-size:11px;color:rgba(192,81,58,0.7);text-decoration:underline;\">Cancelar inscrição</a>\n            <p style=\"margin:16px 0 0 0;font-family:Arial,sans-serif;font-size:10px;color:rgba(250,243,238,0.25);letter-spacing:2px;text-transform:uppercase;\">© 2026 Refúgio da Pele</p>\n          </td>\n        </tr>\n\n      </table>\n    </td>\n  </tr>\n</table>\n</body>\n</html>",
+        "options": {}
+      },
+      "id": "wf1-email-menor",
+      "name": "Send Email — Menor SPF",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1000,
+        480
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "LQzuLvKBJ7VqTETa",
+          "name": "SMTP account"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -624,7 +679,7 @@
             "index": 0
           },
           {
-            "node": "Send an Email",
+            "node": "IF — Menor de Idade (Email)",
             "type": "main",
             "index": 0
           }
@@ -731,6 +786,35 @@
         [
           {
             "node": "Z-API — Pergunta Interesse Pele (Menor)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF — Menor de Idade (Email)": {
+      "main": [
+        [
+          {
+            "node": "Send Email — Menor SPF",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email — Menor SPF": {
+      "main": [
+        [
+          {
+            "node": "Aguardar 3 Dias",
             "type": "main",
             "index": 0
           }
