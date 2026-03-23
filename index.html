@@ -1304,7 +1304,7 @@
     <div class="nav-divider" style="margin:0 12px;"></div>
     <button class="nav-cta" id="navCta" onclick="openQuiz()">Entender minha pele →</button>
     <div class="nav-divider" style="margin:0 12px;"></div>
-    <button class="nav-cta-acquire" onclick="openLegal('planos')">✦ Ver planos</button>
+    <button class="nav-cta-acquire" onclick="document.getElementById('planos').scrollIntoView({behavior:'smooth'})">✦ Ver planos</button>
   </div>
 
   <!-- Hamburger button (mobile only) -->
@@ -1327,7 +1327,7 @@
   <button class="mobile-menu-item" onclick="closeMobileMenu(); openPDF();">
     Rotina gratuita <span>→</span>
   </button>
-  <button class="mobile-menu-item primary" onclick="closeMobileMenu(); openLegal('planos');">
+  <button class="mobile-menu-item primary" onclick="closeMobileMenu(); document.getElementById('planos').scrollIntoView({behavior:'smooth'});">
     ✦ Adquirir — Ver planos
   </button>
 </div>
@@ -1879,7 +1879,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
       <h4>Produtos</h4>
       <ul>
         <li><a href="#" onclick="openLegal('produto')">A Pele que Você Lembra</a></li>
-        <li><a href="#" onclick="openLegal('planos')">Ver planos</a></li>
+        <li><a href="#planos" onclick="document.getElementById('planos').scrollIntoView({behavior:'smooth'});return false;">Ver planos</a></li>
         <li><span>O Encontro <span class="soon">em breve</span></span></li>
         <li><a href="#" onclick="openLegal('planos')">Experiência Completa</a></li>
       </ul>
