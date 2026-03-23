@@ -4,22 +4,45 @@
     {
       "parameters": {
         "rule": {
-          "interval": [{ "field": "cronExpression", "expression": "0 6 * * 0" }]
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 6 * * 0"
+            }
+          ]
         }
       },
       "id": "a1b2c3d4-0001-0001-0001-000000000001",
       "name": "Schedule Trigger — Segunda 08h",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [240, 300]
+      "position": [
+        240,
+        300
+      ]
     },
     {
       "parameters": {
         "assignments": {
           "assignments": [
-            { "id": "field-tema", "name": "tema_semana", "value": "placeholder — substituir por lógica de tema", "type": "string" },
-            { "id": "field-semana", "name": "numero_semana", "value": "={{ Math.ceil(new Date().getDate() / 7) }}", "type": "string" },
-            { "id": "field-clima", "name": "clima_semana", "value": "placeholder", "type": "string" }
+            {
+              "id": "field-tema",
+              "name": "tema_semana",
+              "value": "placeholder — substituir por lógica de tema",
+              "type": "string"
+            },
+            {
+              "id": "field-semana",
+              "name": "numero_semana",
+              "value": "={{ Math.ceil(new Date().getDate() / 7) }}",
+              "type": "string"
+            },
+            {
+              "id": "field-clima",
+              "name": "clima_semana",
+              "value": "placeholder",
+              "type": "string"
+            }
           ]
         },
         "options": {}
@@ -28,7 +51,10 @@
       "name": "Set Tema da Semana",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [460, 300]
+      "position": [
+        460,
+        300
+      ]
     },
     {
       "parameters": {
@@ -37,9 +63,18 @@
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
-            { "name": "q", "value": "={{ $json.tema_semana }} cuidados pele mulheres mundo" },
-            { "name": "api_key", "value": "SERPAPI_KEY_PLACEHOLDER" },
-            { "name": "num", "value": "10" }
+            {
+              "name": "q",
+              "value": "={{ $json.tema_semana }} cuidados pele mulheres mundo"
+            },
+            {
+              "name": "api_key",
+              "value": "SERPAPI_KEY_PLACEHOLDER"
+            },
+            {
+              "name": "num",
+              "value": "10"
+            }
           ]
         },
         "options": {}
@@ -48,7 +83,10 @@
       "name": "SerpAPI — Busca Skincare",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [680, 300]
+      "position": [
+        680,
+        300
+      ]
     },
     {
       "parameters": {
@@ -67,7 +105,10 @@
       "name": "Tavily — Práticas Internacionais",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [900, 300]
+      "position": [
+        900,
+        300
+      ]
     },
     {
       "parameters": {
@@ -77,7 +118,10 @@
       "name": "Merge Resultados de Pesquisa",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1120, 300]
+      "position": [
+        1120,
+        300
+      ]
     },
     {
       "parameters": {
@@ -86,9 +130,18 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "x-api-key", "value": "CLAUDE_KEY_PLACEHOLDER" },
-            { "name": "anthropic-version", "value": "2023-06-01" },
-            { "name": "content-type", "value": "application/json" }
+            {
+              "name": "x-api-key",
+              "value": "CLAUDE_KEY_PLACEHOLDER"
+            },
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
           ]
         },
         "sendBody": true,
@@ -96,7 +149,12 @@
         "body": {
           "model": "claude-sonnet-4-6",
           "max_tokens": 4000,
-          "messages": [{ "role": "user", "content": "={{ 'Você é redatora especialista em skincare feminino e bem-estar. Com base nas pesquisas abaixo, crie um PDF semanal completo em português brasileiro para o projeto Refúgio da Pele.\\n\\nTema da semana: ' + $json.tema_semana + '\\nClima predominante: ' + $json.clima_semana + '\\n\\nPesquisas realizadas:\\n' + $json.contexto_pesquisa + '\\n\\nCrie o conteúdo em HTML estruturado com:\\n\\nREGRAS DE TOM:\\n- Linguagem acessível com profundidade técnica quando necessário\\n- Tom clínico é permitido para clareza científica\\n- Pessoas reais podem ser citadas esporadicamente (dermatologistas, personalidades conhecidas por cuidar bem da pele)\\n- Proibido: julgamento, comparação corporal depreciativa, tom negativo\\n- Escopo: pele = corpo inteiro, não apenas rosto\\n\\nESTRUTURA DO PDF:\\n\\n1. SETE TEMAS DIÁRIOS (segunda a domingo). Para cada dia:\\n   - <h2>Dia X — [Título do Dia]</h2>\\n   - <p>[2-3 parágrafos sobre o tema do dia]</p>\\n   - <h3>Dicas do Dia</h3>\\n   - <ul><li>[3 a 5 dicas práticas de skincare]</li></ul>\\n   - <h3>Perspectiva do Mundo</h3>\\n   - <p>[1 dica comparativa: como outra região ou método diferente aborda este tema. Ex: Na Coreia do Sul... / Na medicina ayurvédica... / Dermatologistas europeus recomendam...]</p>\\n\\n2. SEÇÃO CURIOSIDADE (rotativa — use o formato indicado abaixo conforme o número da semana):\\n   - Semana 1 ou 5 ou 9...: Comparativo cultural — como mulheres de 3 países diferentes cuidam da pele\\n   - Semana 2 ou 6 ou 10...: Linha do tempo — história de um ingrediente ou ritual de skincare\\n   - Semana 3 ou 7 ou 11...: Mito vs Verdade — 4 mitos comuns sobre skincare com explicação científica acessível\\n   - Semana 4 ou 8 ou 12...: Perfil de Ingrediente — deep dive em 1 ingrediente: origem, ciência, como usar, para quem\\n   Use <h2> para o título da seção e <h3> para cada subitem. Até 3 páginas de conteúdo.\\n\\nFormate tudo como HTML semântico. Não inclua <html>, <head> ou <body>.' }}" ]
+          "messages": [
+            {
+              "role": "user",
+              "content": "={{ 'Você é redatora especialista em skincare feminino e bem-estar. Com base nas pesquisas abaixo, crie um PDF semanal completo em português brasileiro para o projeto Refúgio da Pele.\\n\\nTema da semana: ' + $json.tema_semana + '\\nClima predominante: ' + $json.clima_semana + '\\n\\nPesquisas realizadas:\\n' + $json.contexto_pesquisa + '\\n\\nCrie o conteúdo em HTML estruturado com:\\n\\nREGRAS DE TOM:\\n- Linguagem acessível com profundidade técnica quando necessário\\n- Tom clínico é permitido para clareza científica\\n- Pessoas reais podem ser citadas esporadicamente (dermatologistas, personalidades conhecidas por cuidar bem da pele)\\n- Proibido: julgamento, comparação corporal depreciativa, tom negativo\\n- Escopo: pele = corpo inteiro, não apenas rosto\\n\\nESTRUTURA DO PDF:\\n\\n1. SETE TEMAS DIÁRIOS (segunda a domingo). Para cada dia:\\n   - <h2>Dia X — [Título do Dia]</h2>\\n   - <p>[2-3 parágrafos sobre o tema do dia]</p>\\n   - <h3>Dicas do Dia</h3>\\n   - <ul><li>[3 a 5 dicas práticas de skincare]</li></ul>\\n   - <h3>Perspectiva do Mundo</h3>\\n   - <p>[1 dica comparativa: como outra região ou método diferente aborda este tema. Ex: Na Coreia do Sul... / Na medicina ayurvédica... / Dermatologistas europeus recomendam...]</p>\\n\\n2. SEÇÃO CURIOSIDADE (rotativa — use o formato indicado abaixo conforme o número da semana):\\n   - Semana 1 ou 5 ou 9...: Comparativo cultural — como mulheres de 3 países diferentes cuidam da pele\\n   - Semana 2 ou 6 ou 10...: Linha do tempo — história de um ingrediente ou ritual de skincare\\n   - Semana 3 ou 7 ou 11...: Mito vs Verdade — 4 mitos comuns sobre skincare com explicação científica acessível\\n   - Semana 4 ou 8 ou 12...: Perfil de Ingrediente — deep dive em 1 ingrediente: origem, ciência, como usar, para quem\\n   Use <h2> para o título da seção e <h3> para cada subitem. Até 3 páginas de conteúdo.\\n\\nFormate tudo como HTML semântico. Não inclua <html>, <head> ou <body>.' }}"
+            }
+          ]
         },
         "options": {}
       },
@@ -104,7 +162,10 @@
       "name": "Claude — Gerar Conteúdo PDF",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1340, 300]
+      "position": [
+        1340,
+        300
+      ]
     },
     {
       "parameters": {
@@ -114,7 +175,10 @@
       "name": "Extrair Conteúdo Claude",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1560, 300]
+      "position": [
+        1560,
+        300
+      ]
     },
     {
       "parameters": {
@@ -124,15 +188,33 @@
         "genericAuthType": "httpBasicAuth",
         "sendBody": true,
         "contentType": "json",
-        "body": { "source": "={{ $json.html_content }}", "landscape": false, "use_print": true },
-        "options": { "response": { "response": { "responseFormat": "file" } } }
+        "body": {
+          "source": "={{ $json.html_content }}",
+          "landscape": false,
+          "use_print": true
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
       },
       "id": "a1b2c3d4-0001-0001-0001-000000000008",
       "name": "PDFShift — HTML para PDF",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1780, 300],
-      "credentials": { "httpBasicAuth": { "id": "pdfshift-basic-auth", "name": "PDFShift Basic Auth — CONFIGURAR" } }
+      "position": [
+        1780,
+        300
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "pdfshift-basic-auth",
+          "name": "PDFShift Basic Auth — CONFIGURAR"
+        }
+      }
     },
     {
       "parameters": {
@@ -142,44 +224,87 @@
       "name": "Calcular Pasta e Nome do Arquivo",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2000, 300]
+      "position": [
+        2000,
+        300
+      ]
     },
     {
       "parameters": {
         "operation": "createFolder",
         "name": "={{ $json.mes }}",
-        "driveId": { "__rl": true, "value": "myDrive", "mode": "list" },
-        "folderId": { "__rl": true, "value": "14PxriIGLSJTSHu0CEP-KU82XWeGuzNXm", "mode": "id" },
+        "driveId": {
+          "__rl": true,
+          "value": "myDrive",
+          "mode": "list"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "14PxriIGLSJTSHu0CEP-KU82XWeGuzNXm",
+          "mode": "id"
+        },
         "options": {}
       },
       "id": "a1b2c3d4-0001-0001-0001-000000000010",
       "name": "Google Drive — Criar Pasta Mês",
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
-      "position": [2220, 200],
-      "credentials": { "googleDriveOAuth2Api": { "id": "DzhWrB0cOwGmCaUD", "name": "Google Sheets account" } }
+      "position": [
+        2220,
+        200
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "DzhWrB0cOwGmCaUD",
+          "name": "Google Sheets account"
+        }
+      }
     },
     {
       "parameters": {
         "operation": "createFolder",
         "name": "={{ $('Calcular Pasta e Nome do Arquivo').item.json.nomePasta }}",
-        "driveId": { "__rl": true, "value": "myDrive", "mode": "list" },
-        "folderId": { "__rl": true, "value": "={{ $json.id }}", "mode": "id" },
+        "driveId": {
+          "__rl": true,
+          "value": "myDrive",
+          "mode": "list"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
         "options": {}
       },
       "id": "a1b2c3d4-0001-0001-0001-000000000011",
       "name": "Google Drive — Criar Pasta Semana",
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
-      "position": [2440, 200],
-      "credentials": { "googleDriveOAuth2Api": { "id": "DzhWrB0cOwGmCaUD", "name": "Google Sheets account" } }
+      "position": [
+        2440,
+        200
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "DzhWrB0cOwGmCaUD",
+          "name": "Google Sheets account"
+        }
+      }
     },
     {
       "parameters": {
         "operation": "upload",
         "name": "={{ $('Calcular Pasta e Nome do Arquivo').item.json.nomeArquivo }}",
-        "driveId": { "__rl": true, "value": "myDrive", "mode": "list" },
-        "folderId": { "__rl": true, "value": "={{ $json.id }}", "mode": "id" },
+        "driveId": {
+          "__rl": true,
+          "value": "myDrive",
+          "mode": "list"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
         "inputDataFieldName": "data",
         "options": {}
       },
@@ -187,8 +312,16 @@
       "name": "Google Drive — Upload PDF",
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
-      "position": [2660, 200],
-      "credentials": { "googleDriveOAuth2Api": { "id": "DzhWrB0cOwGmCaUD", "name": "Google Sheets account" } }
+      "position": [
+        2660,
+        200
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "DzhWrB0cOwGmCaUD",
+          "name": "Google Sheets account"
+        }
+      }
     },
     {
       "parameters": {
@@ -198,7 +331,10 @@
       "name": "Extrair URL do PDF",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2880, 200]
+      "position": [
+        2880,
+        200
+      ]
     },
     {
       "parameters": {
@@ -207,56 +343,439 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "apikey", "value": "SUPABASE_SERVICE_KEY_PLACEHOLDER" },
-            { "name": "Authorization", "value": "Bearer SUPABASE_SERVICE_KEY_PLACEHOLDER" },
-            { "name": "Content-Type", "value": "application/json" },
-            { "name": "Prefer", "value": "resolution=merge-duplicates" }
+            {
+              "name": "apikey",
+              "value": "SUPABASE_SERVICE_KEY_PLACEHOLDER"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer SUPABASE_SERVICE_KEY_PLACEHOLDER"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates"
+            }
           ]
         },
         "sendBody": true,
         "contentType": "json",
-        "body": { "key": "pdf_url_atual", "value": "={{ $json.pdf_url }}" },
+        "body": {
+          "key": "pdf_url_atual",
+          "value": "={{ $json.pdf_url }}"
+        },
         "options": {}
       },
       "id": "a1b2c3d4-0001-0001-0001-000000000014",
       "name": "Supabase — Salvar URL do PDF",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [3100, 200]
+      "position": [
+        3100,
+        200
+      ]
     },
     {
       "parameters": {
-        "workflowId": { "__rl": true, "value": "WF3_ID_PLACEHOLDER", "mode": "id" },
-        "options": { "waitForSubWorkflow": false }
+        "workflowId": {
+          "__rl": true,
+          "value": "WF3_ID_PLACEHOLDER",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
       },
       "id": "a1b2c3d4-0001-0001-0001-000000000015",
       "name": "Executar WF3 — Atualização de Link",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
-      "position": [3320, 200]
+      "position": [
+        3320,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const htmlCompleto = $('Extrair Conteúdo Claude').item.json.html_content;\nconst tema = $('Set Tema da Semana').item.json.tema_semana || 'skincare';\nconst folderSemanaId = $input.first().json.id;\n\n// Extract only Day 1 and Day 2 blocks\nconst bodyMatch = htmlCompleto.match(/<body[^>]*>([\\s\\S]*?)<\\/body>/);\nconst bodyContent = bodyMatch ? bodyMatch[1] : htmlCompleto;\nconst diaMatches = [...bodyContent.matchAll(/<h2>Dia \\d/gi)];\nlet teaserContent = '';\nif (diaMatches.length >= 2) {\n  const start = diaMatches[0].index;\n  const end = diaMatches.length >= 3 ? diaMatches[2].index : bodyContent.length;\n  teaserContent = bodyContent.substring(start, end);\n} else {\n  teaserContent = bodyContent.substring(0, Math.floor(bodyContent.length * 0.4));\n}\n\nconst htmlGratuito = `<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n  <meta charset=\"UTF-8\">\n  <style>\n    body { font-family:'Georgia',serif; color:#3a2a1e; margin:40px; line-height:1.7; }\n    h1 { color:#8b5e3c; font-size:2em; border-bottom:2px solid #e8c9a0; padding-bottom:10px; }\n    h2 { color:#8b5e3c; font-size:1.5em; margin-top:2em; }\n    h3 { color:#a0714f; font-size:1.2em; }\n    p { margin:0.8em 0; } ul { margin:0.5em 0 1em 1.5em; } li { margin:0.3em 0; }\n    .teaser-box { background:#fdf3ec; border-left:4px solid #B8697A; padding:16px 20px; margin:32px 0; border-radius:4px; }\n    .teaser-box p { margin:0; color:#5a3a2a; font-style:italic; font-size:1.05em; }\n    .plans-page { page-break-before:always; padding-top:20px; }\n    .plans-page h2 { text-align:center; color:#B8697A; margin-bottom:8px; }\n    .plans-page .subtitle { text-align:center; color:#8b5e3c; margin-bottom:32px; font-size:0.95em; }\n    .plan-card { border:1px solid #e8c9a0; border-radius:8px; padding:20px 24px; margin:16px 0; background:#fffaf7; }\n    .plan-card h3 { margin:0 0 4px; color:#B8697A; font-size:1.15em; }\n    .plan-card .price { font-weight:bold; color:#8b5e3c; font-size:1.1em; margin:4px 0 8px; }\n    .plan-card p { margin:0; font-size:0.92em; color:#5a3a2a; }\n    .cta-section { text-align:center; margin-top:32px; padding:24px; background:#B8697A; border-radius:8px; }\n    .cta-section p { color:#FAF3EE; margin:0 0 12px; }\n    .cta-btn { display:inline-block; background:#FAF3EE; color:#B8697A; padding:12px 32px; border-radius:4px; font-weight:bold; text-decoration:none; }\n  </style>\n</head>\n<body>\n  <h1>Refugio da Pele - Edicao Gratuita</h1>\n  <p style=\"color:#8b5e3c;font-size:0.95em;margin-bottom:8px;\">Tema da semana: <strong>${tema}</strong></p>\n  ${teaserContent}\n  <div class=\"teaser-box\">\n    <p>Ha mais 5 temas nesta semana - incluindo dicas de rituais internacionais, a secao Curiosidade e muito mais.<br>\n    <strong>Assine e receba o PDF completo toda semana direto no seu email.</strong></p>\n  </div>\n  <div class=\"plans-page\">\n    <h2>Continue cuidando da sua pele</h2>\n    <p class=\"subtitle\">Escolha o plano ideal e receba conteudo exclusivo toda semana</p>\n    <div class=\"plan-card\"><h3>A Semente</h3><div class=\"price\">R$9,90/mes</div><p>PDF semanal completo com 7 temas, secao curiosidade, perspectivas internacionais e dicas praticas de skincare.</p><p style=\"font-style:italic;color:#B8697A;margin-top:6px;\">\"Uma semente plantada com intencao vira raiz.\"</p></div>\n    <div class=\"plan-card\"><h3>O Encontro</h3><div class=\"price\">R$14,90/mes</div><p>Tudo do plano A Semente + acompanhamento personalizado e conteudo exclusivo de skincare para o seu momento de vida.</p><p style=\"font-style:italic;color:#B8697A;margin-top:6px;\">\"Alguem que cuida da sua pele com voce.\"</p></div>\n    <div class=\"plan-card\"><h3>Experiencia Completa</h3><div class=\"price\">R$19,90/mes</div><p>A experiencia Refugio da Pele completa: PDF semanal + acompanhamento + conteudos bonus mensais + prioridade de acesso a novidades.</p></div>\n    <div class=\"cta-section\"><p>Comece hoje por apenas R$9,90/mes - cancele quando quiser.</p><a class=\"cta-btn\" href=\"https://refugiodapele.com.br\">Quero assinar agora</a></div>\n  </div>\n</body></html>`;\n\nreturn [{ json: { html_gratuito: htmlGratuito, folderSemanaId, tema } }];"
+      },
+      "id": "wf2-grat-001",
+      "name": "Gerar HTML PDF Gratuito",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2440,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pdfshift.io/v3/convert/pdf",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "json",
+        "body": {
+          "source": "={{ $json.html_gratuito }}",
+          "landscape": false,
+          "use_print": true
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "wf2-grat-002",
+      "name": "PDFShift — PDF Gratuito",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2660,
+        480
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "pdfshift-basic-auth",
+          "name": "PDFShift Basic Auth — CONFIGURAR"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\nconst meses = ['janeiro','fevereiro','marco','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];\nconst ano = now.getFullYear().toString();\nconst mes = meses[now.getMonth()];\nconst semana = String(Math.ceil(now.getDate() / 7)).padStart(2, '0');\nconst folderSemanaId = $('Gerar HTML PDF Gratuito').item.json.folderSemanaId;\nconst nomeArquivo = `refugio-da-pele-GRATIS-${ano}-${mes}-semana${semana}.pdf`;\nreturn [{ json: { nomeArquivo, folderSemanaId } }];"
+      },
+      "id": "wf2-grat-003",
+      "name": "Calcular Nome PDF Gratuito",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2880,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "name": "={{ $('Calcular Nome PDF Gratuito').item.json.nomeArquivo }}",
+        "driveId": {
+          "__rl": true,
+          "value": "myDrive",
+          "mode": "list"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Calcular Nome PDF Gratuito').item.json.folderSemanaId }}",
+          "mode": "id"
+        },
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "id": "wf2-grat-004",
+      "name": "Google Drive — Upload PDF Gratuito",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3100,
+        480
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "DzhWrB0cOwGmCaUD",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const fileId = $input.first().json.id;\nconst pdf_gratuito_url = `https://drive.google.com/file/d/${fileId}/view?usp=sharing`;\nreturn [{ json: { pdf_gratuito_url, fileId } }];"
+      },
+      "id": "wf2-grat-005",
+      "name": "Extrair URL PDF Gratuito",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3320,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://aftrvqwazdiumibdfjjy.supabase.co/rest/v1/config",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "SUPABASE_SERVICE_KEY_PLACEHOLDER"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer SUPABASE_SERVICE_KEY_PLACEHOLDER"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": {
+          "key": "pdf_gratuito_url_atual",
+          "value": "={{ $json.pdf_gratuito_url }}"
+        },
+        "options": {}
+      },
+      "id": "wf2-grat-006",
+      "name": "Supabase — Salvar URL PDF Gratuito",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3540,
+        480
+      ]
     }
   ],
   "connections": {
-    "Schedule Trigger — Segunda 08h": { "main": [[{ "node": "Set Tema da Semana", "type": "main", "index": 0 }]] },
-    "Set Tema da Semana": { "main": [[{ "node": "SerpAPI — Busca Skincare", "type": "main", "index": 0 }]] },
-    "SerpAPI — Busca Skincare": { "main": [[{ "node": "Tavily — Práticas Internacionais", "type": "main", "index": 0 }]] },
-    "Tavily — Práticas Internacionais": { "main": [[{ "node": "Merge Resultados de Pesquisa", "type": "main", "index": 0 }]] },
-    "Merge Resultados de Pesquisa": { "main": [[{ "node": "Claude — Gerar Conteúdo PDF", "type": "main", "index": 0 }]] },
-    "Claude — Gerar Conteúdo PDF": { "main": [[{ "node": "Extrair Conteúdo Claude", "type": "main", "index": 0 }]] },
-    "Extrair Conteúdo Claude": { "main": [[{ "node": "PDFShift — HTML para PDF", "type": "main", "index": 0 }]] },
-    "PDFShift — HTML para PDF": { "main": [[{ "node": "Calcular Pasta e Nome do Arquivo", "type": "main", "index": 0 }]] },
-    "Calcular Pasta e Nome do Arquivo": { "main": [[{ "node": "Google Drive — Criar Pasta Mês", "type": "main", "index": 0 }]] },
-    "Google Drive — Criar Pasta Mês": { "main": [[{ "node": "Google Drive — Criar Pasta Semana", "type": "main", "index": 0 }]] },
-    "Google Drive — Criar Pasta Semana": { "main": [[{ "node": "Google Drive — Upload PDF", "type": "main", "index": 0 }]] },
-    "Google Drive — Upload PDF": { "main": [[{ "node": "Extrair URL do PDF", "type": "main", "index": 0 }]] },
-    "Extrair URL do PDF": { "main": [[{ "node": "Supabase — Salvar URL do PDF", "type": "main", "index": 0 }]] },
-    "Supabase — Salvar URL do PDF": { "main": [[{ "node": "Executar WF3 — Atualização de Link", "type": "main", "index": 0 }]] }
+    "Schedule Trigger — Segunda 08h": {
+      "main": [
+        [
+          {
+            "node": "Set Tema da Semana",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Tema da Semana": {
+      "main": [
+        [
+          {
+            "node": "SerpAPI — Busca Skincare",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI — Busca Skincare": {
+      "main": [
+        [
+          {
+            "node": "Tavily — Práticas Internacionais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tavily — Práticas Internacionais": {
+      "main": [
+        [
+          {
+            "node": "Merge Resultados de Pesquisa",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Resultados de Pesquisa": {
+      "main": [
+        [
+          {
+            "node": "Claude — Gerar Conteúdo PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude — Gerar Conteúdo PDF": {
+      "main": [
+        [
+          {
+            "node": "Extrair Conteúdo Claude",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrair Conteúdo Claude": {
+      "main": [
+        [
+          {
+            "node": "PDFShift — HTML para PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PDFShift — HTML para PDF": {
+      "main": [
+        [
+          {
+            "node": "Calcular Pasta e Nome do Arquivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calcular Pasta e Nome do Arquivo": {
+      "main": [
+        [
+          {
+            "node": "Google Drive — Criar Pasta Mês",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive — Criar Pasta Mês": {
+      "main": [
+        [
+          {
+            "node": "Google Drive — Criar Pasta Semana",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive — Criar Pasta Semana": {
+      "main": [
+        [
+          {
+            "node": "Google Drive — Upload PDF",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Gerar HTML PDF Gratuito",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive — Upload PDF": {
+      "main": [
+        [
+          {
+            "node": "Extrair URL do PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrair URL do PDF": {
+      "main": [
+        [
+          {
+            "node": "Supabase — Salvar URL do PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase — Salvar URL do PDF": {
+      "main": [
+        [
+          {
+            "node": "Executar WF3 — Atualização de Link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gerar HTML PDF Gratuito": {
+      "main": [
+        [
+          {
+            "node": "PDFShift — PDF Gratuito",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PDFShift — PDF Gratuito": {
+      "main": [
+        [
+          {
+            "node": "Calcular Nome PDF Gratuito",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calcular Nome PDF Gratuito": {
+      "main": [
+        [
+          {
+            "node": "Google Drive — Upload PDF Gratuito",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive — Upload PDF Gratuito": {
+      "main": [
+        [
+          {
+            "node": "Extrair URL PDF Gratuito",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrair URL PDF Gratuito": {
+      "main": [
+        [
+          {
+            "node": "Supabase — Salvar URL PDF Gratuito",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
   "active": false,
   "pinData": {},
-  "settings": { "executionOrder": "v1", "binaryMode": "separate", "availableInMCP": false },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
   "versionId": "a1b2c3d4-1111-2222-3333-444444444444",
-  "meta": { "templateCredsSetupCompleted": true, "instanceId": "b3f36ad4b8a579dd86116dc9449ee81a2e4c05ad27fc75bf5538fe5592ed48cb" },
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b3f36ad4b8a579dd86116dc9449ee81a2e4c05ad27fc75bf5538fe5592ed48cb"
+  },
   "id": "WF2PdfSemanalRefugio",
   "tags": []
 }
