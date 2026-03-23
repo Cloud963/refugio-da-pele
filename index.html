@@ -1597,6 +1597,14 @@ Uma rotina simples de 3 passos que respeita quem você já é.
       rgba(15,8,5,0.18) 65%,
       transparent 100%);
   }
+  /* Imagem clara (silhueta dourada) — gradiente adaptado */
+  .showcase-card--light::after {
+    background:linear-gradient(to top,
+      rgba(15,8,5,0.97) 0%,
+      rgba(15,8,5,0.88) 40%,
+      rgba(15,8,5,0.55) 65%,
+      rgba(15,8,5,0.2) 100%);
+  }
 
   /* Em breve badge sobre a imagem */
   .showcase-soon { position:absolute; top:16px; right:16px; z-index:3; background:rgba(15,8,5,0.55); color:rgba(250,243,238,0.8); font-size:8px; letter-spacing:0.2em; text-transform:uppercase; font-family:'DM Sans',sans-serif; padding:4px 12px; backdrop-filter:blur(6px); border:1px solid rgba(250,243,238,0.12); }
@@ -1624,13 +1632,13 @@ Uma rotina simples de 3 passos que respeita quem você já é.
   }
 
   /* ── DETAIL OVERLAY ── */
-  .plan-detail-overlay { position:absolute; inset:0; opacity:0; pointer-events:none; transition:opacity 0.35s ease; display:flex; align-items:stretch; background:var(--deep); z-index:10; }
+  .plan-detail-overlay { position:fixed; inset:0; opacity:0; pointer-events:none; transition:opacity 0.35s ease; display:flex; align-items:stretch; background:var(--deep); z-index:1000; }
   .plan-detail-overlay.active { opacity:1; pointer-events:all; }
 
   .plan-detail-img-col { flex:0 0 45%; position:relative; overflow:hidden; }
-  .plan-detail-img-col img { width:100%; height:100%; object-fit:contain; object-position:center center; display:block; background:var(--deep); }
+  .plan-detail-img-col img { width:100%; height:100%; object-fit:cover; object-position:center center; display:block; background:var(--deep); }
 
-  .plan-detail-content { flex:1; display:flex; flex-direction:column; justify-content:center; padding:48px 52px; overflow-y:auto; }
+  .plan-detail-content { flex:1; display:flex; flex-direction:column; justify-content:center; padding:36px 48px; overflow-y:auto; }
   .plan-detail-close { position:absolute; top:20px; right:24px; background:none; border:none; color:rgba(250,243,238,0.45); font-size:28px; cursor:pointer; line-height:1; z-index:11; transition:color 0.2s; font-family:'DM Sans',sans-serif; }
   .plan-detail-close:hover { color:#faf3ee; }
 
@@ -1659,8 +1667,13 @@ Uma rotina simples de 3 passos que respeita quem você já é.
     .plans-cards-grid { grid-template-columns:1fr; gap:8px; }
     .showcase-img-wrap { min-height:260px; }
     .plan-detail-overlay { flex-direction:column; }
-    .plan-detail-img-col { flex:0 0 200px; }
-    .plan-detail-content { padding:28px 24px; }
+    .plan-detail-img-col { flex:0 0 38vh; max-height:38vh; }
+    .plan-detail-content { flex:1; padding:20px 22px; justify-content:flex-start; overflow-y:auto; }
+    .plan-detail-name { font-size:clamp(22px,6vw,32px); }
+    .plan-detail-price { font-size:42px; }
+    .plan-detail-tagline { margin-bottom:16px; }
+    .plan-detail-price-wrap { margin-bottom:16px; padding-bottom:16px; }
+    .plan-detail-features { gap:8px; margin-bottom:20px; }
   }
 </style>
 
@@ -1686,9 +1699,9 @@ Uma rotina simples de 3 passos que respeita quem você já é.
       </div>
 
       <!-- CARD 2 — O Encontro R$14,90 -->
-      <div class="showcase-card">
+      <div class="showcase-card showcase-card--light">
         <div class="showcase-img-wrap">
-          <img src="assets/images/influencer-silhueta.jpg" alt="O Encontro" class="showcase-img" />
+          <img src="assets/images/influencer-silhueta.jpg" alt="O Encontro" class="showcase-img" style="object-position:center 25%;" />
           <span class="showcase-soon">Em breve</span>
         </div>
         <div class="showcase-info">
@@ -2601,12 +2614,13 @@ Uma rotina simples de 3 passos que respeita quem você já é.
         .plan-card.featured { height:480px; }
 
         /* IMAGEM / FUNDO cobre o card inteiro */
-        .plan-card-bg {
+        .plan-card-img {
           position:absolute; inset:0; width:100%; height:100%;
           object-fit:cover; object-position:center top;
           transition:transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
+          display:block;
         }
-        .plan-card:hover .plan-card-bg { transform:scale(1.04); }
+        .plan-card:hover .plan-card-img { transform:scale(1.04); }
 
         /* Gradiente sobre a imagem — de baixo para cima */
         .plan-card::after {
@@ -2748,7 +2762,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
 
         <!-- PLANO 1 - A Dose R$9,90 -->
         <div class="plan-card" onclick="openLegal('planos')">
-          <div class="plan-card-bg plan-bg-semente"></div>
+          <img class="plan-card-img" src="assets/images/ritual-de-pele.jpeg" alt="A Dose" style="object-position:center 18%;" />
           <div class="plan-card-overlay">
             <div class="plan-divider"></div>
             <div class="plan-name">A Dose</div>
@@ -2763,7 +2777,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
 
         <!-- PLANO 2 - O Encontro R$14,90 -->
         <div class="plan-card" onclick="openLegal('planos')">
-          <div class="plan-card-bg plan-bg-presenca"></div>
+          <img class="plan-card-img" src="assets/images/influencer-silhueta.jpg" alt="O Encontro" style="object-position:center 25%;" />
           <div class="plan-silhouette"></div>
           <span class="plan-badge-soon">Em breve</span>
           <div class="plan-card-overlay">
@@ -2780,7 +2794,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
 
         <!-- PLANO 3 - Experiência Completa R$19,90 -->
         <div class="plan-card featured" onclick="openLegal('planos')">
-          <div class="plan-card-bg plan-bg-completa"></div>
+          <img class="plan-card-img" src="assets/images/pele-radiante.jpeg" alt="Experiência Completa" />
           <div class="plan-ornament">
             <div class="plan-ornament-ring"><span class="plan-ornament-star">✦</span></div>
           </div>
