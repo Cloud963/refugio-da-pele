@@ -188,7 +188,7 @@
         },
         "sendBody": true,
         "contentType": "json",
-        "body": "={{ JSON.stringify({ email: $json.email, nome: $json.nome, telefone: $json.telefone, status: 'ativa', ultima_interacao: new Date().toISOString() }) }}",
+        "body": "={{ JSON.stringify({ email: $json.email, nome: $json.nome, telefone: $json.telefone, status: 'ativa', perfil_preenchido: false, ultima_interacao: new Date().toISOString() }) }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -264,6 +264,35 @@
       ],
       "id": "wf7-0009-0009-0009-000000000001",
       "name": "Ignorar — Evento Inválido"
+    },
+    {
+      "parameters": {"unit": "minutes", "amount": 5},
+      "id": "wf7-quiz-wait-001",
+      "name": "Aguardar 5 min",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [1740, 320]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.z-api.io/instances/3F06247099D391366D735EC66E320A44/token/9FEB7A24EE74CDCBC327832A/send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {"name": "Client-Token", "value": "F212a72ec09cb4f14b062257d320f4573S"},
+            {"name": "Content-Type", "value": "application/json"}
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={{ JSON.stringify({ phone: '55' + $('Montar Payload Final').item.json.telefone.replace(/\\D/g, ''), message: 'Para personalizar seu guia de skincare, responda 3 perguntas rápidas — leva menos de 1 minuto 🌿\\n\\nhttps://refugiodapele.com.br/#quiz\\n\\n— Refúgio da Pele 💛' }) }}"
+      },
+      "id": "wf7-quiz-zapi-001",
+      "name": "Z-API — Solicitar Quiz de Perfil",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1960, 320]
     }
   ],
   "connections": {
@@ -339,6 +368,28 @@
           },
           {
             "node": "Z-API — Boas-vindas WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Z-API — Boas-vindas WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Aguardar 5 min",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aguardar 5 min": {
+      "main": [
+        [
+          {
+            "node": "Z-API — Solicitar Quiz de Perfil",
             "type": "main",
             "index": 0
           }
