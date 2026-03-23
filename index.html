@@ -2029,7 +2029,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
 
         <div class="field-group">
           <label>Principal preocupação com sua pele <span style="color:var(--terracotta)">*</span></label>
-          <select id="quizConcern" onchange="toggleConcernOther(this.value)">
+          <select id="quizConcern" onchange="toggleConcernOther(this)">
             <option value="">Selecione...</option>
             <option value="ressecamento">Ressecamento / irritação</option>
             <option value="odor-ph">Odor / pH</option>
@@ -2140,14 +2140,17 @@ Uma rotina simples de 3 passos que respeita quem você já é.
         </div>
         <div class="field-group" style="margin-bottom:12px;">
           <label>Principal preocupação com sua pele <span style="color:var(--terracotta)">*</span></label>
-          <select id="pdfConcern">
+          <select id="pdfConcern" onchange="toggleConcernOther(this)">
             <option value="">Selecione...</option>
             <option value="ressecamento">Ressecamento / irritação</option>
             <option value="odor-ph">Odor / pH</option>
             <option value="menopausa">Menopausa / mudanças hormonais</option>
             <option value="primeira-rotina">Primeira rotina de cuidado</option>
             <option value="envelhecimento">Envelhecimento da pele íntima</option>
+            <option value="outro">Outro</option>
           </select>
+          <textarea id="pdfConcernOther" maxlength="150" placeholder="Descreva sua preocupação (até 150 caracteres)..." style="display:none;margin-top:10px;width:100%;min-height:72px;padding:12px 14px;border:1px solid rgba(107,87,68,0.25);border-radius:2px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--deep);background:#fff;resize:vertical;box-sizing:border-box;"></textarea>
+          <span id="pdfConcernOtherCount" style="display:none;font-size:11px;color:var(--mid);float:right;margin-top:4px;">0/150</span>
         </div>
         <div class="field-group" style="margin-bottom:4px;">
           <label>Você está em alguma dessas fases? <span style="font-weight:400;color:rgba(107,87,68,0.5);font-size:11px;">(opcional — para mamães)</span></label>
@@ -2372,10 +2375,13 @@ Uma rotina simples de 3 passos que respeita quem você já é.
       const ageRawPdf = document.getElementById('pdfAge').value.trim();
       const age = ageRawPdf !== '' ? ageRawPdf : '12'; // sem idade = tratado como menor
       const concern = document.getElementById('pdfConcern').value;
+      const concernOtherPdf = document.getElementById('pdfConcernOther').value.trim();
+      const concernFinalPdf = concern === 'outro' ? (concernOtherPdf || 'outro') : concern;
       const maternal = document.getElementById('pdfMaternal').value;
       if (!name) { showToast('Preenche seu nome para continuar 😊'); return; }
       if (!email || !/\S+@\S+\.\S+/.test(email)) { showToast('E-mail inválido, verifica!'); return; }
       if (!phone) { showToast('Adiciona seu WhatsApp para receber o guia 📱'); return; }
+      if (concern === 'outro' && !concernOtherPdf) { showToast('Descreva sua preocupação para continuar 🌸'); return; }
       fetch('https://refugiodapele.app.n8n.cloud/webhook/lead-refugio', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -2385,7 +2391,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
           email: email,
           whatsapp: phone,
           idade: age,
-          preocupacao_pele: concern,
+          preocupacao_pele: concernFinalPdf,
           fase_materna: maternal,
           pagina: window.location.href,
           data: new Date().toISOString()
@@ -2431,10 +2437,12 @@ Uma rotina simples de 3 passos que respeita quem você já é.
   });
 
   // ─── TOAST ───
-  function toggleConcernOther(val) {
-    const ta = document.getElementById('quizConcernOther');
-    const counter = document.getElementById('quizConcernOtherCount');
-    if (val === 'outro') {
+  function toggleConcernOther(selectEl) {
+    const base = selectEl.id; // ex: quizConcern, pdfConcern
+    const ta = document.getElementById(base + 'Other');
+    const counter = document.getElementById(base + 'OtherCount');
+    if (!ta) return;
+    if (selectEl.value === 'outro') {
       ta.style.display = 'block';
       counter.style.display = 'block';
       ta.oninput = function() { counter.textContent = this.value.length + '/150'; };
