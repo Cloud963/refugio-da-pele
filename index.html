@@ -2029,14 +2029,17 @@ Uma rotina simples de 3 passos que respeita quem você já é.
 
         <div class="field-group">
           <label>Principal preocupação com sua pele <span style="color:var(--terracotta)">*</span></label>
-          <select id="quizConcern">
+          <select id="quizConcern" onchange="toggleConcernOther(this.value)">
             <option value="">Selecione...</option>
             <option value="ressecamento">Ressecamento / irritação</option>
             <option value="odor-ph">Odor / pH</option>
             <option value="menopausa">Menopausa / mudanças hormonais</option>
             <option value="primeira-rotina">Primeira rotina de cuidado</option>
             <option value="envelhecimento">Envelhecimento da pele íntima</option>
+            <option value="outro">Outro</option>
           </select>
+          <textarea id="quizConcernOther" maxlength="150" placeholder="Descreva sua preocupação (até 150 caracteres)..." style="display:none;margin-top:10px;width:100%;min-height:72px;padding:12px 14px;border:1px solid rgba(107,87,68,0.25);border-radius:2px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--deep);background:#fff;resize:vertical;box-sizing:border-box;"></textarea>
+          <span id="quizConcernOtherCount" style="display:none;font-size:11px;color:var(--mid);float:right;margin-top:4px;">0/150</span>
         </div>
 
         <div class="field-group">
@@ -2268,13 +2271,16 @@ Uma rotina simples de 3 passos que respeita quem você já é.
   function showResult() {
     const name = document.getElementById('quizName').value.trim();
     const email = document.getElementById('quizEmail').value.trim();
-    const age = document.getElementById('quizAge').value.trim();
+    const ageRaw = document.getElementById('quizAge').value.trim();
+    const age = ageRaw !== '' ? ageRaw : '12'; // sem idade = tratado como menor
     const concern = document.getElementById('quizConcern').value;
+    const concernOther = document.getElementById('quizConcernOther').value.trim();
+    const concernFinal = concern === 'outro' ? (concernOther || 'outro') : concern;
     const maternal = document.getElementById('quizMaternal').value;
     if (!name || !email) { showToast('Preenche nome e e-mail para continuar 💌'); return; }
     if (!/\S+@\S+\.\S+/.test(email)) { showToast('E-mail parece inválido, verifica!'); return; }
-    if (!age) { showToast('Informe sua idade para continuar 😊'); return; }
     if (!concern) { showToast('Selecione sua principal preocupação 🌸'); return; }
+    if (concern === 'outro' && !concernOther) { showToast('Descreva sua preocupação para continuar 🌸'); return; }
 
     const total = Object.values(scores).reduce((a, b) => a + b, 0);
 
@@ -2349,7 +2355,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
         email: email,
         whatsapp: phone,
         idade: age,
-        preocupacao_pele: concern,
+        preocupacao_pele: concernFinal,
         fase_materna: maternal,
         resultado_pele: type,
         data: new Date().toISOString()
@@ -2424,6 +2430,20 @@ Uma rotina simples de 3 passos que respeita quem você já é.
   });
 
   // ─── TOAST ───
+  function toggleConcernOther(val) {
+    const ta = document.getElementById('quizConcernOther');
+    const counter = document.getElementById('quizConcernOtherCount');
+    if (val === 'outro') {
+      ta.style.display = 'block';
+      counter.style.display = 'block';
+      ta.oninput = function() { counter.textContent = this.value.length + '/150'; };
+    } else {
+      ta.style.display = 'none';
+      counter.style.display = 'none';
+      ta.value = '';
+    }
+  }
+
   function showToast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg;
@@ -2717,13 +2737,13 @@ Uma rotina simples de 3 passos que respeita quem você já é.
       <div class="plans-divider"><span>Planos Refúgio da Pele</span></div>
       <div class="plans-grid">
 
-        <!-- PLANO 1 - A Semente R$9,90 -->
+        <!-- PLANO 1 - A Dose R$9,90 -->
         <div class="plan-card" onclick="openLegal('planos')">
           <div class="plan-card-bg plan-bg-semente"></div>
           <div class="plan-card-overlay">
             <div class="plan-divider"></div>
-            <div class="plan-name">A Semente</div>
-            <div class="plan-tagline">Uma semente plantada com intenção vira raiz.</div>
+            <div class="plan-name">A Dose</div>
+            <div class="plan-tagline">O cuidado que cabe na sua rotina.</div>
             <div class="plan-price-row">
               <span class="plan-price-val">R$9,90</span>
               <span class="plan-price-period">/ mês</span>
@@ -2759,7 +2779,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
           <div class="plan-card-overlay">
             <div class="plan-divider"></div>
             <div class="plan-name">Experiência Completa</div>
-            <div class="plan-tagline">Para quem escolheu se colocar em primeiro lugar.</div>
+            <div class="plan-tagline">O cuidado que você merece, sem abrir mão de nada.</div>
             <div class="plan-price-row">
               <span class="plan-price-val">R$19,90</span>
               <span class="plan-price-period">/ mês</span>
