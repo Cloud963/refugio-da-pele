@@ -1302,8 +1302,6 @@
   <div class="nav-desktop-items" style="display:flex; align-items:center; gap:0;">
     <a href="#tipos-de-pele" class="nav-link">Tipos de pele</a>
     <div class="nav-divider" style="margin:0 12px;"></div>
-    <button class="nav-cta" id="navCta" onclick="openQuiz()">Entender minha pele →</button>
-    <div class="nav-divider" style="margin:0 12px;"></div>
     <button class="nav-cta-acquire" onclick="document.getElementById('planos').scrollIntoView({behavior:'smooth'})">✦ Ver planos</button>
   </div>
 
@@ -1321,9 +1319,6 @@
   <a href="#tipos-de-pele" class="mobile-menu-item" onclick="closeMobileMenu()">
     Tipos de pele <span>→</span>
   </a>
-  <button class="mobile-menu-item" onclick="closeMobileMenu(); openQuiz();">
-    Entender minha pele <span>→</span>
-  </button>
   <button class="mobile-menu-item" onclick="closeMobileMenu(); openPDF();">
     Rotina gratuita <span>→</span>
   </button>
@@ -1471,96 +1466,6 @@ Uma rotina simples de 3 passos que respeita quem você já é.
   </div>
 </section>
 <!-- TRUST -->
-<section class="trust-section fade-up">
-  <h2>Sua pele te conhece.
-<br><em>Você só precisa ouvi-la.</em></h2>
-  <p class="trust-intro">Você não precisa de mais produtos. Você precisa do produto certo, na hora certa, da forma certa. E de uma rotina que respeite a pele que você tem.</p>
-
-  <div class="trust-stats">
-    <div class="stat">
-      <span class="stat-icon">⏱</span>
-      <span class="stat-num">2 min</span>
-      <span class="stat-label">Para te conhecer melhor</span>
-      <span class="stat-desc">para entender o que sua pele está sentindo de verdade</span>
-    </div>
-    <div class="stat">
-      <span class="stat-icon">🌿</span>
-      <span class="stat-num">3</span>
-      <span class="stat-label">Passos de carinho</span>
-      <span class="stat-desc">é tudo que uma pele sensível precisa para florescer</span>
-    </div>
-    <div class="stat">
-      <span class="stat-icon">☀️</span>
-      <span class="stat-num">5 min</span>
-      <span class="stat-label">De ritual diário</span>
-      <span class="stat-desc">para começar e terminar o dia com a pele em paz</span>
-    </div>
-    <div class="stat">
-      <span class="stat-icon">🔒</span>
-      <span class="stat-num">100%</span>
-      <span class="stat-label">Com você</span>
-      <span class="stat-desc">do diagnóstico ao cuidado diário, em cada passo</span>
-    </div>
-  </div>
-
-  <div class="testimonials">
-    <div class="testimonial-card">
-      <p class="testimonial-text">Depois de anos usando produtos errados, finalmente minha pele parou de descamar e irritar. O protocolo de 3 passos mudou tudo.</p>
-      <div class="testimonial-author">
-        <div class="testimonial-avatar">A</div>
-        <div>
-          <span class="testimonial-name">Ana Paula</span>
-          <span class="testimonial-skin">Barreira comprometida · São Paulo</span>
-        </div>
-      </div>
-    </div>
-    <div class="testimonial-card">
-      <p class="testimonial-text">Descobri que minha barreira estava destruída. Com niacinamida e centella em 3 semanas minha vermelhidão reduziu mais de 70%.</p>
-      <div class="testimonial-author">
-        <div class="testimonial-avatar" style="background:var(--sage);">C</div>
-        <div>
-          <span class="testimonial-name">Camila</span>
-          <span class="testimonial-skin">Pele reativa · Curitiba</span>
-        </div>
-      </div>
-    </div>
-    <div class="testimonial-card">
-      <p class="testimonial-text">Tentei mil coisas e sempre piorava. Com o Refúgio aprendi que menos é mais — minha pele reagiu pela primeira vez de forma positiva.</p>
-      <div class="testimonial-author">
-        <div class="testimonial-avatar" style="background:#8A5020;">J</div>
-        <div>
-          <span class="testimonial-name">Juliana</span>
-          <span class="testimonial-skin">Pele sensível · Porto Alegre</span>
-        </div>
-      </div>
-    </div>
-    <div class="testimonial-card">
-      <p class="testimonial-text">Eu tinha medo de qualquer coisa nova na minha pele. O diagnóstico me ajudou a entender exatamente o que estava acontecendo — e finalmente parei de ter crises de irritação toda semana.</p>
-      <div class="testimonial-author">
-        <div class="testimonial-avatar" style="background:#6B5B8A;">M</div>
-        <div>
-          <span class="testimonial-name">Mariana</span>
-          <span class="testimonial-skin">Pele com rosácea · Belo Horizonte</span>
-        </div>
-      </div>
-    </div>
-    <div class="testimonial-card">
-      <p class="testimonial-text">Em duas semanas seguindo o protocolo a minha pele ficou mais firme, menos vermelha e eu finalmente consigo usar protetor solar sem arder. Parece simples mas pra mim foi uma revolução.</p>
-      <div class="testimonial-author">
-        <div class="testimonial-avatar" style="background:#3D7A5E;">F</div>
-        <div>
-          <span class="testimonial-name">Fernanda</span>
-          <span class="testimonial-skin">Pele atópica · Rio de Janeiro</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="trust-cta-wrap">
-    <button class="trust-cta-btn" onclick="openQuiz()">Descobrir minha pele →</button>
-  </div>
-</section>
-
 <!-- PLANS SHOWCASE SECTION -->
 <style>
   .plans-section { padding: 80px 0 60px; background: var(--cream); }
@@ -1740,6 +1645,91 @@ Uma rotina simples de 3 passos que respeita quem você já é.
   </div>
 
   <p class="plans-guarantee-main">🔒 Garantia de 7 dias em todos os planos · Sem perguntas</p>
+</section>
+
+<section class="trust-section fade-up">
+  <h2>Sua pele te conhece.
+<br><em>Você só precisa ouvi-la.</em></h2>
+  <p class="trust-intro">Você não precisa de mais produtos. Você precisa do produto certo, na hora certa, da forma certa. E de uma rotina que respeite a pele que você tem.</p>
+
+  <div class="trust-stats">
+    <div class="stat">
+      <span class="stat-icon">⏱</span>
+      <span class="stat-num">2 min</span>
+      <span class="stat-label">Para te conhecer melhor</span>
+      <span class="stat-desc">para entender o que sua pele está sentindo de verdade</span>
+    </div>
+    <div class="stat">
+      <span class="stat-icon">🌿</span>
+      <span class="stat-num">3</span>
+      <span class="stat-label">Passos de carinho</span>
+      <span class="stat-desc">é tudo que uma pele sensível precisa para florescer</span>
+    </div>
+    <div class="stat">
+      <span class="stat-icon">☀️</span>
+      <span class="stat-num">5 min</span>
+      <span class="stat-label">De ritual diário</span>
+      <span class="stat-desc">para começar e terminar o dia com a pele em paz</span>
+    </div>
+    <div class="stat">
+      <span class="stat-icon">🔒</span>
+      <span class="stat-num">100%</span>
+      <span class="stat-desc">do diagnóstico ao cuidado diário, em cada passo</span>
+    </div>
+  </div>
+
+  <div class="testimonials">
+    <div class="testimonial-card">
+      <p class="testimonial-text">Depois de anos usando produtos errados, finalmente minha pele parou de descamar e irritar. O protocolo de 3 passos mudou tudo.</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar">A</div>
+        <div>
+          <span class="testimonial-name">Ana Paula</span>
+          <span class="testimonial-skin">Barreira comprometida · São Paulo</span>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card">
+      <p class="testimonial-text">Descobri que minha barreira estava destruída. Com niacinamida e centella em 3 semanas minha vermelhidão reduziu mais de 70%.</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar" style="background:var(--sage);">C</div>
+        <div>
+          <span class="testimonial-name">Camila</span>
+          <span class="testimonial-skin">Pele reativa · Curitiba</span>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card">
+      <p class="testimonial-text">Tentei mil coisas e sempre piorava. Com o Refúgio aprendi que menos é mais — minha pele reagiu pela primeira vez de forma positiva.</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar" style="background:#8A5020;">J</div>
+        <div>
+          <span class="testimonial-name">Juliana</span>
+          <span class="testimonial-skin">Pele sensível · Porto Alegre</span>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card">
+      <p class="testimonial-text">Eu tinha medo de qualquer coisa nova na minha pele. O diagnóstico me ajudou a entender exatamente o que estava acontecendo — e finalmente parei de ter crises de irritação toda semana.</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar" style="background:#6B5B8A;">M</div>
+        <div>
+          <span class="testimonial-name">Mariana</span>
+          <span class="testimonial-skin">Pele com rosácea · Belo Horizonte</span>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card">
+      <p class="testimonial-text">Em duas semanas seguindo o protocolo a minha pele ficou mais firme, menos vermelha e eu finalmente consigo usar protetor solar sem arder. Parece simples mas pra mim foi uma revolução.</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar" style="background:#3D7A5E;">F</div>
+        <div>
+          <span class="testimonial-name">Fernanda</span>
+          <span class="testimonial-skin">Pele atópica · Rio de Janeiro</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <script>
@@ -3238,6 +3228,57 @@ Uma rotina simples de 3 passos que respeita quem você já é.
     </div>
   </div>
 </div>
+
+<!-- BACK TO TOP -->
+<button id="backToTop" aria-label="Voltar ao topo" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M9 14V4M9 4L4 9M9 4L14 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</button>
+<style>
+  #backToTop {
+    position: fixed;
+    bottom: 32px;
+    right: 28px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(42,26,36,0.82);
+    border: 1px solid rgba(212,175,55,0.35);
+    color: rgba(250,243,238,0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.3s ease, transform 0.3s ease, background 0.2s, border-color 0.2s;
+    z-index: 900;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.25);
+  }
+  #backToTop.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  #backToTop:hover {
+    background: rgba(42,26,36,0.97);
+    border-color: rgba(212,175,55,0.7);
+    color: #faf3ee;
+  }
+</style>
+<script>
+  (function() {
+    var btn = document.getElementById('backToTop');
+    window.addEventListener('scroll', function() {
+      if (window.scrollY > 400) {
+        btn.classList.add('visible');
+      } else {
+        btn.classList.remove('visible');
+      }
+    }, { passive: true });
+  })();
+</script>
 
 </body>
 </html>
