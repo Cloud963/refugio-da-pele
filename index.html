@@ -1434,7 +1434,20 @@ Uma rotina simples de 3 passos que respeita quem você já é.
   .plan-detail-overlay { position:fixed; inset:0; opacity:0; pointer-events:none; transition:opacity 0.35s ease; display:flex; align-items:center; justify-content:center; background:rgba(22,12,18,0.72); backdrop-filter:blur(5px); z-index:1000; padding:20px; }
   .plan-detail-overlay.active { opacity:1; pointer-events:all; }
 
-  .plan-detail-inner { display:flex; width:min(880px,90vw); max-height:min(580px,85vh); position:relative; overflow:hidden; border-radius:2px; box-shadow:0 24px 80px rgba(0,0,0,0.5); }
+  .plan-detail-glow-wrap {
+    position:relative; padding:1.5px; border-radius:2px;
+    background: conic-gradient(
+      from var(--glow-angle),
+      transparent 0deg,
+      rgba(212,175,55,0.75) 45deg,
+      transparent 90deg
+    );
+    animation: glow-spin 5s linear infinite;
+    box-shadow:0 24px 80px rgba(0,0,0,0.5);
+    width:min(880px,90vw); max-height:min(580px,85vh);
+    flex-shrink:0;
+  }
+  .plan-detail-inner { display:flex; width:100%; height:100%; max-height:inherit; position:relative; overflow:hidden; border-radius:1px; background:var(--deep); }
 
   .plan-detail-img-col { flex:0 0 42%; position:relative; overflow:hidden; }
   .plan-detail-img-col img { width:100%; height:100%; object-fit:cover; object-position:center center; display:block; background:var(--deep); }
@@ -1505,7 +1518,8 @@ Uma rotina simples de 3 passos que respeita quem você já é.
     .plans-cards-grid { grid-template-columns:1fr; gap:8px; }
     .showcase-img-wrap { min-height:260px; }
     .plan-detail-overlay { padding:12px; align-items:flex-end; }
-    .plan-detail-inner { flex-direction:column; width:100%; max-height:92vh; border-radius:4px 4px 2px 2px; }
+    .plan-detail-glow-wrap { width:100%; max-height:92vh; border-radius:4px 4px 2px 2px; }
+    .plan-detail-inner { flex-direction:column; width:100%; height:100%; max-height:none; border-radius:3px 3px 1px 1px; }
     .plan-detail-img-col { flex:0 0 36vw; max-height:36vw; }
     .plan-detail-content { flex:1; padding:20px 22px; justify-content:flex-start; overflow-y:auto; }
     .plan-detail-name { font-size:clamp(22px,6vw,32px); }
@@ -1567,10 +1581,12 @@ Uma rotina simples de 3 passos que respeita quem você já é.
 
     <!-- DETAIL OVERLAY (expande sobre os 3 cards) -->
     <div class="plan-detail-overlay" id="planDetailOverlay" onclick="if(event.target===this)closePlanDetail()">
-      <div class="plan-detail-inner">
-        <button class="plan-detail-close" onclick="closePlanDetail()">×</button>
-        <div class="plan-detail-img-col" id="planDetailImgCol"></div>
-        <div class="plan-detail-content" id="planDetailContent"></div>
+      <div class="plan-detail-glow-wrap">
+        <div class="plan-detail-inner">
+          <button class="plan-detail-close" onclick="closePlanDetail()">×</button>
+          <div class="plan-detail-img-col" id="planDetailImgCol"></div>
+          <div class="plan-detail-content" id="planDetailContent"></div>
+        </div>
       </div>
     </div>
   </div>
