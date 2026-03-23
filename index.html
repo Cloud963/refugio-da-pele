@@ -2369,7 +2369,8 @@ Uma rotina simples de 3 passos que respeita quem você já é.
       const name = document.getElementById('pdfName').value.trim();
       const email = document.getElementById('pdfEmail').value.trim();
       const phone = document.getElementById('pdfPhoneDirect').value.trim();
-      const age = document.getElementById('pdfAge').value.trim();
+      const ageRawPdf = document.getElementById('pdfAge').value.trim();
+      const age = ageRawPdf !== '' ? ageRawPdf : '12'; // sem idade = tratado como menor
       const concern = document.getElementById('pdfConcern').value;
       const maternal = document.getElementById('pdfMaternal').value;
       if (!name) { showToast('Preenche seu nome para continuar 😊'); return; }
