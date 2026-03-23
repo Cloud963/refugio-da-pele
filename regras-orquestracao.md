@@ -125,3 +125,4 @@ ORQUESTRADOR: Claude (você está lendo isso)
 - Claude API (WF2) é responsável exclusivo pelo PDF semanal
 - Dados sensíveis (chaves de API) nunca vão para o repo público
 - Auto-save no git a cada ~5 min durante sessões ativas (cron configurado em 23/03/2026)
+
