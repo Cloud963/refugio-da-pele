@@ -1632,14 +1632,16 @@ Uma rotina simples de 3 passos que respeita quem você já é.
   }
 
   /* ── DETAIL OVERLAY ── */
-  .plan-detail-overlay { position:fixed; inset:0; opacity:0; pointer-events:none; transition:opacity 0.35s ease; display:flex; align-items:stretch; background:var(--deep); z-index:1000; }
+  .plan-detail-overlay { position:fixed; inset:0; opacity:0; pointer-events:none; transition:opacity 0.35s ease; display:flex; align-items:center; justify-content:center; background:rgba(22,12,18,0.72); backdrop-filter:blur(5px); z-index:1000; padding:20px; }
   .plan-detail-overlay.active { opacity:1; pointer-events:all; }
 
-  .plan-detail-img-col { flex:0 0 45%; position:relative; overflow:hidden; }
+  .plan-detail-inner { display:flex; width:min(880px,90vw); max-height:min(580px,85vh); position:relative; overflow:hidden; border-radius:2px; box-shadow:0 24px 80px rgba(0,0,0,0.5); }
+
+  .plan-detail-img-col { flex:0 0 42%; position:relative; overflow:hidden; }
   .plan-detail-img-col img { width:100%; height:100%; object-fit:cover; object-position:center center; display:block; background:var(--deep); }
 
-  .plan-detail-content { flex:1; display:flex; flex-direction:column; justify-content:center; padding:36px 48px; overflow-y:auto; }
-  .plan-detail-close { position:absolute; top:20px; right:24px; background:none; border:none; color:rgba(250,243,238,0.45); font-size:28px; cursor:pointer; line-height:1; z-index:11; transition:color 0.2s; font-family:'DM Sans',sans-serif; }
+  .plan-detail-content { flex:1; display:flex; flex-direction:column; justify-content:center; padding:36px 44px; overflow-y:auto; background:var(--deep); }
+  .plan-detail-close { position:absolute; top:16px; right:20px; background:none; border:none; color:rgba(250,243,238,0.45); font-size:26px; cursor:pointer; line-height:1; z-index:11; transition:color 0.2s; font-family:'DM Sans',sans-serif; }
   .plan-detail-close:hover { color:#faf3ee; }
 
   .plan-detail-tag { font-family:'DM Sans',sans-serif; font-size:9px; letter-spacing:0.25em; text-transform:uppercase; color:rgba(196,104,62,0.8); margin-bottom:12px; display:block; }
@@ -1666,8 +1668,9 @@ Uma rotina simples de 3 passos que respeita quem você já é.
   @media(max-width:768px) {
     .plans-cards-grid { grid-template-columns:1fr; gap:8px; }
     .showcase-img-wrap { min-height:260px; }
-    .plan-detail-overlay { flex-direction:column; }
-    .plan-detail-img-col { flex:0 0 38vh; max-height:38vh; }
+    .plan-detail-overlay { padding:12px; align-items:flex-end; }
+    .plan-detail-inner { flex-direction:column; width:100%; max-height:92vh; border-radius:4px 4px 2px 2px; }
+    .plan-detail-img-col { flex:0 0 36vw; max-height:36vw; }
     .plan-detail-content { flex:1; padding:20px 22px; justify-content:flex-start; overflow-y:auto; }
     .plan-detail-name { font-size:clamp(22px,6vw,32px); }
     .plan-detail-price { font-size:42px; }
@@ -1727,10 +1730,12 @@ Uma rotina simples de 3 passos que respeita quem você já é.
     </div>
 
     <!-- DETAIL OVERLAY (expande sobre os 3 cards) -->
-    <div class="plan-detail-overlay" id="planDetailOverlay">
-      <button class="plan-detail-close" onclick="closePlanDetail()">×</button>
-      <div class="plan-detail-img-col" id="planDetailImgCol"></div>
-      <div class="plan-detail-content" id="planDetailContent"></div>
+    <div class="plan-detail-overlay" id="planDetailOverlay" onclick="if(event.target===this)closePlanDetail()">
+      <div class="plan-detail-inner">
+        <button class="plan-detail-close" onclick="closePlanDetail()">×</button>
+        <div class="plan-detail-img-col" id="planDetailImgCol"></div>
+        <div class="plan-detail-content" id="planDetailContent"></div>
+      </div>
     </div>
   </div>
 
@@ -1773,7 +1778,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
       img: 'assets/images/pele-radiante.jpeg',
       tag: 'Plano Premium',
       name: 'Experiência Completa',
-      tagline: 'O cuidado que você merece, sem abrir mão de nada.',
+      tagline: 'Tudo que a A Dose entrega — feito especialmente pra você.',
       price: '<span class="price-currency">R$</span>19,90',
       features: [
         { text: '<strong>PDF semanal completo</strong> + e-book mensal temático exclusivo (rituais sazonais, guia de ativos, cuidados por fase...)' },
@@ -2362,21 +2367,23 @@ Uma rotina simples de 3 passos que respeita quem você já é.
 
     // ─── ENVIAR PARA N8N ───
     const phone = document.getElementById('quizPhone') ? document.getElementById('quizPhone').value.trim() : '';
-    fetch('https://refugiodapele.app.n8n.cloud/webhook/lead-refugio', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        origem: 'quiz',
-        nome: name,
-        email: email,
-        whatsapp: phone,
-        idade: age,
-        preocupacao_pele: concernFinal,
-        fase_materna: maternal,
-        resultado_pele: type,
-        data: new Date().toISOString()
-      })
-    }).catch(function() {});
+    if (_rdpCanSubmit()) {
+      fetch('https://refugiodapele.app.n8n.cloud/webhook/lead-refugio', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          origem: 'quiz',
+          nome: name,
+          email: email,
+          whatsapp: phone,
+          idade: age,
+          preocupacao_pele: concernFinal,
+          fase_materna: maternal,
+          resultado_pele: type,
+          data: new Date().toISOString()
+        })
+      }).then(function() { _rdpMarkSubmit(); }).catch(function() {});
+    }
   }
 
   // ─── PDF FORM ───
@@ -2395,6 +2402,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
       if (!email || !/\S+@\S+\.\S+/.test(email)) { showToast('E-mail inválido, verifica!'); return; }
       if (!phone) { showToast('Adiciona seu WhatsApp para receber o guia 📱'); return; }
       if (concern === 'outro' && !concernOtherPdf) { showToast('Descreva sua preocupação para continuar 🌸'); return; }
+      if (!_rdpCanSubmit()) return;
       fetch('https://refugiodapele.app.n8n.cloud/webhook/lead-refugio', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -2409,7 +2417,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
           pagina: window.location.href,
           data: new Date().toISOString()
         })
-      }).catch(function() {});
+      }).then(function() { _rdpMarkSubmit(); }).catch(function() {});
     }
     const skinLabels = { sensivel: 'Pele Sensível', oleosa: 'Pele Oleosa', acneica: 'Pele Acneica' };
     showToast(`Perfeito! Sua rotina para ${skinLabels[selectedSkin]} vai chegar em instantes ✅`);
@@ -2448,6 +2456,26 @@ Uma rotina simples de 3 passos que respeita quem você já é.
   document.querySelectorAll('.modal-overlay').forEach(m => {
     m.addEventListener('click', e => { if (e.target === m) closeModal(m.id); });
   });
+
+  // ─── RATE LIMIT: 1 submissão por aparelho a cada 4h ───
+  function _rdpCanSubmit() {
+    var last = localStorage.getItem('rdp_last_submit');
+    if (last) {
+      var diff = Date.now() - parseInt(last, 10);
+      var limit = 4 * 60 * 60 * 1000;
+      if (diff < limit) {
+        var remaining = Math.ceil((limit - diff) / 60000);
+        var h = Math.floor(remaining / 60), m = remaining % 60;
+        var tempo = h > 0 ? h + 'h' + (m > 0 ? m + 'min' : '') : m + 'min';
+        showToast('Você já solicitou o guia recentemente. Tente novamente em ' + tempo + ' 😊');
+        return false;
+      }
+    }
+    return true;
+  }
+  function _rdpMarkSubmit() {
+    localStorage.setItem('rdp_last_submit', Date.now().toString());
+  }
 
   // ─── TOAST ───
   function toggleConcernOther(selectEl) {
@@ -2802,7 +2830,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
           <div class="plan-card-overlay">
             <div class="plan-divider"></div>
             <div class="plan-name">Experiência Completa</div>
-            <div class="plan-tagline">O cuidado que você merece, sem abrir mão de nada.</div>
+            <div class="plan-tagline">Tudo que a A Dose entrega — feito especialmente pra você.</div>
             <div class="plan-price-row">
               <span class="plan-price-val">R$19,90</span>
               <span class="plan-price-period">/ mês</span>
