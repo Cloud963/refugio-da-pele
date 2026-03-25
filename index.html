@@ -1378,9 +1378,14 @@ Uma rotina simples de 3 passos que respeita quem você já é.
     position:relative; cursor:pointer;
     height:540px;
     transition:transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94), box-shadow 0.4s;
-    box-shadow:0 4px 24px rgba(42,26,36,0.14);
+    box-shadow:
+      0 4px 24px rgba(10,5,3,0.22),
+      0 16px 48px rgba(10,5,3,0.20),
+      0 32px 80px rgba(10,5,3,0.14),
+      0 0 0 1px rgba(255,255,255,0.04);
+    isolation: isolate;
   }
-  .showcase-card:hover { transform:translateY(-6px); box-shadow:0 16px 48px rgba(42,26,36,0.24); }
+  .showcase-card:hover { transform:translateY(-6px); box-shadow:0 16px 56px rgba(10,5,3,0.32), 0 32px 80px rgba(10,5,3,0.22), 0 0 0 1px rgba(255,255,255,0.07); }
   .showcase-card:hover .showcase-img { transform:scale(1.05); }
 
   /* Imagem ocupa o card inteiro */
@@ -1478,40 +1483,90 @@ Uma rotina simples de 3 passos que respeita quem você já é.
   .plans-guarantee-main { text-align:center; font-size:11px; color:rgba(107,87,68,0.45); letter-spacing:0.1em; margin:28px 0 0; padding:0 24px; }
 
 
-  /* ── BORDER GLOW (showcase plan cards) ── */
-  @property --glow-angle {
-    syntax: '<angle>';
-    initial-value: 0deg;
-    inherits: false;
-  }
+  /* ── BORDER GLOW: mouse-reactive (showcase plan cards) ── */
   .showcase-card {
-    --glow-clr: rgba(212,175,55,0.75);
+    --edge-proximity: 0;
+    --cursor-angle: 0deg;
+    --edge-sensitivity: 32;
+    --cone-spread: 20;
+    --glow-radius: 38px;
+    --glow-color:    hsl(335deg 52% 66% / 100%);
+    --glow-color-60: hsl(335deg 52% 66% /  60%);
+    --glow-color-50: hsl(335deg 52% 66% /  50%);
+    --glow-color-40: hsl(335deg 52% 66% /  40%);
+    --glow-color-30: hsl(335deg 52% 66% /  30%);
+    --glow-color-20: hsl(335deg 52% 66% /  20%);
+    --glow-color-10: hsl(335deg 52% 66% /  10%);
   }
+
+  /* Directional border highlight — cone toward cursor */
   .showcase-card::before {
     content: '';
     position: absolute;
-    inset: -1.5px;
-    z-index: 0;
-    border-radius: inherit;
-    background: conic-gradient(
-      from var(--glow-angle),
-      transparent 0deg,
-      var(--glow-clr) 45deg,
-      transparent 90deg
+    inset: -1px;
+    z-index: 3;
+    pointer-events: none;
+    border: 1px solid transparent;
+    background:
+      linear-gradient(rgba(0,0,0,0) 0 100%) padding-box,
+      linear-gradient(
+        hsl(335deg 52% 66% / 0%)  0%,
+        hsl(335deg 52% 66% / 1)  30%,
+        hsl(40deg  72% 70% / 1)  50%,
+        hsl(335deg 52% 66% / 1)  70%,
+        hsl(335deg 52% 66% / 0%) 100%
+      ) border-box;
+    opacity: calc((var(--edge-proximity) - var(--edge-sensitivity)) / (100 - var(--edge-sensitivity)));
+    transition: opacity 0.25s ease-out;
+    mask-image: conic-gradient(
+      from var(--cursor-angle) at center,
+      black         calc(var(--cone-spread) * 1%),
+      transparent   calc((var(--cone-spread) + 13) * 1%),
+      transparent   calc((100 - var(--cone-spread) - 13) * 1%),
+      black         calc((100 - var(--cone-spread)) * 1%)
     );
-    -webkit-mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    padding: 1.5px;
-    animation: glow-spin 5s linear infinite;
   }
-  @keyframes glow-spin {
-    to { --glow-angle: 360deg; }
+  .showcase-card:not(:hover)::before {
+    opacity: 0;
+    transition: opacity 0.7s ease-in-out;
+  }
+
+  /* Outer glow — extends beyond card border */
+  .showcase-card > .edge-light {
+    position: absolute;
+    inset: calc(var(--glow-radius) * -1);
+    pointer-events: none;
+    z-index: 4;
+    mask-image: conic-gradient(
+      from var(--cursor-angle) at center,
+      black 2.5%, transparent 10%, transparent 90%, black 97.5%
+    );
+    opacity: calc((var(--edge-proximity) - var(--edge-sensitivity)) / (100 - var(--edge-sensitivity)));
+    transition: opacity 0.25s ease-out;
+    mix-blend-mode: plus-lighter;
+  }
+  .showcase-card:not(:hover) > .edge-light {
+    opacity: 0;
+    transition: opacity 0.7s ease-in-out;
+  }
+  .showcase-card > .edge-light::before {
+    content: '';
+    position: absolute;
+    inset: var(--glow-radius);
+    box-shadow:
+      inset 0 0 0  1px var(--glow-color),
+      inset 0 0 2px 0  var(--glow-color-60),
+      inset 0 0 5px 0  var(--glow-color-50),
+      inset 0 0 10px 0 var(--glow-color-40),
+      inset 0 0 22px 0 var(--glow-color-30),
+      inset 0 0 38px 2px var(--glow-color-20),
+      inset 0 0 60px 2px var(--glow-color-10),
+      0 0 2px  0  var(--glow-color-60),
+      0 0 5px  0  var(--glow-color-50),
+      0 0 10px 0  var(--glow-color-40),
+      0 0 22px 0  var(--glow-color-30),
+      0 0 38px 2px var(--glow-color-20),
+      0 0 60px 2px var(--glow-color-10);
   }
 
   @media(max-width:768px) {
@@ -1541,6 +1596,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
 
       <!-- CARD 1 — A Dose R$9,90 -->
       <div class="showcase-card">
+        <span class="edge-light"></span>
         <div class="showcase-img-wrap">
           <img src="assets/images/ritual-de-pele.jpeg" alt="A Dose" class="showcase-img" style="object-position:center 18%;" />
         </div>
@@ -1553,6 +1609,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
 
       <!-- CARD 2 — O Encontro R$14,90 -->
       <div class="showcase-card showcase-card--light">
+        <span class="edge-light"></span>
         <div class="showcase-img-wrap">
           <img src="assets/images/influencer-silhueta.jpg" alt="O Encontro" class="showcase-img" style="object-position:center 25%;" />
           <span class="showcase-soon">Em breve</span>
@@ -1566,6 +1623,7 @@ Uma rotina simples de 3 passos que respeita quem você já é.
 
       <!-- CARD 3 — Experiência Completa R$19,90 -->
       <div class="showcase-card">
+        <span class="edge-light"></span>
         <div class="showcase-img-wrap">
           <img src="assets/images/pele-radiante.jpeg" alt="Experiência Completa" class="showcase-img" />
           <span class="showcase-soon">Em breve</span>
@@ -3331,6 +3389,43 @@ Uma rotina simples de 3 passos que respeita quem você já é.
       }
     }, { passive: true });
   })();
+</script>
+
+<script>
+/* ── BorderGlow: mouse-reactive edge highlight on plan cards ── */
+(function() {
+  function getCenterOfElement(el) {
+    const { width, height } = el.getBoundingClientRect();
+    return [width / 2, height / 2];
+  }
+  function getEdgeProximity(el, x, y) {
+    const [cx, cy] = getCenterOfElement(el);
+    const dx = x - cx, dy = y - cy;
+    let kx = Infinity, ky = Infinity;
+    if (dx !== 0) kx = cx / Math.abs(dx);
+    if (dy !== 0) ky = cy / Math.abs(dy);
+    return Math.min(Math.max(1 / Math.min(kx, ky), 0), 1);
+  }
+  function getCursorAngle(el, x, y) {
+    const [cx, cy] = getCenterOfElement(el);
+    const dx = x - cx, dy = y - cy;
+    if (dx === 0 && dy === 0) return 0;
+    let deg = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
+    if (deg < 0) deg += 360;
+    return deg;
+  }
+  document.querySelectorAll('.showcase-card').forEach(function(card) {
+    card.addEventListener('pointermove', function(e) {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const proximity = getEdgeProximity(card, x, y);
+      const angle = getCursorAngle(card, x, y);
+      card.style.setProperty('--edge-proximity', (proximity * 100).toFixed(2));
+      card.style.setProperty('--cursor-angle', angle.toFixed(2) + 'deg');
+    }, { passive: true });
+  });
+})();
 </script>
 
 </body>
