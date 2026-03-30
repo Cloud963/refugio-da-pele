@@ -1,786 +1,1766 @@
 {
-  "name": "WF2 — PDF Semanal",
-  "nodes": [
-    {
-      "parameters": {
-        "rule": {
-          "interval": [
-            {
-              "field": "cronExpression",
-              "expression": "0 6 * * 0"
+    "updatedAt": "2026-03-30T06:29:54.162Z",
+    "createdAt": "2026-03-23T20:12:48.488Z",
+    "id": "8UYOQDq5vVp2Oy7R",
+    "name": "WF2 \u2014 PDF Semanal",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "cronExpression",
+                            "expression": "0 6 * * 0"
+                        }
+                    ]
+                }
+            },
+            "id": "a1b2c3d4-0001-0001-0001-000000000001",
+            "name": "Schedule Trigger \u2014 Segunda 08h",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.2,
+            "position": [
+                240,
+                304
+            ]
+        },
+        {
+            "parameters": {
+                "url": "https://aftrvqwazdiumibdfjjy.supabase.co/rest/v1/config?key=in.(\"tema_semana\",\"tema_mes\",\"tema_trimestre\")&select=key,value",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "{{SUPABASE_SERVICE_KEY}}"
+                        },
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer {{SUPABASE_SERVICE_KEY}}"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "a1b2c3d4-0001-0001-0001-000000000002a",
+            "name": "Supabase \u2014 Buscar Temas WF5",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                464,
+                304
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const rows = $input.first().json;\nconst map = {};\nif (Array.isArray(rows)) rows.forEach(r => { map[r.key] = r.value; });\nconst tema_semana = map['tema_semana'] || 'skincare \u2014 hidrata\u00e7\u00e3o e barreira cut\u00e2nea';\nconst tema_mes = map['tema_mes'] || 'skincare \u2014 prote\u00e7\u00e3o solar';\nconst tema_trimestre = map['tema_trimestre'] || 'skincare \u2014 anti-idade natural';\nconst numero_semana = Math.ceil(new Date().getDate() / 7);\nreturn [{ json: { tema_semana, tema_mes, tema_trimestre, numero_semana, clima_semana: 'tropical \u2014 calor e umidade' } }];"
+            },
+            "id": "a1b2c3d4-0001-0001-0001-000000000002b",
+            "name": "Extrair Temas do Supabase",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                688,
+                304
+            ]
+        },
+        {
+            "parameters": {
+                "url": "https://serpapi.com/search",
+                "sendQuery": true,
+                "queryParameters": {
+                    "parameters": [
+                        {
+                            "name": "q",
+                            "value": "={{ $json.tema_semana }} cuidados pele mulheres mundo"
+                        },
+                        {
+                            "name": "api_key",
+                            "value": "{{SERPAPI_KEY}}"
+                        },
+                        {
+                            "name": "num",
+                            "value": "10"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "a1b2c3d4-0001-0001-0001-000000000003",
+            "name": "SerpAPI \u2014 Busca Skincare",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                912,
+                304
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://api.tavily.com/search",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer {{TAVILY_API_KEY}}"
+                        },
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ JSON.stringify({ query: $('Extrair Temas do Supabase').item.json.tema_semana + ' skincare international practices', max_results: 5, include_answer: false, search_depth: 'advanced' }) }}",
+                "options": {}
+            },
+            "id": "a1b2c3d4-0001-0001-0001-000000000004",
+            "name": "Tavily \u2014 Pr\u00e1ticas Internacionais",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                1120,
+                304
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const serpData = $('SerpAPI \u2014 Busca Skincare').item.json;\nconst tavilyData = $input.first().json;\nlet contextParts = [];\nif (serpData.organic_results && Array.isArray(serpData.organic_results)) {\n  const serpSnippets = serpData.organic_results.slice(0, 10).map((r, i) => `[Fonte ${i+1}] ${r.title||''}:\\n${r.snippet||''}\\nURL: ${r.link||''}`).join('\\n\\n');\n  contextParts.push('=== Resultados SerpAPI ===\\n' + serpSnippets);\n}\nif (tavilyData.results && Array.isArray(tavilyData.results)) {\n  const tavilySnippets = tavilyData.results.slice(0, 5).map((r, i) => `[Tavily ${i+1}] ${r.title||''}:\\n${r.content||''}\\nURL: ${r.url||''}`).join('\\n\\n');\n  contextParts.push('=== Resultados Tavily ===\\n' + tavilySnippets);\n}\nconst contexto_pesquisa = contextParts.join('\\n\\n');\nconst tema_semana = $('Extrair Temas do Supabase').item.json.tema_semana;\nconst clima_semana = $('Extrair Temas do Supabase').item.json.clima_semana;\nreturn [{ json: { contexto_pesquisa, tema_semana, clima_semana } }];"
+            },
+            "id": "a1b2c3d4-0001-0001-0001-000000000005",
+            "name": "Merge Resultados de Pesquisa",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1344,
+                304
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://api.openai.com/v1/chat/completions",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer {{OPENAI_API_KEY}}"
+                        },
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ JSON.stringify({\"model\": \"gpt-4o\", \"max_tokens\": 8000, \"messages\": [{\"role\": \"system\", \"content\": \"Voc\\u00ea \\u00e9 especialista em cria\\u00e7\\u00e3o de conte\\u00fado editorial para revistas femininas de skincare e designer editorial de revistas digitais.\\n\\nCria a revista digital semanal do Ref\\u00fagio da Pele \\u2014 marca brasileira de skincare \\u00edntimo feminino.\\n\\nFONTES OBRIGAT\\u00d3RIAS DE PESQUISA (use todas):\\n- Dermatologia cl\\u00ednica: https://www.aad.org/public (American Academy of Dermatology)\\n- Sa\\u00fade da pele: https://www.mayoclinic.org/\\n- Tend\\u00eancias virais em tempo real: resultados do Tavily (fornecidos no contexto)\\n- Busca ampla e not\\u00edcias: resultados do SerpAPI (fornecidos no contexto)\\n- Tend\\u00eancias de busca: dados do Google Trends (fornecidos no contexto quando dispon\\u00edveis)\\n- Tend\\u00eancias virais: TikTok skincare, Instagram Reels, K-Beauty atual\\n- Dores reais: coment\\u00e1rios/f\\u00f3runs de mulheres brasileiras, d\\u00favidas frequentes\\n- Pr\\u00e1ticas internacionais: Coreia do Sul, Jap\\u00e3o, Fran\\u00e7a, Ayurveda, Escandin\\u00e1via\\n\\nREGRAS DE TOM E CONTE\\u00daDO:\\n- Linguagem simples, feminina, conversacional \\u2014 como amiga especialista, n\\u00e3o aula\\n- Frases curtas. Analogias quando necess\\u00e1rio. Evitar jarg\\u00e3o t\\u00e9cnico\\n- Escopo: pele = corpo inteiro, n\\u00e3o s\\u00f3 rosto\\n- Tom cl\\u00ednico permitido para clareza cient\\u00edfica\\n- Pessoas reais podem ser citadas (dermatologistas, personalidades)\\n- PROIBIDO: julgamento, compara\\u00e7\\u00e3o corporal negativa, tom de vergonha\\n\\nREGRAS LGPD \\u2014 MENORES:\\n- Faixa 13\\u201317 anos: ZERO CTA, ZERO pre\\u00e7os \\u2014 100% educativo, personagem Luna\\n- Idade vazia = menor de 12 anos \\u2014 conte\\u00fado ultra-b\\u00e1sico de higiene apenas\\n- Para menores de 12: sem nenhuma refer\\u00eancia comercial\"}, {\"role\": \"user\", \"content\": 'Tema da semana: ' + $json.tema_semana + '\\nTema do m\u00eas: ' + $json.tema_mes + '\\nClima: ' + $json.clima_semana + '\\nSemana n\u00ba: ' + $json.numero_semana + ' do ano\\n\\nCONTEXTO DE PESQUISA (Tavily + SerpAPI + Google Trends):\\n' + $json.contexto_pesquisa + '\\n\\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\\nCRIE A REVISTA DIGITAL COMPLETA EM HTML SEM\u00c2NTICO\\nUse as classes CSS do template. N\u00e3o inclua <html><head><body>.\\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\\n\\n1. SUM\u00c1RIO\\n<div class=\"sumario\"><div class=\"sumario-titulo\">NESTA EDI\u00c7\u00c3O</div><ul>[lista: 7 dias + Curiosidade + Antes/Depois + Checklist + Dicas + Planos]</ul></div>\\n\\n2. SETE DIAS (Segunda a Domingo) \u2014 CADA DIA com estrutura obrigat\u00f3ria:\\n<div class=\"dia-bloco\">\\n  <div class=\"dia-header\">\\n    <div class=\"dia-num\">[N]</div>\\n    <div><div class=\"dia-label\">DIA [N] \u2014 [DIA DA SEMANA]</div><h2>[T\u00cdTULO FORTE ESTILO REVISTA]</h2><p class=\"dia-sub\">[subt\u00edtulo curto e explicativo]</p></div>\\n  </div>\\n  <p>[2 par\u00e1grafos \u2014 introdu\u00e7\u00e3o identificando o problema com empatia]</p>\\n  <div class=\"callout callout-erro\"><span class=\"callout-ico\">\u274c</span><strong>ERRO COMUM</strong><p>[erro frequente das mulheres relacionado ao tema]</p></div>\\n  <div class=\"steps-box\"><div class=\"steps-titulo\">\u2705 SOLU\u00c7\u00c3O PASSO A PASSO</div><ol>[3-4 passos pr\u00e1ticos e diretos]</ol></div>\\n  <div class=\"callout callout-dica\"><span class=\"callout-ico\">\ud83d\udca1</span><strong>DICA EXTRA</strong><p>[insight r\u00e1pido, inesperado, baseado em pesquisa real]</p></div>\\n  <div class=\"perspectiva\"><span>\ud83c\udf0d</span><strong>PERSPECTIVA DO MUNDO</strong><p>[como outro pa\u00eds aborda \u2014 Coreia, Jap\u00e3o, Fran\u00e7a, Ayurveda, etc.]</p></div>\\n  <div class=\"callout callout-sabia\"><span class=\"callout-ico\">\ud83d\udd2c</span><strong>VOC\u00ca SABIA?</strong><p>[dado cient\u00edfico surpreendente \u2014 cite fonte AAD ou MayoClinic]</p></div>\\n</div>\\n\\n3. CURIOSIDADE \u2014 semana ' + $json.numero_semana + ' (rota\u00e7\u00e3o OBRIGAT\u00d3RIA):\\nSem 1,5,9,13,17,21,25,29,33,37,41,45,49 \u2192 COMPARATIVO CULTURAL (3 pa\u00edses, mesmo problema, solu\u00e7\u00f5es diferentes + estat\u00edsticas)\\nSem 2,6,10,14,18,22,26,30,34,38,42,46,50 \u2192 LINHA DO TEMPO (hist\u00f3ria de 1 ingrediente, descoberta at\u00e9 hoje)\\nSem 3,7,11,15,19,23,27,31,35,39,43,47,51 \u2192 MITO VS VERDADE (4 mitos populares + veredicto cient\u00edfico)\\nSem 4,8,12,16,20,24,28,32,36,40,44,48,52 \u2192 PERFIL DE INGREDIENTE (origem, ci\u00eancia, como usar, o que evitar)\\n\\n<div class=\"curiosidade-section\">\\n  <div class=\"curiosidade-badge\">\u2728 CURIOSIDADE DA SEMANA</div>\\n  <h2>[T\u00edtulo impactante \u2014 ex: \"Voc\u00ea n\u00e3o vai acreditar nisso...\" / \"A ci\u00eancia revelou...\"]</h2>\\n  <p>[3-6 linhas, linguagem leve e impactante, dados reais das pesquisas]</p>\\n  [infogr\u00e1fico HTML conforme o tipo da semana: .info-comparativo / .timeline / .mito-grid / .ingrediente-stats]\\n  <div class=\"curiosidade-caixa\"><strong>\ud83d\udcad O que isso muda na sua rotina?</strong><p>[aplica\u00e7\u00e3o pr\u00e1tica \u2014 1-2 frases diretas]</p></div>\\n</div>\\n\\n4. ANTES E DEPOIS\\n<div class=\"antes-depois\">\\n  <h2>ANTES E DEPOIS \u2014 [tema espec\u00edfico]</h2>\\n  <div class=\"comparacao-grid\">\\n    <div class=\"antes-col\"><div class=\"badge-estado antes-badge\">ANTES</div><p>[cen\u00e1rio problem\u00e1tico com empatia]</p><ul>[3 sinais/sintomas]</ul></div>\\n    <div class=\"depois-col\"><div class=\"badge-estado depois-badge\">DEPOIS</div><p>[transforma\u00e7\u00e3o \u2014 o que muda e em quanto tempo]</p><ul>[3 resultados not\u00e1veis]</ul></div>\\n  </div>\\n</div>\\n\\n5. CHECKLIST / ROTINA SEMANAL\\n<div class=\"checklist-section\">\\n  <h2>SUA ROTINA DA SEMANA</h2>\\n  <div class=\"checklist-grid\">\\n    <div class=\"check-col\"><div class=\"check-header\">\ud83c\udf05 MANH\u00c3</div><ol>[4-5 passos com emoji de produto]</ol></div>\\n    <div class=\"check-col\"><div class=\"check-header\">\ud83c\udf19 NOITE</div><ol>[4-5 passos com emoji de produto]</ol></div>\\n    <div class=\"check-col\"><div class=\"check-header\">\ud83d\udcc5 SEMANAL</div><ul>[3-4 rituais especiais]</ul></div>\\n  </div>\\n</div>\\n\\n6. DICAS R\u00c1PIDAS\\n<div class=\"dicas-rapidas\">\\n  <h2>\u26a1 10 DICAS R\u00c1PIDAS</h2>\\n  <div class=\"dicas-grid\">[10 divs class=\"dica-card\" \u2014 1 emoji + 1 frase direta cada]</div>\\n</div>\\n\\n7. CTA FINAL \u2014 ALTA CONVERS\u00c3O (omitir para menores)\\n<div class=\"cta-section\">\\n  <div class=\"cta-headline\">Sua pele merece informa\u00e7\u00e3o de primeira m\u00e3o. Toda semana.</div>\\n  <div class=\"cta-sub-headline\">Escolha o plano certo para o seu momento</div>\\n  <div class=\"planos-grid\">\\n    <div class=\"plano-card plano-basico\">\\n      <div class=\"plano-nome\">A Dose</div>\\n      <div class=\"plano-preco\">R$ <span>9</span><sup>,90</sup><small>/m\u00eas</small></div>\\n      <div class=\"plano-tagline\">\"O cuidado que cabe na sua rotina.\"</div>\\n      <ul class=\"plano-itens\">\\n        <li>\u2726 PDF semanal com os 7 dias completos</li>\\n        <li>\u2726 Receitas naturais com ingredientes de casa</li>\\n        <li>\u2726 Dicas por tipo de pele</li>\\n        <li>\u2726 Se\u00e7\u00e3o Curiosidade exclusiva</li>\\n      </ul>\\n      <div class=\"plano-cta\">Quero come\u00e7ar \u2192</div>\\n    </div>\\n    <div class=\"plano-card plano-medio\">\\n      <div class=\"plano-destaque\">MAIS POPULAR</div>\\n      <div class=\"plano-nome\">O Encontro</div>\\n      <div class=\"plano-preco\">R$ <span>14</span><sup>,90</sup><small>/m\u00eas</small></div>\\n      <div class=\"plano-tagline\">\"Algu\u00e9m que cuida da sua pele com voc\u00ea.\"</div>\\n      <ul class=\"plano-itens\">\\n        <li>\u2726 Tudo do plano A Dose</li>\\n        <li>\u2726 Rotina personalizada ao seu momento de vida</li>\\n        <li>\u2726 Acesso 2h antes aos lan\u00e7amentos</li>\\n        <li>\u2726 Conte\u00fado adaptado \u00e0 sua faixa et\u00e1ria</li>\\n      </ul>\\n      <div class=\"plano-cta\">Quero o Encontro \u2192</div>\\n    </div>\\n    <div class=\"plano-card plano-premium\">\\n      <div class=\"plano-destaque plano-destaque-premium\">\u2b50 EXPERI\u00caNCIA COMPLETA</div>\\n      <div class=\"plano-nome\">Experi\u00eancia Completa</div>\\n      <div class=\"plano-preco\">R$ <span>19</span><sup>,90</sup><small>/m\u00eas</small></div>\\n      <div class=\"plano-tagline\">\"O cuidado que voc\u00ea merece, sem abrir m\u00e3o de nada.\"</div>\\n      <ul class=\"plano-itens\">\\n        <li>\u2b50 Tudo dos planos anteriores</li>\\n        <li>\u2b50 Informa\u00e7\u00f5es de PRIMEIRA M\u00c3O \u2014 antes de viralizar</li>\\n        <li>\u2b50 Tend\u00eancias direto de dermatologistas e pesquisas</li>\\n        <li>\u2b50 E-book mensal tem\u00e1tico exclusivo</li>\\n        <li>\u2b50 Rotina completa manh\u00e3 + noite + semanal personalizada</li>\\n        <li>\u2b50 Cupom exclusivo em cada lan\u00e7amento</li>\\n        <li>\u2b50 Acesso antecipado a novos produtos e rituais</li>\\n      </ul>\\n      <div class=\"plano-cta plano-cta-premium\">Quero a Experi\u00eancia Completa \u2192</div>\\n    </div>\\n  </div>\\n  <div class=\"cta-garantia\">\ud83d\udd12 Cancele quando quiser \u2022 Sem fidelidade \u2022 Satisfa\u00e7\u00e3o garantida</div>\\n  <div class=\"cta-urgencia\">Comece hoje por menos de R$ 0,33 por dia. Sua pele vai agradecer. \ud83c\udf3f</div>\\n  <div class=\"cta-link\">refugiodapele.com.br</div>\\n</div>'}]}) }}",
+                "options": {}
+            },
+            "id": "a1b2c3d4-0001-0001-0001-000000000006",
+            "name": "GPT \u2014 Gerar Conte\u00fado PDF",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                1568,
+                304
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const response = $input.first().json;\nlet html_content = '';\n\nif (response.choices && response.choices.length > 0) {\n  html_content = response.choices[0].message?.content || '';\n} else if (response.content && Array.isArray(response.content)) {\n  html_content = response.content[0]?.text || '';\n} else {\n  throw new Error('API n\u00e3o retornou conte\u00fado: ' + JSON.stringify(response).slice(0, 300));\n}\n\n// Strip markdown wrappers se GPT os incluiu\nhtml_content = html_content.replace(/^```html\\s*/i, '').replace(/^```\\s*/i, '').replace(/\\s*```\\s*$/, '').trim();\n\n// Dados para a capa\nconst tema = (() => { try { return $('Extrair Temas do Supabase').item.json.tema_semana || ''; } catch(e) { return ''; } })();\nconst dataFmt = new Date().toLocaleDateString('pt-BR', {day:'2-digit', month:'long', year:'numeric'});\nconst imagem_url = (() => { try { return $('Extrair URL Imagem').item.json.imagem_url || ''; } catch(e) { return ''; } })();\nconst imagem_autor = (() => { try { return $('Extrair URL Imagem').item.json.imagem_autor || ''; } catch(e) { return ''; } })();\n\nconst CSS_EXTRA = \"\\n/* \\u2500\\u2500 CTA SE\\u00c7\\u00c3O DE PLANOS \\u2500\\u2500 */\\n.cta-section { background: linear-gradient(150deg, #2d1a1a 0%, #5a2840 100%); color: white; padding: 52px 60px; margin: 44px -60px -40px; page-break-before: always; }\\n.cta-headline { font-family: Georgia, serif; font-size: 28px; text-align: center; margin-bottom: 8px; line-height: 1.3; }\\n.cta-sub-headline { text-align: center; font-size: 14px; opacity: 0.75; margin-bottom: 36px; letter-spacing: 1px; }\\n.planos-grid { display: flex; gap: 16px; align-items: stretch; }\\n.plano-card { flex: 1; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 24px 20px; position: relative; }\\n.plano-premium { background: rgba(184,105,122,0.25); border-color: #B8697A; border-width: 2px; }\\n.plano-destaque { display: inline-block; background: #e8a0b4; color: #2d1a1a; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; font-weight: bold; padding: 4px 12px; border-radius: 12px; margin-bottom: 12px; }\\n.plano-destaque-premium { background: #ffd700; color: #2d1a1a; }\\n.plano-nome { font-family: Georgia, serif; font-size: 18px; font-weight: bold; color: white; margin-bottom: 8px; }\\n.plano-preco { margin-bottom: 8px; line-height: 1; }\\n.plano-preco span { font-family: Georgia, serif; font-size: 36px; font-weight: bold; color: #e8a0b4; }\\n.plano-preco sup { font-size: 18px; color: #e8a0b4; vertical-align: super; }\\n.plano-preco small { font-size: 12px; opacity: 0.7; }\\n.plano-tagline { font-style: italic; font-size: 11px; opacity: 0.7; margin-bottom: 16px; line-height: 1.4; }\\n.plano-itens { list-style: none; padding: 0; margin-bottom: 20px; }\\n.plano-itens li { font-size: 12px; color: #f0d8e0; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.08); line-height: 1.4; }\\n.plano-premium .plano-itens li { color: #ffeef5; }\\n.plano-cta { display: block; background: rgba(255,255,255,0.15); color: white; text-align: center; padding: 10px; border-radius: 6px; font-size: 12px; font-weight: bold; letter-spacing: 1px; border: 1px solid rgba(255,255,255,0.3); }\\n.plano-cta-premium { background: #B8697A; border-color: #B8697A; font-size: 13px; padding: 12px; }\\n.cta-garantia { text-align: center; margin-top: 28px; font-size: 12px; opacity: 0.6; }\\n.cta-urgencia { text-align: center; margin-top: 12px; font-size: 15px; color: #ffeef5; font-style: italic; }\\n.cta-link { text-align: center; margin-top: 10px; font-size: 13px; color: #e8a0b4; font-weight: bold; letter-spacing: 1px; }\";\nconst CSS_REVISTA = \"* { box-sizing: border-box; margin: 0; padding: 0; }\\nbody { font-family: Arial, Helvetica, sans-serif; color: #2d1a1a; background: #fff; font-size: 14px; line-height: 1.7; }\\n\\n/* \\u2500\\u2500 CAPA \\u2500\\u2500 */\\n.capa { background: linear-gradient(150deg, #c47a8a 0%, #8b3a4e 45%, #2d1f1f 100%); color: white; padding: 64px 60px 48px; position: relative; overflow: hidden; min-height: 260px; }\\n.capa-bolha1 { position: absolute; top: -70px; right: -70px; width: 280px; height: 280px; border-radius: 50%; background: rgba(255,255,255,0.07); }\\n.capa-bolha2 { position: absolute; bottom: -90px; left: -50px; width: 220px; height: 220px; border-radius: 50%; background: rgba(255,255,255,0.04); }\\n.marca-label { font-size: 11px; letter-spacing: 5px; text-transform: uppercase; opacity: 0.65; margin-bottom: 14px; }\\n.capa h1 { font-family: Georgia, serif; font-size: 42px; font-weight: bold; line-height: 1.15; margin-bottom: 14px; position: relative; z-index: 1; }\\n.capa .capa-desc { font-size: 14px; opacity: 0.85; line-height: 1.65; max-width: 500px; margin-bottom: 28px; }\\n.edicao-tag { display: inline-block; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 5px 16px; font-size: 11px; opacity: 0.8; }\\n.capa-foto { width: 100%; max-height: 320px; overflow: hidden; }\\n.capa-foto img { width: 100%; height: 320px; object-fit: cover; object-position: center 30%; display: block; }\\n.capa-credito { font-size: 10px; color: rgba(255,255,255,0.5); padding: 4px 8px; background: rgba(0,0,0,0.3); text-align: right; }\\n\\n/* \\u2500\\u2500 FAIXA \\u2500\\u2500 */\\n.faixa { height: 5px; background: linear-gradient(90deg, #B8697A, #e8a0b4, #B8697A); }\\n\\n/* \\u2500\\u2500 SUM\\u00c1RIO \\u2500\\u2500 */\\n.sumario { background: #fdf0f4; padding: 28px 60px; border-bottom: 2px solid #f0c8d0; }\\n.sumario-titulo { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: #B8697A; margin-bottom: 14px; font-weight: bold; }\\n.sumario ul { list-style: none; display: flex; flex-wrap: wrap; gap: 6px 0; }\\n.sumario li { flex: 0 0 50%; font-size: 12.5px; color: #5a3040; padding: 4px 12px 4px 0; border-left: 2px solid #B8697A; margin-left: 12px; }\\n\\n/* \\u2500\\u2500 CORPO \\u2500\\u2500 */\\n.corpo { padding: 40px 60px; }\\n\\n/* \\u2500\\u2500 BLOCO DE DIA \\u2500\\u2500 */\\n.dia-bloco { margin-bottom: 48px; padding-bottom: 40px; border-bottom: 2px dashed #f0c8d0; }\\n.dia-bloco:nth-child(even) { background: #fdf8f5; margin: 0 -60px 48px; padding: 32px 60px 40px; }\\n.dia-bloco:last-of-type { border-bottom: none; }\\n\\n.dia-header { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 20px; }\\n.dia-num { background: #B8697A; color: white; width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: Georgia, serif; font-size: 22px; font-weight: bold; flex-shrink: 0; }\\n.dia-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #B8697A; margin-bottom: 4px; font-weight: bold; }\\nh2 { font-family: Georgia, serif; font-size: 22px; color: #2d1a1a; font-weight: bold; line-height: 1.25; margin-bottom: 6px; }\\n.dia-sub { font-size: 13px; color: #8b5a6a; font-style: italic; margin-top: 4px; }\\np { font-size: 14px; line-height: 1.85; color: #3d2535; margin-bottom: 14px; }\\n\\n/* \\u2500\\u2500 CALLOUTS \\u2500\\u2500 */\\n.callout { display: flex; align-items: flex-start; gap: 12px; padding: 16px 20px; border-radius: 8px; margin: 18px 0; }\\n.callout-ico { font-size: 20px; flex-shrink: 0; line-height: 1; }\\n.callout strong { display: block; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }\\n.callout p { margin: 0; font-size: 13.5px; }\\n.callout-erro { background: #fff0f0; border-left: 4px solid #e05c6a; }\\n.callout-erro strong { color: #e05c6a; }\\n.callout-dica { background: #f0f8f0; border-left: 4px solid #5a9e6a; }\\n.callout-dica strong { color: #3a7a4a; }\\n.callout-sabia { background: #f0f4ff; border-left: 4px solid #5a6ae0; }\\n.callout-sabia strong { color: #3a4ab0; }\\n\\n/* \\u2500\\u2500 SOLU\\u00c7\\u00c3O PASSO A PASSO \\u2500\\u2500 */\\n.steps-box { background: #fdf5f0; border-radius: 8px; padding: 20px 24px; margin: 18px 0; }\\n.steps-titulo { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #3a7a4a; font-weight: bold; margin-bottom: 14px; }\\n.steps-box ol { padding-left: 0; list-style: none; counter-reset: steps; }\\n.steps-box li { counter-increment: steps; padding: 8px 0 8px 44px; position: relative; font-size: 13.5px; border-bottom: 1px dashed #e8c8c0; }\\n.steps-box li:last-child { border-bottom: none; }\\n.steps-box li::before { content: counter(steps); position: absolute; left: 0; top: 6px; background: #B8697A; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; }\\n\\n/* \\u2500\\u2500 PERSPECTIVA \\u2500\\u2500 */\\n.perspectiva { background: linear-gradient(135deg, #3d2535 0%, #5a2840 100%); color: white; padding: 20px 24px; border-radius: 8px; margin: 16px 0; }\\n.perspectiva span { display: block; font-size: 22px; margin-bottom: 6px; }\\n.perspectiva strong { display: block; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #e8a0b4; margin-bottom: 8px; }\\n.perspectiva p { color: #f5d8e0; margin: 0; font-size: 13.5px; font-style: italic; }\\n\\n/* \\u2500\\u2500 CURIOSIDADE \\u2500\\u2500 */\\n.curiosidade-section { background: linear-gradient(150deg, #f5e8f0 0%, #fdf0f4 100%); border: 2px solid #e8b0c8; border-radius: 12px; padding: 36px 40px; margin: 44px 0; page-break-before: always; }\\n.curiosidade-badge { display: inline-block; background: #B8697A; color: white; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; padding: 6px 16px; border-radius: 20px; margin-bottom: 16px; }\\n.curiosidade-section h2 { font-family: Georgia, serif; font-size: 26px; color: #5a2840; margin-bottom: 16px; }\\n.curiosidade-section p { font-size: 14px; color: #3d2535; }\\n.curiosidade-caixa { background: white; border-radius: 8px; padding: 16px 20px; margin-top: 20px; border-left: 4px solid #B8697A; }\\n.curiosidade-caixa strong { color: #B8697A; font-size: 13px; display: block; margin-bottom: 6px; }\\n\\n/* \\u2500\\u2500 INFOGR\\u00c1FICOS na CURIOSIDADE \\u2500\\u2500 */\\n.info-comparativo { display: flex; gap: 16px; margin: 20px 0; }\\n.info-pais { flex: 1; background: white; border-radius: 8px; padding: 16px; text-align: center; border-top: 4px solid #B8697A; }\\n.info-pais .pais-flag { font-size: 32px; display: block; margin-bottom: 8px; }\\n.info-pais strong { display: block; color: #5a2840; margin-bottom: 6px; font-size: 13px; }\\n.info-pais p { font-size: 12px; margin: 0; }\\n.timeline { position: relative; padding-left: 30px; margin: 20px 0; }\\n.timeline::before { content: ''; position: absolute; left: 10px; top: 0; bottom: 0; width: 2px; background: #B8697A; }\\n.timeline-item { position: relative; margin-bottom: 20px; }\\n.timeline-item::before { content: ''; position: absolute; left: -24px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: #B8697A; border: 2px solid white; }\\n.timeline-ano { font-weight: bold; color: #B8697A; font-size: 13px; }\\n.mito-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }\\n.mito-card { background: white; border-radius: 8px; padding: 14px; border-top: 3px solid #e05c6a; }\\n.mito-card .mito-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #e05c6a; margin-bottom: 6px; font-weight: bold; }\\n.mito-card .verdade-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #3a7a4a; margin-top: 10px; margin-bottom: 4px; font-weight: bold; }\\n.ingrediente-stats { display: flex; gap: 12px; margin: 20px 0; flex-wrap: wrap; }\\n.stat-box { background: white; border-radius: 8px; padding: 14px; text-align: center; flex: 1; min-width: 100px; }\\n.stat-num { font-family: Georgia, serif; font-size: 28px; color: #B8697A; font-weight: bold; display: block; }\\n.stat-label { font-size: 11px; color: #8b5a6a; }\\n\\n/* \\u2500\\u2500 ANTES E DEPOIS \\u2500\\u2500 */\\n.antes-depois { margin: 44px 0; page-break-before: always; }\\n.antes-depois h2 { font-family: Georgia, serif; font-size: 22px; color: #2d1a1a; margin-bottom: 24px; text-align: center; border-bottom: 2px solid #f0c8d0; padding-bottom: 12px; }\\n.comparacao-grid { display: flex; gap: 20px; }\\n.antes-col, .depois-col { flex: 1; border-radius: 10px; padding: 24px; }\\n.antes-col { background: #fff0f0; border: 2px solid #e8b0b8; }\\n.depois-col { background: #f0faf0; border: 2px solid #a0d8b0; }\\n.badge-estado { display: inline-block; padding: 6px 20px; border-radius: 20px; font-size: 11px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }\\n.antes-badge { background: #e05c6a; color: white; }\\n.depois-badge { background: #3a9a5a; color: white; }\\n.antes-col p, .depois-col p { font-size: 13.5px; margin-bottom: 12px; }\\n.antes-col ul, .depois-col ul { list-style: none; padding: 0; }\\n.antes-col li { padding: 5px 0 5px 20px; position: relative; font-size: 13px; }\\n.antes-col li::before { content: \\\"\\u2717\\\"; position: absolute; left: 0; color: #e05c6a; }\\n.depois-col li { padding: 5px 0 5px 20px; position: relative; font-size: 13px; }\\n.depois-col li::before { content: \\\"\\u2713\\\"; position: absolute; left: 0; color: #3a9a5a; font-weight: bold; }\\n\\n/* \\u2500\\u2500 CHECKLIST \\u2500\\u2500 */\\n.checklist-section { margin: 44px 0; background: #f9f5ff; border-radius: 12px; padding: 32px 36px; page-break-before: always; }\\n.checklist-section h2 { font-family: Georgia, serif; font-size: 20px; color: #2d1a1a; margin-bottom: 24px; text-align: center; }\\n.checklist-grid { display: flex; gap: 16px; }\\n.check-col { flex: 1; background: white; border-radius: 8px; padding: 20px; }\\n.check-header { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; font-weight: bold; color: #B8697A; margin-bottom: 14px; text-align: center; padding-bottom: 8px; border-bottom: 2px solid #f0c8d0; }\\n.check-col ol, .check-col ul { list-style: none; padding: 0; counter-reset: chk; }\\n.check-col ol li { counter-increment: chk; padding: 7px 0 7px 32px; position: relative; font-size: 13px; border-bottom: 1px solid #f5e8f0; }\\n.check-col ol li::before { content: counter(chk); position: absolute; left: 0; top: 5px; background: #B8697A; color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; }\\n.check-col ul li { padding: 7px 0 7px 24px; position: relative; font-size: 13px; border-bottom: 1px solid #f5e8f0; }\\n.check-col ul li::before { content: \\\"\\u25c6\\\"; position: absolute; left: 0; color: #B8697A; font-size: 10px; top: 9px; }\\n\\n/* \\u2500\\u2500 DICAS R\\u00c1PIDAS \\u2500\\u2500 */\\n.dicas-rapidas { margin: 44px 0; }\\n.dicas-rapidas h2 { font-family: Georgia, serif; font-size: 20px; color: #2d1a1a; margin-bottom: 20px; }\\n.dicas-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }\\n.dica-card { background: #fdf5f0; border-radius: 8px; padding: 14px 16px; border-left: 3px solid #B8697A; font-size: 13px; color: #3d2535; line-height: 1.5; }\\n\\n/* \\u2500\\u2500 CTA FINAL \\u2500\\u2500 */\\n.cta-final { background: linear-gradient(150deg, #B8697A, #7a3545); color: white; padding: 48px 60px; text-align: center; margin: 44px -60px -40px; }\\n.cta-frase { font-family: Georgia, serif; font-size: 22px; line-height: 1.4; margin-bottom: 16px; }\\n.cta-sub { font-size: 14px; opacity: 0.85; }\\n\\n/* \\u2500\\u2500 RODAP\\u00c9 \\u2500\\u2500 */\\n.rodape { background: #2d1a1a; color: #9a7080; padding: 24px 60px; text-align: center; }\\n.rodape-logo { font-family: Georgia, serif; font-size: 18px; color: #e8a0b4; margin-bottom: 6px; }\\n.rodape p { font-size: 11px; }\";\n\nconst html_wrapped = `<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n<meta charset=\"UTF-8\">\n<style>${CSS_REVISTA}${CSS_EXTRA}</style>\n</head>\n<body>\n\n<div class=\"capa\">\n  <div class=\"capa-bolha1\"></div>\n  <div class=\"capa-bolha2\"></div>\n  <div class=\"marca-label\">Ref\u00fagio da Pele \u2022 Edi\u00e7\u00e3o Semanal</div>\n  <h1>Sua Semana<br>de Cuidados</h1>\n  <div class=\"capa-desc\">7 dias de rituais, dicas e inspira\u00e7\u00f5es do mundo inteiro para voc\u00ea cuidar da sua pele com leveza e inten\u00e7\u00e3o.</div>\n  <span class=\"edicao-tag\">\ud83d\udcc5 ${dataFmt}</span>\n</div>\n<div class=\"faixa\"></div>\n${imagem_url ? `<div class=\"capa-foto\"><img src=\"${imagem_url}\" alt=\"${tema}\" /><div class=\"capa-credito\">\ud83d\udcf7 ${imagem_autor} / Unsplash</div></div>` : ''}\n\n<div class=\"corpo\">\n${html_content}\n</div>\n\n<div class=\"cta-final\">\n  <p class=\"cta-frase\">O cuidado com a sua pele \u00e9 um ato de amor-pr\u00f3prio. \ud83c\udf3f</p>\n  <p class=\"cta-sub\">Comece com UMA mudan\u00e7a esta semana. S\u00f3 uma.</p>\n</div>\n\n<div class=\"rodape\">\n  <div class=\"rodape-logo\">Ref\u00fagio da Pele</div>\n  <p>refugiodapele.com.br \u2022 contato@refugiodapele.com.br</p>\n  <p>Conte\u00fado exclusivo para assinantes \u2022 Cancelamento a qualquer momento</p>\n</div>\n\n</body>\n</html>`;\n\nreturn [{ json: { html_content, html_wrapped } }];"
+            },
+            "id": "a1b2c3d4-0001-0001-0001-000000000007",
+            "name": "Extrair Conte\u00fado GPT",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1808,
+                304
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://gotenberg-production-ccea.up.railway.app/forms/chromium/convert/html",
+                "sendBody": true,
+                "contentType": "multipart-form-data",
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "parameterType": "formBinaryData",
+                            "name": "files",
+                            "inputDataFieldName": "htmlFile"
+                        }
+                    ]
+                },
+                "options": {
+                    "response": {
+                        "response": {
+                            "responseFormat": "file"
+                        }
+                    }
+                }
+            },
+            "id": "a1b2c3d4-0001-0001-0001-000000000008",
+            "name": "Gotenberg \u2014 PDF Semanal",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                2272,
+                208
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "\nconst now = new Date();\nconst year = now.getFullYear();\nconst week = String(Math.ceil((now - new Date(year,0,1)) / 604800000)).padStart(2,'0');\nconst month = String(now.getMonth()+1).padStart(2,'0');\n\nconst filenamePago   = 'pdf-semanal-' + year + '-semana' + week + '.pdf';\nconst filenameGratis = 'pdf-gratuito-' + year + '-semana' + week + '.pdf';\nconst pathPago       = year + '/' + month + '/' + filenamePago;\nconst pathGratis     = year + '/' + month + '/' + filenameGratis;\n\nreturn [{\n  json: {\n    ...$input.first().json,\n    filename_pago:   filenamePago,\n    filename_gratis: filenameGratis,\n    path_pago:       pathPago,\n    path_gratis:     pathGratis\n  },\n  binary: $input.first().binary\n}];\n"
+            },
+            "id": "a1b2c3d4-0001-0001-0001-000000000009",
+            "name": "Calcular Pasta e Nome do Arquivo",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                2448,
+                208
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://aftrvqwazdiumibdfjjy.supabase.co/rest/v1/config",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "{{SUPABASE_SERVICE_KEY}}"
+                        },
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer {{SUPABASE_SERVICE_KEY}}"
+                        },
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        },
+                        {
+                            "name": "Prefer",
+                            "value": "resolution=merge-duplicates"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ JSON.stringify({ key: 'pdf_url_semana', value: $('Montar URL PDF Semanal').item.json.pdf_url, atualizado_em: new Date().toISOString() }) }}",
+                "options": {}
+            },
+            "id": "a1b2c3d4-0001-0001-0001-000000000014",
+            "name": "Supabase \u2014 Salvar URL do PDF",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                3136,
+                208
+            ]
+        },
+        {
+            "parameters": {
+                "method": "PATCH",
+                "url": "https://aftrvqwazdiumibdfjjy.supabase.co/rest/v1/config",
+                "sendQuery": true,
+                "queryParameters": {
+                    "parameters": [
+                        {
+                            "name": "key",
+                            "value": "eq.pdf_url_atual"
+                        }
+                    ]
+                },
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "{{SUPABASE_SERVICE_KEY}}"
+                        },
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer {{SUPABASE_SERVICE_KEY}}"
+                        },
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        },
+                        {
+                            "name": "Prefer",
+                            "value": "return=minimal"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ JSON.stringify({ value: $('Montar URL PDF Semanal').item.json.pdf_url }) }}",
+                "options": {}
+            },
+            "id": "a1b2c3d4-0001-0001-0001-000000000015",
+            "name": "Executar WF3 \u2014 Atualiza\u00e7\u00e3o de Link",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                3360,
+                208
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const htmlCompleto = $('Extrair Conte\u00fado GPT').item.json.html_content;\nconst tema = $('Extrair Temas do Supabase').item.json.tema_semana || 'skincare';\nconst folderSemanaId = $input.first().json.id;\n\n// Extract only Day 1 and Day 2 blocks\nconst bodyMatch = htmlCompleto.match(/<body[^>]*>([\\s\\S]*?)<\\/body>/);\nconst bodyContent = bodyMatch ? bodyMatch[1] : htmlCompleto;\nconst diaMatches = [...bodyContent.matchAll(/<h2>Dia \\d/gi)];\nlet teaserContent = '';\nif (diaMatches.length >= 2) {\n  const start = diaMatches[0].index;\n  const end = diaMatches.length >= 3 ? diaMatches[2].index : bodyContent.length;\n  teaserContent = bodyContent.substring(start, end);\n} else {\n  teaserContent = bodyContent.substring(0, Math.floor(bodyContent.length * 0.4));\n}\n\nconst htmlGratuito = `<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n  <meta charset=\"UTF-8\">\n  <style>\n    body { font-family:'Georgia',serif; color:#3a2a1e; margin:40px; line-height:1.7; }\n    h1 { color:#8b5e3c; font-size:2em; border-bottom:2px solid #e8c9a0; padding-bottom:10px; }\n    h2 { color:#8b5e3c; font-size:1.5em; margin-top:2em; }\n    h3 { color:#a0714f; font-size:1.2em; }\n    p { margin:0.8em 0; } ul { margin:0.5em 0 1em 1.5em; } li { margin:0.3em 0; }\n    .teaser-box { background:#fdf3ec; border-left:4px solid #B8697A; padding:16px 20px; margin:32px 0; border-radius:4px; }\n    .teaser-box p { margin:0; color:#5a3a2a; font-style:italic; font-size:1.05em; }\n    .plans-page { page-break-before:always; padding-top:20px; }\n    .plans-page h2 { text-align:center; color:#B8697A; margin-bottom:8px; }\n    .plans-page .subtitle { text-align:center; color:#8b5e3c; margin-bottom:32px; font-size:0.95em; }\n    .plan-card { border:1px solid #e8c9a0; border-radius:8px; padding:20px 24px; margin:16px 0; background:#fffaf7; }\n    .plan-card h3 { margin:0 0 4px; color:#B8697A; font-size:1.15em; }\n    .plan-card .price { font-weight:bold; color:#8b5e3c; font-size:1.1em; margin:4px 0 8px; }\n    .plan-card p { margin:0; font-size:0.92em; color:#5a3a2a; }\n    .cta-section { text-align:center; margin-top:32px; padding:24px; background:#B8697A; border-radius:8px; }\n    .cta-section p { color:#FAF3EE; margin:0 0 12px; }\n    .cta-btn { display:inline-block; background:#FAF3EE; color:#B8697A; padding:12px 32px; border-radius:4px; font-weight:bold; text-decoration:none; }\n  </style>\n</head>\n<body>\n  <h1>Refugio da Pele - Edicao Gratuita</h1>\n  <p style=\"color:#8b5e3c;font-size:0.95em;margin-bottom:8px;\">Tema da semana: <strong>${tema}</strong></p>\n  ${teaserContent}\n  <div class=\"teaser-box\">\n    <p>Ha mais 5 temas nesta semana - incluindo dicas de rituais internacionais, a secao Curiosidade e muito mais.<br>\n    <strong>Assine e receba o PDF completo toda semana direto no seu email.</strong></p>\n  </div>\n  <div class=\"plans-page\">\n    <h2>Continue cuidando da sua pele</h2>\n    <p class=\"subtitle\">Escolha o plano ideal e receba conteudo exclusivo toda semana</p>\n    <div class=\"plan-card\"><h3>A Dose</h3><div class=\"price\">R$9,90/mes</div><p>PDF semanal com 2 temas curados da semana, receitas naturais com ingredientes de casa e dicas por tipo de pele.</p></div>\n    <div class=\"plan-card\"><h3>O Encontro</h3><div class=\"price\">R$14,90/mes</div><p>PDF semanal completo com todos os 7 temas, rotina personalizada ao seu momento de vida e acesso 2h antes a lancamentos.</p><p style=\"font-style:italic;color:#B8697A;margin-top:6px;\">\"Alguem que cuida da sua pele com voce.\"</p></div>\n    <div class=\"plan-card\"><h3>Experiencia Completa</h3><div class=\"price\">R$19,90/mes</div><p>PDF completo + e-book mensal tematico exclusivo, rotina completa (manha, noite e semanal) e cupom exclusivo em lancamentos.</p></div>\n    <div class=\"cta-section\"><p>Comece hoje por apenas R$9,90/mes - cancele quando quiser.</p><a class=\"cta-btn\" href=\"https://refugiodapele.com.br\">Quero assinar agora</a></div>\n  </div>\n</body></html>`;\n\nconst base64 = Buffer.from(htmlGratuito, 'utf-8').toString('base64');\nreturn [{ json: { html_gratuito: htmlGratuito, folderSemanaId, tema }, binary: { htmlFile: { data: base64, mimeType: 'text/html', fileName: 'index.html' } } }];"
+            },
+            "id": "wf2-grat-001",
+            "name": "Gerar HTML PDF Gratuito",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                2256,
+                416
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://gotenberg-production-ccea.up.railway.app/forms/chromium/convert/html",
+                "sendBody": true,
+                "contentType": "multipart-form-data",
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "parameterType": "formBinaryData",
+                            "name": "files",
+                            "inputDataFieldName": "htmlFile"
+                        }
+                    ]
+                },
+                "options": {
+                    "response": {
+                        "response": {
+                            "responseFormat": "file"
+                        }
+                    }
+                }
+            },
+            "id": "wf2-grat-002",
+            "name": "Gotenberg \u2014 PDF Gratuito",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                2464,
+                416
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "\nconst now = new Date();\nconst year = now.getFullYear();\nconst week = String(Math.ceil((now - new Date(year,0,1)) / 604800000)).padStart(2,'0');\nconst month = String(now.getMonth()+1).padStart(2,'0');\n\nconst nomeArquivo = 'refugio-da-pele-GRATIS-' + year + '-semana' + week + '.pdf';\nconst path = year + '/' + month + '/' + nomeArquivo;\n\nreturn [{\n  json: {\n    ...$input.first().json,\n    nomeArquivo: nomeArquivo,\n    path_gratis: path\n  },\n  binary: $input.first().binary\n}];\n"
+            },
+            "id": "wf2-grat-003",
+            "name": "Calcular Nome PDF Gratuito",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                2688,
+                416
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://aftrvqwazdiumibdfjjy.supabase.co/rest/v1/config",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "{{SUPABASE_SERVICE_KEY}}"
+                        },
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer {{SUPABASE_SERVICE_KEY}}"
+                        },
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        },
+                        {
+                            "name": "Prefer",
+                            "value": "resolution=merge-duplicates"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ JSON.stringify({ key: 'pdf_url_gratis', value: $('Montar URL PDF Gratuito').item.json.pdf_url_gratis, atualizado_em: new Date().toISOString() }) }}",
+                "options": {}
+            },
+            "id": "wf2-grat-006",
+            "name": "Supabase \u2014 Salvar URL PDF Gratuito",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                3344,
+                416
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const html = $json.html_wrapped;\nconst base64 = Buffer.from(html, 'utf-8').toString('base64');\nreturn [{\n  json: $json,\n  binary: {\n    htmlFile: {\n      data: base64,\n      mimeType: 'text/html',\n      fileName: 'index.html'\n    }\n  }\n}];"
+            },
+            "id": "ca6b826b-210d-4602-aacc-1705d82538cb",
+            "name": "Preparar HTML Pago",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                2080,
+                208
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "\nconst html = $json.html_content;\nconst base64 = Buffer.from(html, 'utf-8').toString('base64');\nreturn [{\n  json: $json,\n  binary: {\n    htmlFile: {\n      data: base64,\n      mimeType: 'text/html',\n      fileName: 'index.html'\n    }\n  }\n}];\n"
+            },
+            "id": "2eb417a6-a7ac-4fcc-8e4d-3b621d99a5f5",
+            "name": "Preparar HTML Gratuito",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                2080,
+                416
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=https://aftrvqwazdiumibdfjjy.supabase.co/storage/v1/object/pdfs/{{$('Calcular Pasta e Nome do Arquivo').item.json.path_pago}}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "{{SUPABASE_SERVICE_KEY}}"
+                        },
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer {{SUPABASE_SERVICE_KEY}}"
+                        },
+                        {
+                            "name": "Content-Type",
+                            "value": "application/pdf"
+                        },
+                        {
+                            "name": "x-upsert",
+                            "value": "true"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "contentType": "binaryData",
+                "inputDataFieldName": "data",
+                "options": {}
+            },
+            "id": "133f2927-9ec8-4811-abe0-bb5718d648fd",
+            "name": "Supabase \u2014 Upload PDF Semanal",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                2672,
+                208
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "\nconst path = $('Calcular Pasta e Nome do Arquivo').item.json.path_pago;\nconst url = 'https://aftrvqwazdiumibdfjjy.supabase.co/storage/v1/object/public/pdfs/' + path;\nreturn [{ json: { ...$input.first().json, pdf_url: url } }];\n"
+            },
+            "id": "f494e770-34d9-4a03-a907-2130180c8e6b",
+            "name": "Montar URL PDF Semanal",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                2896,
+                208
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=https://aftrvqwazdiumibdfjjy.supabase.co/storage/v1/object/pdfs/{{ $('Calcular Nome PDF Gratuito').item.json.path_gratis }}",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "apikey",
+                            "value": "{{SUPABASE_SERVICE_KEY}}"
+                        },
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer {{SUPABASE_SERVICE_KEY}}"
+                        },
+                        {
+                            "name": "Content-Type",
+                            "value": "application/pdf"
+                        },
+                        {
+                            "name": "x-upsert",
+                            "value": "true"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "contentType": "binaryData",
+                "inputDataFieldName": "data",
+                "options": {}
+            },
+            "id": "51fc7bbc-aa2c-4140-bd0a-58564a1cf556",
+            "name": "Supabase \u2014 Upload PDF Gratuito",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                2912,
+                416
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const path = $('Calcular Nome PDF Gratuito').item.json.path_gratis;\nconst url = 'https://aftrvqwazdiumibdfjjy.supabase.co/storage/v1/object/public/pdfs/' + path;\nreturn [{ json: { ...$input.first().json, pdf_url_gratis: url } }];"
+            },
+            "id": "beb5b52a-b2aa-40d0-b2f3-4c08b51fcad2",
+            "name": "Montar URL PDF Gratuito",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                3136,
+                416
+            ]
+        },
+        {
+            "parameters": {
+                "url": "https://api.unsplash.com/search/photos",
+                "sendQuery": true,
+                "queryParameters": {
+                    "parameters": [
+                        {
+                            "name": "query",
+                            "value": "={{ $('Extrair Temas do Supabase').item.json.tema_semana + ' skincare beauty woman skin care'  }}"
+                        },
+                        {
+                            "name": "orientation",
+                            "value": "landscape"
+                        },
+                        {
+                            "name": "per_page",
+                            "value": "3"
+                        },
+                        {
+                            "name": "content_filter",
+                            "value": "high"
+                        },
+                        {
+                            "name": "client_id",
+                            "value": "{{UNSPLASH_ACCESS_KEY}}"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "unsplash-001",
+            "name": "Unsplash \u2014 Imagem do Tema",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                960,
+                496
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const data = $input.first().json;\nlet imagem_url = '';\nlet imagem_autor = '';\nlet imagem_link = '';\n\ntry {\n  if (data.results && data.results.length > 0) {\n    const foto = data.results[0];\n    imagem_url = foto.urls?.regular || foto.urls?.full || '';\n    imagem_autor = foto.user?.name || '';\n    imagem_link = foto.links?.html || '';\n  }\n} catch(e) {}\n\n// Fallback: imagem gen\u00e9rica de skincare se Unsplash falhar\nif (!imagem_url) {\n  imagem_url = 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=1200&q=80';\n  imagem_autor = 'Unsplash';\n}\n\nreturn [{ json: { imagem_url, imagem_autor, imagem_link } }];"
+            },
+            "id": "unsplash-002",
+            "name": "Extrair URL Imagem",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1184,
+                496
+            ]
+        }
+    ],
+    "connections": {
+        "Schedule Trigger \u2014 Segunda 08h": {
+            "main": [
+                [
+                    {
+                        "node": "Supabase \u2014 Buscar Temas WF5",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Supabase \u2014 Buscar Temas WF5": {
+            "main": [
+                [
+                    {
+                        "node": "Extrair Temas do Supabase",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Extrair Temas do Supabase": {
+            "main": [
+                [
+                    {
+                        "node": "SerpAPI \u2014 Busca Skincare",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Unsplash \u2014 Imagem do Tema",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "SerpAPI \u2014 Busca Skincare": {
+            "main": [
+                [
+                    {
+                        "node": "Tavily \u2014 Pr\u00e1ticas Internacionais",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Tavily \u2014 Pr\u00e1ticas Internacionais": {
+            "main": [
+                [
+                    {
+                        "node": "Merge Resultados de Pesquisa",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Merge Resultados de Pesquisa": {
+            "main": [
+                [
+                    {
+                        "node": "GPT \u2014 Gerar Conte\u00fado PDF",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "GPT \u2014 Gerar Conte\u00fado PDF": {
+            "main": [
+                [
+                    {
+                        "node": "Extrair Conte\u00fado GPT",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Extrair Conte\u00fado GPT": {
+            "main": [
+                [
+                    {
+                        "node": "Preparar HTML Pago",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Preparar HTML Gratuito",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Preparar HTML Pago": {
+            "main": [
+                [
+                    {
+                        "node": "Gotenberg \u2014 PDF Semanal",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Gotenberg \u2014 PDF Semanal": {
+            "main": [
+                [
+                    {
+                        "node": "Calcular Pasta e Nome do Arquivo",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Calcular Pasta e Nome do Arquivo": {
+            "main": [
+                [
+                    {
+                        "node": "Supabase \u2014 Upload PDF Semanal",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Supabase \u2014 Upload PDF Semanal": {
+            "main": [
+                [
+                    {
+                        "node": "Montar URL PDF Semanal",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Montar URL PDF Semanal": {
+            "main": [
+                [
+                    {
+                        "node": "Supabase \u2014 Salvar URL do PDF",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Supabase \u2014 Salvar URL do PDF": {
+            "main": [
+                [
+                    {
+                        "node": "Executar WF3 \u2014 Atualiza\u00e7\u00e3o de Link",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Preparar HTML Gratuito": {
+            "main": [
+                [
+                    {
+                        "node": "Gerar HTML PDF Gratuito",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Gerar HTML PDF Gratuito": {
+            "main": [
+                [
+                    {
+                        "node": "Gotenberg \u2014 PDF Gratuito",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Gotenberg \u2014 PDF Gratuito": {
+            "main": [
+                [
+                    {
+                        "node": "Calcular Nome PDF Gratuito",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Calcular Nome PDF Gratuito": {
+            "main": [
+                [
+                    {
+                        "node": "Supabase \u2014 Upload PDF Gratuito",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Supabase \u2014 Upload PDF Gratuito": {
+            "main": [
+                [
+                    {
+                        "node": "Montar URL PDF Gratuito",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Montar URL PDF Gratuito": {
+            "main": [
+                [
+                    {
+                        "node": "Supabase \u2014 Salvar URL PDF Gratuito",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Unsplash \u2014 Imagem do Tema": {
+            "main": [
+                [
+                    {
+                        "node": "Extrair URL Imagem",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Extrair URL Imagem": {
+            "main": [
+                [
+                    {
+                        "node": "GPT \u2014 Gerar Conte\u00fado PDF",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1",
+        "callerPolicy": "workflowsFromSameOwner",
+        "availableInMCP": false,
+        "binaryMode": "separate"
+    },
+    "staticData": {
+        "node:Schedule Trigger \u2014 Segunda 08h": {
+            "recurrenceRules": []
+        }
+    },
+    "meta": null,
+    "pinData": {},
+    "versionId": "78747ca8-b5b8-4021-80f8-389d5bb09f58",
+    "activeVersionId": "78747ca8-b5b8-4021-80f8-389d5bb09f58",
+    "versionCounter": 107,
+    "triggerCount": 1,
+    "shared": [
+        {
+            "updatedAt": "2026-03-23T20:12:48.493Z",
+            "createdAt": "2026-03-23T20:12:48.493Z",
+            "role": "workflow:owner",
+            "workflowId": "8UYOQDq5vVp2Oy7R",
+            "projectId": "2CTnVMIZGJvEjtlF",
+            "project": {
+                "updatedAt": "2026-03-23T05:10:11.042Z",
+                "createdAt": "2026-03-08T13:44:03.611Z",
+                "id": "2CTnVMIZGJvEjtlF",
+                "name": "Erick Bezerra <erick.job@outlook.com>",
+                "type": "personal",
+                "icon": null,
+                "description": null,
+                "creatorId": "01d5e406-ea81-4bf7-8375-919a226646b6"
             }
-          ]
         }
-      },
-      "id": "a1b2c3d4-0001-0001-0001-000000000001",
-      "name": "Schedule Trigger — Segunda 08h",
-      "type": "n8n-nodes-base.scheduleTrigger",
-      "typeVersion": 1.2,
-      "position": [
-        240,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "method": "GET",
-        "url": "https://aftrvqwazdiumibdfjjy.supabase.co/rest/v1/config?key=in.(\"tema_semana\",\"tema_mes\",\"tema_trimestre\")&select=key,value",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {"name": "apikey", "value": "SUPABASE_SERVICE_KEY_PLACEHOLDER"},
-            {"name": "Authorization", "value": "Bearer SUPABASE_SERVICE_KEY_PLACEHOLDER"}
-          ]
-        },
-        "options": {}
-      },
-      "id": "a1b2c3d4-0001-0001-0001-000000000002a",
-      "name": "Supabase — Buscar Temas WF5",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [460, 300]
-    },
-    {
-      "parameters": {
-        "jsCode": "const rows = $input.first().json;\nconst map = {};\nif (Array.isArray(rows)) rows.forEach(r => { map[r.key] = r.value; });\nconst tema_semana = map['tema_semana'] || 'skincare — hidratação e barreira cutânea';\nconst tema_mes = map['tema_mes'] || 'skincare — proteção solar';\nconst tema_trimestre = map['tema_trimestre'] || 'skincare — anti-idade natural';\nconst numero_semana = Math.ceil(new Date().getDate() / 7);\nreturn [{ json: { tema_semana, tema_mes, tema_trimestre, numero_semana, clima_semana: 'tropical — calor e umidade' } }];"
-      },
-      "id": "a1b2c3d4-0001-0001-0001-000000000002b",
-      "name": "Extrair Temas do Supabase",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [680, 300]
-    },
-    {
-      "parameters": {
-        "method": "GET",
-        "url": "https://serpapi.com/search",
-        "sendQuery": true,
-        "queryParameters": {
-          "parameters": [
+    ],
+    "tags": [],
+    "activeVersion": {
+        "updatedAt": "2026-03-30T06:29:54.164Z",
+        "createdAt": "2026-03-30T06:29:54.164Z",
+        "versionId": "78747ca8-b5b8-4021-80f8-389d5bb09f58",
+        "workflowId": "8UYOQDq5vVp2Oy7R",
+        "nodes": [
             {
-              "name": "q",
-              "value": "={{ $json.tema_semana }} cuidados pele mulheres mundo"
+                "parameters": {
+                    "rule": {
+                        "interval": [
+                            {
+                                "field": "cronExpression",
+                                "expression": "0 6 * * 0"
+                            }
+                        ]
+                    }
+                },
+                "id": "a1b2c3d4-0001-0001-0001-000000000001",
+                "name": "Schedule Trigger \u2014 Segunda 08h",
+                "type": "n8n-nodes-base.scheduleTrigger",
+                "typeVersion": 1.2,
+                "position": [
+                    240,
+                    304
+                ]
             },
             {
-              "name": "api_key",
-              "value": "SERPAPI_KEY_PLACEHOLDER"
+                "parameters": {
+                    "url": "https://aftrvqwazdiumibdfjjy.supabase.co/rest/v1/config?key=in.(\"tema_semana\",\"tema_mes\",\"tema_trimestre\")&select=key,value",
+                    "sendHeaders": true,
+                    "headerParameters": {
+                        "parameters": [
+                            {
+                                "name": "apikey",
+                                "value": "{{SUPABASE_SERVICE_KEY}}"
+                            },
+                            {
+                                "name": "Authorization",
+                                "value": "Bearer {{SUPABASE_SERVICE_KEY}}"
+                            }
+                        ]
+                    },
+                    "options": {}
+                },
+                "id": "a1b2c3d4-0001-0001-0001-000000000002a",
+                "name": "Supabase \u2014 Buscar Temas WF5",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.2,
+                "position": [
+                    464,
+                    304
+                ]
             },
             {
-              "name": "num",
-              "value": "10"
+                "parameters": {
+                    "jsCode": "const rows = $input.first().json;\nconst map = {};\nif (Array.isArray(rows)) rows.forEach(r => { map[r.key] = r.value; });\nconst tema_semana = map['tema_semana'] || 'skincare \u2014 hidrata\u00e7\u00e3o e barreira cut\u00e2nea';\nconst tema_mes = map['tema_mes'] || 'skincare \u2014 prote\u00e7\u00e3o solar';\nconst tema_trimestre = map['tema_trimestre'] || 'skincare \u2014 anti-idade natural';\nconst numero_semana = Math.ceil(new Date().getDate() / 7);\nreturn [{ json: { tema_semana, tema_mes, tema_trimestre, numero_semana, clima_semana: 'tropical \u2014 calor e umidade' } }];"
+                },
+                "id": "a1b2c3d4-0001-0001-0001-000000000002b",
+                "name": "Extrair Temas do Supabase",
+                "type": "n8n-nodes-base.code",
+                "typeVersion": 2,
+                "position": [
+                    688,
+                    304
+                ]
+            },
+            {
+                "parameters": {
+                    "url": "https://serpapi.com/search",
+                    "sendQuery": true,
+                    "queryParameters": {
+                        "parameters": [
+                            {
+                                "name": "q",
+                                "value": "={{ $json.tema_semana }} cuidados pele mulheres mundo"
+                            },
+                            {
+                                "name": "api_key",
+                                "value": "{{SERPAPI_KEY}}"
+                            },
+                            {
+                                "name": "num",
+                                "value": "10"
+                            }
+                        ]
+                    },
+                    "options": {}
+                },
+                "id": "a1b2c3d4-0001-0001-0001-000000000003",
+                "name": "SerpAPI \u2014 Busca Skincare",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.2,
+                "position": [
+                    912,
+                    304
+                ]
+            },
+            {
+                "parameters": {
+                    "method": "POST",
+                    "url": "https://api.tavily.com/search",
+                    "sendHeaders": true,
+                    "headerParameters": {
+                        "parameters": [
+                            {
+                                "name": "Authorization",
+                                "value": "Bearer {{TAVILY_API_KEY}}"
+                            },
+                            {
+                                "name": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ]
+                    },
+                    "sendBody": true,
+                    "specifyBody": "json",
+                    "jsonBody": "={{ JSON.stringify({ query: $('Extrair Temas do Supabase').item.json.tema_semana + ' skincare international practices', max_results: 5, include_answer: false, search_depth: 'advanced' }) }}",
+                    "options": {}
+                },
+                "id": "a1b2c3d4-0001-0001-0001-000000000004",
+                "name": "Tavily \u2014 Pr\u00e1ticas Internacionais",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.2,
+                "position": [
+                    1120,
+                    304
+                ]
+            },
+            {
+                "parameters": {
+                    "jsCode": "const serpData = $('SerpAPI \u2014 Busca Skincare').item.json;\nconst tavilyData = $input.first().json;\nlet contextParts = [];\nif (serpData.organic_results && Array.isArray(serpData.organic_results)) {\n  const serpSnippets = serpData.organic_results.slice(0, 10).map((r, i) => `[Fonte ${i+1}] ${r.title||''}:\\n${r.snippet||''}\\nURL: ${r.link||''}`).join('\\n\\n');\n  contextParts.push('=== Resultados SerpAPI ===\\n' + serpSnippets);\n}\nif (tavilyData.results && Array.isArray(tavilyData.results)) {\n  const tavilySnippets = tavilyData.results.slice(0, 5).map((r, i) => `[Tavily ${i+1}] ${r.title||''}:\\n${r.content||''}\\nURL: ${r.url||''}`).join('\\n\\n');\n  contextParts.push('=== Resultados Tavily ===\\n' + tavilySnippets);\n}\nconst contexto_pesquisa = contextParts.join('\\n\\n');\nconst tema_semana = $('Extrair Temas do Supabase').item.json.tema_semana;\nconst clima_semana = $('Extrair Temas do Supabase').item.json.clima_semana;\nreturn [{ json: { contexto_pesquisa, tema_semana, clima_semana } }];"
+                },
+                "id": "a1b2c3d4-0001-0001-0001-000000000005",
+                "name": "Merge Resultados de Pesquisa",
+                "type": "n8n-nodes-base.code",
+                "typeVersion": 2,
+                "position": [
+                    1344,
+                    304
+                ]
+            },
+            {
+                "parameters": {
+                    "method": "POST",
+                    "url": "https://api.openai.com/v1/chat/completions",
+                    "sendHeaders": true,
+                    "headerParameters": {
+                        "parameters": [
+                            {
+                                "name": "Authorization",
+                                "value": "Bearer {{OPENAI_API_KEY}}"
+                            },
+                            {
+                                "name": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ]
+                    },
+                    "sendBody": true,
+                    "specifyBody": "json",
+                    "jsonBody": "={{ JSON.stringify({\"model\": \"gpt-4o\", \"max_tokens\": 8000, \"messages\": [{\"role\": \"system\", \"content\": \"Voc\\u00ea \\u00e9 especialista em cria\\u00e7\\u00e3o de conte\\u00fado editorial para revistas femininas de skincare e designer editorial de revistas digitais.\\n\\nCria a revista digital semanal do Ref\\u00fagio da Pele \\u2014 marca brasileira de skincare \\u00edntimo feminino.\\n\\nFONTES OBRIGAT\\u00d3RIAS DE PESQUISA (use todas):\\n- Dermatologia cl\\u00ednica: https://www.aad.org/public (American Academy of Dermatology)\\n- Sa\\u00fade da pele: https://www.mayoclinic.org/\\n- Tend\\u00eancias virais em tempo real: resultados do Tavily (fornecidos no contexto)\\n- Busca ampla e not\\u00edcias: resultados do SerpAPI (fornecidos no contexto)\\n- Tend\\u00eancias de busca: dados do Google Trends (fornecidos no contexto quando dispon\\u00edveis)\\n- Tend\\u00eancias virais: TikTok skincare, Instagram Reels, K-Beauty atual\\n- Dores reais: coment\\u00e1rios/f\\u00f3runs de mulheres brasileiras, d\\u00favidas frequentes\\n- Pr\\u00e1ticas internacionais: Coreia do Sul, Jap\\u00e3o, Fran\\u00e7a, Ayurveda, Escandin\\u00e1via\\n\\nREGRAS DE TOM E CONTE\\u00daDO:\\n- Linguagem simples, feminina, conversacional \\u2014 como amiga especialista, n\\u00e3o aula\\n- Frases curtas. Analogias quando necess\\u00e1rio. Evitar jarg\\u00e3o t\\u00e9cnico\\n- Escopo: pele = corpo inteiro, n\\u00e3o s\\u00f3 rosto\\n- Tom cl\\u00ednico permitido para clareza cient\\u00edfica\\n- Pessoas reais podem ser citadas (dermatologistas, personalidades)\\n- PROIBIDO: julgamento, compara\\u00e7\\u00e3o corporal negativa, tom de vergonha\\n\\nREGRAS LGPD \\u2014 MENORES:\\n- Faixa 13\\u201317 anos: ZERO CTA, ZERO pre\\u00e7os \\u2014 100% educativo, personagem Luna\\n- Idade vazia = menor de 12 anos \\u2014 conte\\u00fado ultra-b\\u00e1sico de higiene apenas\\n- Para menores de 12: sem nenhuma refer\\u00eancia comercial\"}, {\"role\": \"user\", \"content\": 'Tema da semana: ' + $json.tema_semana + '\\nTema do m\u00eas: ' + $json.tema_mes + '\\nClima: ' + $json.clima_semana + '\\nSemana n\u00ba: ' + $json.numero_semana + ' do ano\\n\\nCONTEXTO DE PESQUISA (Tavily + SerpAPI + Google Trends):\\n' + $json.contexto_pesquisa + '\\n\\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\\nCRIE A REVISTA DIGITAL COMPLETA EM HTML SEM\u00c2NTICO\\nUse as classes CSS do template. N\u00e3o inclua <html><head><body>.\\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\\n\\n1. SUM\u00c1RIO\\n<div class=\"sumario\"><div class=\"sumario-titulo\">NESTA EDI\u00c7\u00c3O</div><ul>[lista: 7 dias + Curiosidade + Antes/Depois + Checklist + Dicas + Planos]</ul></div>\\n\\n2. SETE DIAS (Segunda a Domingo) \u2014 CADA DIA com estrutura obrigat\u00f3ria:\\n<div class=\"dia-bloco\">\\n  <div class=\"dia-header\">\\n    <div class=\"dia-num\">[N]</div>\\n    <div><div class=\"dia-label\">DIA [N] \u2014 [DIA DA SEMANA]</div><h2>[T\u00cdTULO FORTE ESTILO REVISTA]</h2><p class=\"dia-sub\">[subt\u00edtulo curto e explicativo]</p></div>\\n  </div>\\n  <p>[2 par\u00e1grafos \u2014 introdu\u00e7\u00e3o identificando o problema com empatia]</p>\\n  <div class=\"callout callout-erro\"><span class=\"callout-ico\">\u274c</span><strong>ERRO COMUM</strong><p>[erro frequente das mulheres relacionado ao tema]</p></div>\\n  <div class=\"steps-box\"><div class=\"steps-titulo\">\u2705 SOLU\u00c7\u00c3O PASSO A PASSO</div><ol>[3-4 passos pr\u00e1ticos e diretos]</ol></div>\\n  <div class=\"callout callout-dica\"><span class=\"callout-ico\">\ud83d\udca1</span><strong>DICA EXTRA</strong><p>[insight r\u00e1pido, inesperado, baseado em pesquisa real]</p></div>\\n  <div class=\"perspectiva\"><span>\ud83c\udf0d</span><strong>PERSPECTIVA DO MUNDO</strong><p>[como outro pa\u00eds aborda \u2014 Coreia, Jap\u00e3o, Fran\u00e7a, Ayurveda, etc.]</p></div>\\n  <div class=\"callout callout-sabia\"><span class=\"callout-ico\">\ud83d\udd2c</span><strong>VOC\u00ca SABIA?</strong><p>[dado cient\u00edfico surpreendente \u2014 cite fonte AAD ou MayoClinic]</p></div>\\n</div>\\n\\n3. CURIOSIDADE \u2014 semana ' + $json.numero_semana + ' (rota\u00e7\u00e3o OBRIGAT\u00d3RIA):\\nSem 1,5,9,13,17,21,25,29,33,37,41,45,49 \u2192 COMPARATIVO CULTURAL (3 pa\u00edses, mesmo problema, solu\u00e7\u00f5es diferentes + estat\u00edsticas)\\nSem 2,6,10,14,18,22,26,30,34,38,42,46,50 \u2192 LINHA DO TEMPO (hist\u00f3ria de 1 ingrediente, descoberta at\u00e9 hoje)\\nSem 3,7,11,15,19,23,27,31,35,39,43,47,51 \u2192 MITO VS VERDADE (4 mitos populares + veredicto cient\u00edfico)\\nSem 4,8,12,16,20,24,28,32,36,40,44,48,52 \u2192 PERFIL DE INGREDIENTE (origem, ci\u00eancia, como usar, o que evitar)\\n\\n<div class=\"curiosidade-section\">\\n  <div class=\"curiosidade-badge\">\u2728 CURIOSIDADE DA SEMANA</div>\\n  <h2>[T\u00edtulo impactante \u2014 ex: \"Voc\u00ea n\u00e3o vai acreditar nisso...\" / \"A ci\u00eancia revelou...\"]</h2>\\n  <p>[3-6 linhas, linguagem leve e impactante, dados reais das pesquisas]</p>\\n  [infogr\u00e1fico HTML conforme o tipo da semana: .info-comparativo / .timeline / .mito-grid / .ingrediente-stats]\\n  <div class=\"curiosidade-caixa\"><strong>\ud83d\udcad O que isso muda na sua rotina?</strong><p>[aplica\u00e7\u00e3o pr\u00e1tica \u2014 1-2 frases diretas]</p></div>\\n</div>\\n\\n4. ANTES E DEPOIS\\n<div class=\"antes-depois\">\\n  <h2>ANTES E DEPOIS \u2014 [tema espec\u00edfico]</h2>\\n  <div class=\"comparacao-grid\">\\n    <div class=\"antes-col\"><div class=\"badge-estado antes-badge\">ANTES</div><p>[cen\u00e1rio problem\u00e1tico com empatia]</p><ul>[3 sinais/sintomas]</ul></div>\\n    <div class=\"depois-col\"><div class=\"badge-estado depois-badge\">DEPOIS</div><p>[transforma\u00e7\u00e3o \u2014 o que muda e em quanto tempo]</p><ul>[3 resultados not\u00e1veis]</ul></div>\\n  </div>\\n</div>\\n\\n5. CHECKLIST / ROTINA SEMANAL\\n<div class=\"checklist-section\">\\n  <h2>SUA ROTINA DA SEMANA</h2>\\n  <div class=\"checklist-grid\">\\n    <div class=\"check-col\"><div class=\"check-header\">\ud83c\udf05 MANH\u00c3</div><ol>[4-5 passos com emoji de produto]</ol></div>\\n    <div class=\"check-col\"><div class=\"check-header\">\ud83c\udf19 NOITE</div><ol>[4-5 passos com emoji de produto]</ol></div>\\n    <div class=\"check-col\"><div class=\"check-header\">\ud83d\udcc5 SEMANAL</div><ul>[3-4 rituais especiais]</ul></div>\\n  </div>\\n</div>\\n\\n6. DICAS R\u00c1PIDAS\\n<div class=\"dicas-rapidas\">\\n  <h2>\u26a1 10 DICAS R\u00c1PIDAS</h2>\\n  <div class=\"dicas-grid\">[10 divs class=\"dica-card\" \u2014 1 emoji + 1 frase direta cada]</div>\\n</div>\\n\\n7. CTA FINAL \u2014 ALTA CONVERS\u00c3O (omitir para menores)\\n<div class=\"cta-section\">\\n  <div class=\"cta-headline\">Sua pele merece informa\u00e7\u00e3o de primeira m\u00e3o. Toda semana.</div>\\n  <div class=\"cta-sub-headline\">Escolha o plano certo para o seu momento</div>\\n  <div class=\"planos-grid\">\\n    <div class=\"plano-card plano-basico\">\\n      <div class=\"plano-nome\">A Dose</div>\\n      <div class=\"plano-preco\">R$ <span>9</span><sup>,90</sup><small>/m\u00eas</small></div>\\n      <div class=\"plano-tagline\">\"O cuidado que cabe na sua rotina.\"</div>\\n      <ul class=\"plano-itens\">\\n        <li>\u2726 PDF semanal com os 7 dias completos</li>\\n        <li>\u2726 Receitas naturais com ingredientes de casa</li>\\n        <li>\u2726 Dicas por tipo de pele</li>\\n        <li>\u2726 Se\u00e7\u00e3o Curiosidade exclusiva</li>\\n      </ul>\\n      <div class=\"plano-cta\">Quero come\u00e7ar \u2192</div>\\n    </div>\\n    <div class=\"plano-card plano-medio\">\\n      <div class=\"plano-destaque\">MAIS POPULAR</div>\\n      <div class=\"plano-nome\">O Encontro</div>\\n      <div class=\"plano-preco\">R$ <span>14</span><sup>,90</sup><small>/m\u00eas</small></div>\\n      <div class=\"plano-tagline\">\"Algu\u00e9m que cuida da sua pele com voc\u00ea.\"</div>\\n      <ul class=\"plano-itens\">\\n        <li>\u2726 Tudo do plano A Dose</li>\\n        <li>\u2726 Rotina personalizada ao seu momento de vida</li>\\n        <li>\u2726 Acesso 2h antes aos lan\u00e7amentos</li>\\n        <li>\u2726 Conte\u00fado adaptado \u00e0 sua faixa et\u00e1ria</li>\\n      </ul>\\n      <div class=\"plano-cta\">Quero o Encontro \u2192</div>\\n    </div>\\n    <div class=\"plano-card plano-premium\">\\n      <div class=\"plano-destaque plano-destaque-premium\">\u2b50 EXPERI\u00caNCIA COMPLETA</div>\\n      <div class=\"plano-nome\">Experi\u00eancia Completa</div>\\n      <div class=\"plano-preco\">R$ <span>19</span><sup>,90</sup><small>/m\u00eas</small></div>\\n      <div class=\"plano-tagline\">\"O cuidado que voc\u00ea merece, sem abrir m\u00e3o de nada.\"</div>\\n      <ul class=\"plano-itens\">\\n        <li>\u2b50 Tudo dos planos anteriores</li>\\n        <li>\u2b50 Informa\u00e7\u00f5es de PRIMEIRA M\u00c3O \u2014 antes de viralizar</li>\\n        <li>\u2b50 Tend\u00eancias direto de dermatologistas e pesquisas</li>\\n        <li>\u2b50 E-book mensal tem\u00e1tico exclusivo</li>\\n        <li>\u2b50 Rotina completa manh\u00e3 + noite + semanal personalizada</li>\\n        <li>\u2b50 Cupom exclusivo em cada lan\u00e7amento</li>\\n        <li>\u2b50 Acesso antecipado a novos produtos e rituais</li>\\n      </ul>\\n      <div class=\"plano-cta plano-cta-premium\">Quero a Experi\u00eancia Completa \u2192</div>\\n    </div>\\n  </div>\\n  <div class=\"cta-garantia\">\ud83d\udd12 Cancele quando quiser \u2022 Sem fidelidade \u2022 Satisfa\u00e7\u00e3o garantida</div>\\n  <div class=\"cta-urgencia\">Comece hoje por menos de R$ 0,33 por dia. Sua pele vai agradecer. \ud83c\udf3f</div>\\n  <div class=\"cta-link\">refugiodapele.com.br</div>\\n</div>'}]}) }}",
+                    "options": {}
+                },
+                "id": "a1b2c3d4-0001-0001-0001-000000000006",
+                "name": "GPT \u2014 Gerar Conte\u00fado PDF",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.2,
+                "position": [
+                    1568,
+                    304
+                ]
+            },
+            {
+                "parameters": {
+                    "jsCode": "const response = $input.first().json;\nlet html_content = '';\n\nif (response.choices && response.choices.length > 0) {\n  html_content = response.choices[0].message?.content || '';\n} else if (response.content && Array.isArray(response.content)) {\n  html_content = response.content[0]?.text || '';\n} else {\n  throw new Error('API n\u00e3o retornou conte\u00fado: ' + JSON.stringify(response).slice(0, 300));\n}\n\n// Strip markdown wrappers se GPT os incluiu\nhtml_content = html_content.replace(/^```html\\s*/i, '').replace(/^```\\s*/i, '').replace(/\\s*```\\s*$/, '').trim();\n\n// Dados para a capa\nconst tema = (() => { try { return $('Extrair Temas do Supabase').item.json.tema_semana || ''; } catch(e) { return ''; } })();\nconst dataFmt = new Date().toLocaleDateString('pt-BR', {day:'2-digit', month:'long', year:'numeric'});\nconst imagem_url = (() => { try { return $('Extrair URL Imagem').item.json.imagem_url || ''; } catch(e) { return ''; } })();\nconst imagem_autor = (() => { try { return $('Extrair URL Imagem').item.json.imagem_autor || ''; } catch(e) { return ''; } })();\n\nconst CSS_EXTRA = \"\\n/* \\u2500\\u2500 CTA SE\\u00c7\\u00c3O DE PLANOS \\u2500\\u2500 */\\n.cta-section { background: linear-gradient(150deg, #2d1a1a 0%, #5a2840 100%); color: white; padding: 52px 60px; margin: 44px -60px -40px; page-break-before: always; }\\n.cta-headline { font-family: Georgia, serif; font-size: 28px; text-align: center; margin-bottom: 8px; line-height: 1.3; }\\n.cta-sub-headline { text-align: center; font-size: 14px; opacity: 0.75; margin-bottom: 36px; letter-spacing: 1px; }\\n.planos-grid { display: flex; gap: 16px; align-items: stretch; }\\n.plano-card { flex: 1; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 24px 20px; position: relative; }\\n.plano-premium { background: rgba(184,105,122,0.25); border-color: #B8697A; border-width: 2px; }\\n.plano-destaque { display: inline-block; background: #e8a0b4; color: #2d1a1a; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; font-weight: bold; padding: 4px 12px; border-radius: 12px; margin-bottom: 12px; }\\n.plano-destaque-premium { background: #ffd700; color: #2d1a1a; }\\n.plano-nome { font-family: Georgia, serif; font-size: 18px; font-weight: bold; color: white; margin-bottom: 8px; }\\n.plano-preco { margin-bottom: 8px; line-height: 1; }\\n.plano-preco span { font-family: Georgia, serif; font-size: 36px; font-weight: bold; color: #e8a0b4; }\\n.plano-preco sup { font-size: 18px; color: #e8a0b4; vertical-align: super; }\\n.plano-preco small { font-size: 12px; opacity: 0.7; }\\n.plano-tagline { font-style: italic; font-size: 11px; opacity: 0.7; margin-bottom: 16px; line-height: 1.4; }\\n.plano-itens { list-style: none; padding: 0; margin-bottom: 20px; }\\n.plano-itens li { font-size: 12px; color: #f0d8e0; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.08); line-height: 1.4; }\\n.plano-premium .plano-itens li { color: #ffeef5; }\\n.plano-cta { display: block; background: rgba(255,255,255,0.15); color: white; text-align: center; padding: 10px; border-radius: 6px; font-size: 12px; font-weight: bold; letter-spacing: 1px; border: 1px solid rgba(255,255,255,0.3); }\\n.plano-cta-premium { background: #B8697A; border-color: #B8697A; font-size: 13px; padding: 12px; }\\n.cta-garantia { text-align: center; margin-top: 28px; font-size: 12px; opacity: 0.6; }\\n.cta-urgencia { text-align: center; margin-top: 12px; font-size: 15px; color: #ffeef5; font-style: italic; }\\n.cta-link { text-align: center; margin-top: 10px; font-size: 13px; color: #e8a0b4; font-weight: bold; letter-spacing: 1px; }\";\nconst CSS_REVISTA = \"* { box-sizing: border-box; margin: 0; padding: 0; }\\nbody { font-family: Arial, Helvetica, sans-serif; color: #2d1a1a; background: #fff; font-size: 14px; line-height: 1.7; }\\n\\n/* \\u2500\\u2500 CAPA \\u2500\\u2500 */\\n.capa { background: linear-gradient(150deg, #c47a8a 0%, #8b3a4e 45%, #2d1f1f 100%); color: white; padding: 64px 60px 48px; position: relative; overflow: hidden; min-height: 260px; }\\n.capa-bolha1 { position: absolute; top: -70px; right: -70px; width: 280px; height: 280px; border-radius: 50%; background: rgba(255,255,255,0.07); }\\n.capa-bolha2 { position: absolute; bottom: -90px; left: -50px; width: 220px; height: 220px; border-radius: 50%; background: rgba(255,255,255,0.04); }\\n.marca-label { font-size: 11px; letter-spacing: 5px; text-transform: uppercase; opacity: 0.65; margin-bottom: 14px; }\\n.capa h1 { font-family: Georgia, serif; font-size: 42px; font-weight: bold; line-height: 1.15; margin-bottom: 14px; position: relative; z-index: 1; }\\n.capa .capa-desc { font-size: 14px; opacity: 0.85; line-height: 1.65; max-width: 500px; margin-bottom: 28px; }\\n.edicao-tag { display: inline-block; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 5px 16px; font-size: 11px; opacity: 0.8; }\\n.capa-foto { width: 100%; max-height: 320px; overflow: hidden; }\\n.capa-foto img { width: 100%; height: 320px; object-fit: cover; object-position: center 30%; display: block; }\\n.capa-credito { font-size: 10px; color: rgba(255,255,255,0.5); padding: 4px 8px; background: rgba(0,0,0,0.3); text-align: right; }\\n\\n/* \\u2500\\u2500 FAIXA \\u2500\\u2500 */\\n.faixa { height: 5px; background: linear-gradient(90deg, #B8697A, #e8a0b4, #B8697A); }\\n\\n/* \\u2500\\u2500 SUM\\u00c1RIO \\u2500\\u2500 */\\n.sumario { background: #fdf0f4; padding: 28px 60px; border-bottom: 2px solid #f0c8d0; }\\n.sumario-titulo { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: #B8697A; margin-bottom: 14px; font-weight: bold; }\\n.sumario ul { list-style: none; display: flex; flex-wrap: wrap; gap: 6px 0; }\\n.sumario li { flex: 0 0 50%; font-size: 12.5px; color: #5a3040; padding: 4px 12px 4px 0; border-left: 2px solid #B8697A; margin-left: 12px; }\\n\\n/* \\u2500\\u2500 CORPO \\u2500\\u2500 */\\n.corpo { padding: 40px 60px; }\\n\\n/* \\u2500\\u2500 BLOCO DE DIA \\u2500\\u2500 */\\n.dia-bloco { margin-bottom: 48px; padding-bottom: 40px; border-bottom: 2px dashed #f0c8d0; }\\n.dia-bloco:nth-child(even) { background: #fdf8f5; margin: 0 -60px 48px; padding: 32px 60px 40px; }\\n.dia-bloco:last-of-type { border-bottom: none; }\\n\\n.dia-header { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 20px; }\\n.dia-num { background: #B8697A; color: white; width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: Georgia, serif; font-size: 22px; font-weight: bold; flex-shrink: 0; }\\n.dia-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #B8697A; margin-bottom: 4px; font-weight: bold; }\\nh2 { font-family: Georgia, serif; font-size: 22px; color: #2d1a1a; font-weight: bold; line-height: 1.25; margin-bottom: 6px; }\\n.dia-sub { font-size: 13px; color: #8b5a6a; font-style: italic; margin-top: 4px; }\\np { font-size: 14px; line-height: 1.85; color: #3d2535; margin-bottom: 14px; }\\n\\n/* \\u2500\\u2500 CALLOUTS \\u2500\\u2500 */\\n.callout { display: flex; align-items: flex-start; gap: 12px; padding: 16px 20px; border-radius: 8px; margin: 18px 0; }\\n.callout-ico { font-size: 20px; flex-shrink: 0; line-height: 1; }\\n.callout strong { display: block; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }\\n.callout p { margin: 0; font-size: 13.5px; }\\n.callout-erro { background: #fff0f0; border-left: 4px solid #e05c6a; }\\n.callout-erro strong { color: #e05c6a; }\\n.callout-dica { background: #f0f8f0; border-left: 4px solid #5a9e6a; }\\n.callout-dica strong { color: #3a7a4a; }\\n.callout-sabia { background: #f0f4ff; border-left: 4px solid #5a6ae0; }\\n.callout-sabia strong { color: #3a4ab0; }\\n\\n/* \\u2500\\u2500 SOLU\\u00c7\\u00c3O PASSO A PASSO \\u2500\\u2500 */\\n.steps-box { background: #fdf5f0; border-radius: 8px; padding: 20px 24px; margin: 18px 0; }\\n.steps-titulo { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #3a7a4a; font-weight: bold; margin-bottom: 14px; }\\n.steps-box ol { padding-left: 0; list-style: none; counter-reset: steps; }\\n.steps-box li { counter-increment: steps; padding: 8px 0 8px 44px; position: relative; font-size: 13.5px; border-bottom: 1px dashed #e8c8c0; }\\n.steps-box li:last-child { border-bottom: none; }\\n.steps-box li::before { content: counter(steps); position: absolute; left: 0; top: 6px; background: #B8697A; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; }\\n\\n/* \\u2500\\u2500 PERSPECTIVA \\u2500\\u2500 */\\n.perspectiva { background: linear-gradient(135deg, #3d2535 0%, #5a2840 100%); color: white; padding: 20px 24px; border-radius: 8px; margin: 16px 0; }\\n.perspectiva span { display: block; font-size: 22px; margin-bottom: 6px; }\\n.perspectiva strong { display: block; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #e8a0b4; margin-bottom: 8px; }\\n.perspectiva p { color: #f5d8e0; margin: 0; font-size: 13.5px; font-style: italic; }\\n\\n/* \\u2500\\u2500 CURIOSIDADE \\u2500\\u2500 */\\n.curiosidade-section { background: linear-gradient(150deg, #f5e8f0 0%, #fdf0f4 100%); border: 2px solid #e8b0c8; border-radius: 12px; padding: 36px 40px; margin: 44px 0; page-break-before: always; }\\n.curiosidade-badge { display: inline-block; background: #B8697A; color: white; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; padding: 6px 16px; border-radius: 20px; margin-bottom: 16px; }\\n.curiosidade-section h2 { font-family: Georgia, serif; font-size: 26px; color: #5a2840; margin-bottom: 16px; }\\n.curiosidade-section p { font-size: 14px; color: #3d2535; }\\n.curiosidade-caixa { background: white; border-radius: 8px; padding: 16px 20px; margin-top: 20px; border-left: 4px solid #B8697A; }\\n.curiosidade-caixa strong { color: #B8697A; font-size: 13px; display: block; margin-bottom: 6px; }\\n\\n/* \\u2500\\u2500 INFOGR\\u00c1FICOS na CURIOSIDADE \\u2500\\u2500 */\\n.info-comparativo { display: flex; gap: 16px; margin: 20px 0; }\\n.info-pais { flex: 1; background: white; border-radius: 8px; padding: 16px; text-align: center; border-top: 4px solid #B8697A; }\\n.info-pais .pais-flag { font-size: 32px; display: block; margin-bottom: 8px; }\\n.info-pais strong { display: block; color: #5a2840; margin-bottom: 6px; font-size: 13px; }\\n.info-pais p { font-size: 12px; margin: 0; }\\n.timeline { position: relative; padding-left: 30px; margin: 20px 0; }\\n.timeline::before { content: ''; position: absolute; left: 10px; top: 0; bottom: 0; width: 2px; background: #B8697A; }\\n.timeline-item { position: relative; margin-bottom: 20px; }\\n.timeline-item::before { content: ''; position: absolute; left: -24px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: #B8697A; border: 2px solid white; }\\n.timeline-ano { font-weight: bold; color: #B8697A; font-size: 13px; }\\n.mito-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }\\n.mito-card { background: white; border-radius: 8px; padding: 14px; border-top: 3px solid #e05c6a; }\\n.mito-card .mito-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #e05c6a; margin-bottom: 6px; font-weight: bold; }\\n.mito-card .verdade-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #3a7a4a; margin-top: 10px; margin-bottom: 4px; font-weight: bold; }\\n.ingrediente-stats { display: flex; gap: 12px; margin: 20px 0; flex-wrap: wrap; }\\n.stat-box { background: white; border-radius: 8px; padding: 14px; text-align: center; flex: 1; min-width: 100px; }\\n.stat-num { font-family: Georgia, serif; font-size: 28px; color: #B8697A; font-weight: bold; display: block; }\\n.stat-label { font-size: 11px; color: #8b5a6a; }\\n\\n/* \\u2500\\u2500 ANTES E DEPOIS \\u2500\\u2500 */\\n.antes-depois { margin: 44px 0; page-break-before: always; }\\n.antes-depois h2 { font-family: Georgia, serif; font-size: 22px; color: #2d1a1a; margin-bottom: 24px; text-align: center; border-bottom: 2px solid #f0c8d0; padding-bottom: 12px; }\\n.comparacao-grid { display: flex; gap: 20px; }\\n.antes-col, .depois-col { flex: 1; border-radius: 10px; padding: 24px; }\\n.antes-col { background: #fff0f0; border: 2px solid #e8b0b8; }\\n.depois-col { background: #f0faf0; border: 2px solid #a0d8b0; }\\n.badge-estado { display: inline-block; padding: 6px 20px; border-radius: 20px; font-size: 11px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }\\n.antes-badge { background: #e05c6a; color: white; }\\n.depois-badge { background: #3a9a5a; color: white; }\\n.antes-col p, .depois-col p { font-size: 13.5px; margin-bottom: 12px; }\\n.antes-col ul, .depois-col ul { list-style: none; padding: 0; }\\n.antes-col li { padding: 5px 0 5px 20px; position: relative; font-size: 13px; }\\n.antes-col li::before { content: \\\"\\u2717\\\"; position: absolute; left: 0; color: #e05c6a; }\\n.depois-col li { padding: 5px 0 5px 20px; position: relative; font-size: 13px; }\\n.depois-col li::before { content: \\\"\\u2713\\\"; position: absolute; left: 0; color: #3a9a5a; font-weight: bold; }\\n\\n/* \\u2500\\u2500 CHECKLIST \\u2500\\u2500 */\\n.checklist-section { margin: 44px 0; background: #f9f5ff; border-radius: 12px; padding: 32px 36px; page-break-before: always; }\\n.checklist-section h2 { font-family: Georgia, serif; font-size: 20px; color: #2d1a1a; margin-bottom: 24px; text-align: center; }\\n.checklist-grid { display: flex; gap: 16px; }\\n.check-col { flex: 1; background: white; border-radius: 8px; padding: 20px; }\\n.check-header { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; font-weight: bold; color: #B8697A; margin-bottom: 14px; text-align: center; padding-bottom: 8px; border-bottom: 2px solid #f0c8d0; }\\n.check-col ol, .check-col ul { list-style: none; padding: 0; counter-reset: chk; }\\n.check-col ol li { counter-increment: chk; padding: 7px 0 7px 32px; position: relative; font-size: 13px; border-bottom: 1px solid #f5e8f0; }\\n.check-col ol li::before { content: counter(chk); position: absolute; left: 0; top: 5px; background: #B8697A; color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; }\\n.check-col ul li { padding: 7px 0 7px 24px; position: relative; font-size: 13px; border-bottom: 1px solid #f5e8f0; }\\n.check-col ul li::before { content: \\\"\\u25c6\\\"; position: absolute; left: 0; color: #B8697A; font-size: 10px; top: 9px; }\\n\\n/* \\u2500\\u2500 DICAS R\\u00c1PIDAS \\u2500\\u2500 */\\n.dicas-rapidas { margin: 44px 0; }\\n.dicas-rapidas h2 { font-family: Georgia, serif; font-size: 20px; color: #2d1a1a; margin-bottom: 20px; }\\n.dicas-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }\\n.dica-card { background: #fdf5f0; border-radius: 8px; padding: 14px 16px; border-left: 3px solid #B8697A; font-size: 13px; color: #3d2535; line-height: 1.5; }\\n\\n/* \\u2500\\u2500 CTA FINAL \\u2500\\u2500 */\\n.cta-final { background: linear-gradient(150deg, #B8697A, #7a3545); color: white; padding: 48px 60px; text-align: center; margin: 44px -60px -40px; }\\n.cta-frase { font-family: Georgia, serif; font-size: 22px; line-height: 1.4; margin-bottom: 16px; }\\n.cta-sub { font-size: 14px; opacity: 0.85; }\\n\\n/* \\u2500\\u2500 RODAP\\u00c9 \\u2500\\u2500 */\\n.rodape { background: #2d1a1a; color: #9a7080; padding: 24px 60px; text-align: center; }\\n.rodape-logo { font-family: Georgia, serif; font-size: 18px; color: #e8a0b4; margin-bottom: 6px; }\\n.rodape p { font-size: 11px; }\";\n\nconst html_wrapped = `<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n<meta charset=\"UTF-8\">\n<style>${CSS_REVISTA}${CSS_EXTRA}</style>\n</head>\n<body>\n\n<div class=\"capa\">\n  <div class=\"capa-bolha1\"></div>\n  <div class=\"capa-bolha2\"></div>\n  <div class=\"marca-label\">Ref\u00fagio da Pele \u2022 Edi\u00e7\u00e3o Semanal</div>\n  <h1>Sua Semana<br>de Cuidados</h1>\n  <div class=\"capa-desc\">7 dias de rituais, dicas e inspira\u00e7\u00f5es do mundo inteiro para voc\u00ea cuidar da sua pele com leveza e inten\u00e7\u00e3o.</div>\n  <span class=\"edicao-tag\">\ud83d\udcc5 ${dataFmt}</span>\n</div>\n<div class=\"faixa\"></div>\n${imagem_url ? `<div class=\"capa-foto\"><img src=\"${imagem_url}\" alt=\"${tema}\" /><div class=\"capa-credito\">\ud83d\udcf7 ${imagem_autor} / Unsplash</div></div>` : ''}\n\n<div class=\"corpo\">\n${html_content}\n</div>\n\n<div class=\"cta-final\">\n  <p class=\"cta-frase\">O cuidado com a sua pele \u00e9 um ato de amor-pr\u00f3prio. \ud83c\udf3f</p>\n  <p class=\"cta-sub\">Comece com UMA mudan\u00e7a esta semana. S\u00f3 uma.</p>\n</div>\n\n<div class=\"rodape\">\n  <div class=\"rodape-logo\">Ref\u00fagio da Pele</div>\n  <p>refugiodapele.com.br \u2022 contato@refugiodapele.com.br</p>\n  <p>Conte\u00fado exclusivo para assinantes \u2022 Cancelamento a qualquer momento</p>\n</div>\n\n</body>\n</html>`;\n\nreturn [{ json: { html_content, html_wrapped } }];"
+                },
+                "id": "a1b2c3d4-0001-0001-0001-000000000007",
+                "name": "Extrair Conte\u00fado GPT",
+                "type": "n8n-nodes-base.code",
+                "typeVersion": 2,
+                "position": [
+                    1808,
+                    304
+                ]
+            },
+            {
+                "parameters": {
+                    "method": "POST",
+                    "url": "https://gotenberg-production-ccea.up.railway.app/forms/chromium/convert/html",
+                    "sendBody": true,
+                    "contentType": "multipart-form-data",
+                    "bodyParameters": {
+                        "parameters": [
+                            {
+                                "parameterType": "formBinaryData",
+                                "name": "files",
+                                "inputDataFieldName": "htmlFile"
+                            }
+                        ]
+                    },
+                    "options": {
+                        "response": {
+                            "response": {
+                                "responseFormat": "file"
+                            }
+                        }
+                    }
+                },
+                "id": "a1b2c3d4-0001-0001-0001-000000000008",
+                "name": "Gotenberg \u2014 PDF Semanal",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.2,
+                "position": [
+                    2272,
+                    208
+                ]
+            },
+            {
+                "parameters": {
+                    "jsCode": "\nconst now = new Date();\nconst year = now.getFullYear();\nconst week = String(Math.ceil((now - new Date(year,0,1)) / 604800000)).padStart(2,'0');\nconst month = String(now.getMonth()+1).padStart(2,'0');\n\nconst filenamePago   = 'pdf-semanal-' + year + '-semana' + week + '.pdf';\nconst filenameGratis = 'pdf-gratuito-' + year + '-semana' + week + '.pdf';\nconst pathPago       = year + '/' + month + '/' + filenamePago;\nconst pathGratis     = year + '/' + month + '/' + filenameGratis;\n\nreturn [{\n  json: {\n    ...$input.first().json,\n    filename_pago:   filenamePago,\n    filename_gratis: filenameGratis,\n    path_pago:       pathPago,\n    path_gratis:     pathGratis\n  },\n  binary: $input.first().binary\n}];\n"
+                },
+                "id": "a1b2c3d4-0001-0001-0001-000000000009",
+                "name": "Calcular Pasta e Nome do Arquivo",
+                "type": "n8n-nodes-base.code",
+                "typeVersion": 2,
+                "position": [
+                    2448,
+                    208
+                ]
+            },
+            {
+                "parameters": {
+                    "method": "POST",
+                    "url": "https://aftrvqwazdiumibdfjjy.supabase.co/rest/v1/config",
+                    "sendHeaders": true,
+                    "headerParameters": {
+                        "parameters": [
+                            {
+                                "name": "apikey",
+                                "value": "{{SUPABASE_SERVICE_KEY}}"
+                            },
+                            {
+                                "name": "Authorization",
+                                "value": "Bearer {{SUPABASE_SERVICE_KEY}}"
+                            },
+                            {
+                                "name": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "name": "Prefer",
+                                "value": "resolution=merge-duplicates"
+                            }
+                        ]
+                    },
+                    "sendBody": true,
+                    "specifyBody": "json",
+                    "jsonBody": "={{ JSON.stringify({ key: 'pdf_url_semana', value: $('Montar URL PDF Semanal').item.json.pdf_url, atualizado_em: new Date().toISOString() }) }}",
+                    "options": {}
+                },
+                "id": "a1b2c3d4-0001-0001-0001-000000000014",
+                "name": "Supabase \u2014 Salvar URL do PDF",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.2,
+                "position": [
+                    3136,
+                    208
+                ]
+            },
+            {
+                "parameters": {
+                    "method": "PATCH",
+                    "url": "https://aftrvqwazdiumibdfjjy.supabase.co/rest/v1/config",
+                    "sendQuery": true,
+                    "queryParameters": {
+                        "parameters": [
+                            {
+                                "name": "key",
+                                "value": "eq.pdf_url_atual"
+                            }
+                        ]
+                    },
+                    "sendHeaders": true,
+                    "headerParameters": {
+                        "parameters": [
+                            {
+                                "name": "apikey",
+                                "value": "{{SUPABASE_SERVICE_KEY}}"
+                            },
+                            {
+                                "name": "Authorization",
+                                "value": "Bearer {{SUPABASE_SERVICE_KEY}}"
+                            },
+                            {
+                                "name": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "name": "Prefer",
+                                "value": "return=minimal"
+                            }
+                        ]
+                    },
+                    "sendBody": true,
+                    "specifyBody": "json",
+                    "jsonBody": "={{ JSON.stringify({ value: $('Montar URL PDF Semanal').item.json.pdf_url }) }}",
+                    "options": {}
+                },
+                "id": "a1b2c3d4-0001-0001-0001-000000000015",
+                "name": "Executar WF3 \u2014 Atualiza\u00e7\u00e3o de Link",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.2,
+                "position": [
+                    3360,
+                    208
+                ]
+            },
+            {
+                "parameters": {
+                    "jsCode": "const htmlCompleto = $('Extrair Conte\u00fado GPT').item.json.html_content;\nconst tema = $('Extrair Temas do Supabase').item.json.tema_semana || 'skincare';\nconst folderSemanaId = $input.first().json.id;\n\n// Extract only Day 1 and Day 2 blocks\nconst bodyMatch = htmlCompleto.match(/<body[^>]*>([\\s\\S]*?)<\\/body>/);\nconst bodyContent = bodyMatch ? bodyMatch[1] : htmlCompleto;\nconst diaMatches = [...bodyContent.matchAll(/<h2>Dia \\d/gi)];\nlet teaserContent = '';\nif (diaMatches.length >= 2) {\n  const start = diaMatches[0].index;\n  const end = diaMatches.length >= 3 ? diaMatches[2].index : bodyContent.length;\n  teaserContent = bodyContent.substring(start, end);\n} else {\n  teaserContent = bodyContent.substring(0, Math.floor(bodyContent.length * 0.4));\n}\n\nconst htmlGratuito = `<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n  <meta charset=\"UTF-8\">\n  <style>\n    body { font-family:'Georgia',serif; color:#3a2a1e; margin:40px; line-height:1.7; }\n    h1 { color:#8b5e3c; font-size:2em; border-bottom:2px solid #e8c9a0; padding-bottom:10px; }\n    h2 { color:#8b5e3c; font-size:1.5em; margin-top:2em; }\n    h3 { color:#a0714f; font-size:1.2em; }\n    p { margin:0.8em 0; } ul { margin:0.5em 0 1em 1.5em; } li { margin:0.3em 0; }\n    .teaser-box { background:#fdf3ec; border-left:4px solid #B8697A; padding:16px 20px; margin:32px 0; border-radius:4px; }\n    .teaser-box p { margin:0; color:#5a3a2a; font-style:italic; font-size:1.05em; }\n    .plans-page { page-break-before:always; padding-top:20px; }\n    .plans-page h2 { text-align:center; color:#B8697A; margin-bottom:8px; }\n    .plans-page .subtitle { text-align:center; color:#8b5e3c; margin-bottom:32px; font-size:0.95em; }\n    .plan-card { border:1px solid #e8c9a0; border-radius:8px; padding:20px 24px; margin:16px 0; background:#fffaf7; }\n    .plan-card h3 { margin:0 0 4px; color:#B8697A; font-size:1.15em; }\n    .plan-card .price { font-weight:bold; color:#8b5e3c; font-size:1.1em; margin:4px 0 8px; }\n    .plan-card p { margin:0; font-size:0.92em; color:#5a3a2a; }\n    .cta-section { text-align:center; margin-top:32px; padding:24px; background:#B8697A; border-radius:8px; }\n    .cta-section p { color:#FAF3EE; margin:0 0 12px; }\n    .cta-btn { display:inline-block; background:#FAF3EE; color:#B8697A; padding:12px 32px; border-radius:4px; font-weight:bold; text-decoration:none; }\n  </style>\n</head>\n<body>\n  <h1>Refugio da Pele - Edicao Gratuita</h1>\n  <p style=\"color:#8b5e3c;font-size:0.95em;margin-bottom:8px;\">Tema da semana: <strong>${tema}</strong></p>\n  ${teaserContent}\n  <div class=\"teaser-box\">\n    <p>Ha mais 5 temas nesta semana - incluindo dicas de rituais internacionais, a secao Curiosidade e muito mais.<br>\n    <strong>Assine e receba o PDF completo toda semana direto no seu email.</strong></p>\n  </div>\n  <div class=\"plans-page\">\n    <h2>Continue cuidando da sua pele</h2>\n    <p class=\"subtitle\">Escolha o plano ideal e receba conteudo exclusivo toda semana</p>\n    <div class=\"plan-card\"><h3>A Dose</h3><div class=\"price\">R$9,90/mes</div><p>PDF semanal com 2 temas curados da semana, receitas naturais com ingredientes de casa e dicas por tipo de pele.</p></div>\n    <div class=\"plan-card\"><h3>O Encontro</h3><div class=\"price\">R$14,90/mes</div><p>PDF semanal completo com todos os 7 temas, rotina personalizada ao seu momento de vida e acesso 2h antes a lancamentos.</p><p style=\"font-style:italic;color:#B8697A;margin-top:6px;\">\"Alguem que cuida da sua pele com voce.\"</p></div>\n    <div class=\"plan-card\"><h3>Experiencia Completa</h3><div class=\"price\">R$19,90/mes</div><p>PDF completo + e-book mensal tematico exclusivo, rotina completa (manha, noite e semanal) e cupom exclusivo em lancamentos.</p></div>\n    <div class=\"cta-section\"><p>Comece hoje por apenas R$9,90/mes - cancele quando quiser.</p><a class=\"cta-btn\" href=\"https://refugiodapele.com.br\">Quero assinar agora</a></div>\n  </div>\n</body></html>`;\n\nconst base64 = Buffer.from(htmlGratuito, 'utf-8').toString('base64');\nreturn [{ json: { html_gratuito: htmlGratuito, folderSemanaId, tema }, binary: { htmlFile: { data: base64, mimeType: 'text/html', fileName: 'index.html' } } }];"
+                },
+                "id": "wf2-grat-001",
+                "name": "Gerar HTML PDF Gratuito",
+                "type": "n8n-nodes-base.code",
+                "typeVersion": 2,
+                "position": [
+                    2256,
+                    416
+                ]
+            },
+            {
+                "parameters": {
+                    "method": "POST",
+                    "url": "https://gotenberg-production-ccea.up.railway.app/forms/chromium/convert/html",
+                    "sendBody": true,
+                    "contentType": "multipart-form-data",
+                    "bodyParameters": {
+                        "parameters": [
+                            {
+                                "parameterType": "formBinaryData",
+                                "name": "files",
+                                "inputDataFieldName": "htmlFile"
+                            }
+                        ]
+                    },
+                    "options": {
+                        "response": {
+                            "response": {
+                                "responseFormat": "file"
+                            }
+                        }
+                    }
+                },
+                "id": "wf2-grat-002",
+                "name": "Gotenberg \u2014 PDF Gratuito",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.2,
+                "position": [
+                    2464,
+                    416
+                ]
+            },
+            {
+                "parameters": {
+                    "jsCode": "\nconst now = new Date();\nconst year = now.getFullYear();\nconst week = String(Math.ceil((now - new Date(year,0,1)) / 604800000)).padStart(2,'0');\nconst month = String(now.getMonth()+1).padStart(2,'0');\n\nconst nomeArquivo = 'refugio-da-pele-GRATIS-' + year + '-semana' + week + '.pdf';\nconst path = year + '/' + month + '/' + nomeArquivo;\n\nreturn [{\n  json: {\n    ...$input.first().json,\n    nomeArquivo: nomeArquivo,\n    path_gratis: path\n  },\n  binary: $input.first().binary\n}];\n"
+                },
+                "id": "wf2-grat-003",
+                "name": "Calcular Nome PDF Gratuito",
+                "type": "n8n-nodes-base.code",
+                "typeVersion": 2,
+                "position": [
+                    2688,
+                    416
+                ]
+            },
+            {
+                "parameters": {
+                    "method": "POST",
+                    "url": "https://aftrvqwazdiumibdfjjy.supabase.co/rest/v1/config",
+                    "sendHeaders": true,
+                    "headerParameters": {
+                        "parameters": [
+                            {
+                                "name": "apikey",
+                                "value": "{{SUPABASE_SERVICE_KEY}}"
+                            },
+                            {
+                                "name": "Authorization",
+                                "value": "Bearer {{SUPABASE_SERVICE_KEY}}"
+                            },
+                            {
+                                "name": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "name": "Prefer",
+                                "value": "resolution=merge-duplicates"
+                            }
+                        ]
+                    },
+                    "sendBody": true,
+                    "specifyBody": "json",
+                    "jsonBody": "={{ JSON.stringify({ key: 'pdf_url_gratis', value: $('Montar URL PDF Gratuito').item.json.pdf_url_gratis, atualizado_em: new Date().toISOString() }) }}",
+                    "options": {}
+                },
+                "id": "wf2-grat-006",
+                "name": "Supabase \u2014 Salvar URL PDF Gratuito",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.2,
+                "position": [
+                    3344,
+                    416
+                ]
+            },
+            {
+                "parameters": {
+                    "jsCode": "const html = $json.html_wrapped;\nconst base64 = Buffer.from(html, 'utf-8').toString('base64');\nreturn [{\n  json: $json,\n  binary: {\n    htmlFile: {\n      data: base64,\n      mimeType: 'text/html',\n      fileName: 'index.html'\n    }\n  }\n}];"
+                },
+                "id": "ca6b826b-210d-4602-aacc-1705d82538cb",
+                "name": "Preparar HTML Pago",
+                "type": "n8n-nodes-base.code",
+                "typeVersion": 2,
+                "position": [
+                    2080,
+                    208
+                ]
+            },
+            {
+                "parameters": {
+                    "jsCode": "\nconst html = $json.html_content;\nconst base64 = Buffer.from(html, 'utf-8').toString('base64');\nreturn [{\n  json: $json,\n  binary: {\n    htmlFile: {\n      data: base64,\n      mimeType: 'text/html',\n      fileName: 'index.html'\n    }\n  }\n}];\n"
+                },
+                "id": "2eb417a6-a7ac-4fcc-8e4d-3b621d99a5f5",
+                "name": "Preparar HTML Gratuito",
+                "type": "n8n-nodes-base.code",
+                "typeVersion": 2,
+                "position": [
+                    2080,
+                    416
+                ]
+            },
+            {
+                "parameters": {
+                    "method": "POST",
+                    "url": "=https://aftrvqwazdiumibdfjjy.supabase.co/storage/v1/object/pdfs/{{$('Calcular Pasta e Nome do Arquivo').item.json.path_pago}}",
+                    "sendHeaders": true,
+                    "headerParameters": {
+                        "parameters": [
+                            {
+                                "name": "apikey",
+                                "value": "{{SUPABASE_SERVICE_KEY}}"
+                            },
+                            {
+                                "name": "Authorization",
+                                "value": "Bearer {{SUPABASE_SERVICE_KEY}}"
+                            },
+                            {
+                                "name": "Content-Type",
+                                "value": "application/pdf"
+                            },
+                            {
+                                "name": "x-upsert",
+                                "value": "true"
+                            }
+                        ]
+                    },
+                    "sendBody": true,
+                    "contentType": "binaryData",
+                    "inputDataFieldName": "data",
+                    "options": {}
+                },
+                "id": "133f2927-9ec8-4811-abe0-bb5718d648fd",
+                "name": "Supabase \u2014 Upload PDF Semanal",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.2,
+                "position": [
+                    2672,
+                    208
+                ]
+            },
+            {
+                "parameters": {
+                    "jsCode": "\nconst path = $('Calcular Pasta e Nome do Arquivo').item.json.path_pago;\nconst url = 'https://aftrvqwazdiumibdfjjy.supabase.co/storage/v1/object/public/pdfs/' + path;\nreturn [{ json: { ...$input.first().json, pdf_url: url } }];\n"
+                },
+                "id": "f494e770-34d9-4a03-a907-2130180c8e6b",
+                "name": "Montar URL PDF Semanal",
+                "type": "n8n-nodes-base.code",
+                "typeVersion": 2,
+                "position": [
+                    2896,
+                    208
+                ]
+            },
+            {
+                "parameters": {
+                    "method": "POST",
+                    "url": "=https://aftrvqwazdiumibdfjjy.supabase.co/storage/v1/object/pdfs/{{ $('Calcular Nome PDF Gratuito').item.json.path_gratis }}",
+                    "sendHeaders": true,
+                    "headerParameters": {
+                        "parameters": [
+                            {
+                                "name": "apikey",
+                                "value": "{{SUPABASE_SERVICE_KEY}}"
+                            },
+                            {
+                                "name": "Authorization",
+                                "value": "Bearer {{SUPABASE_SERVICE_KEY}}"
+                            },
+                            {
+                                "name": "Content-Type",
+                                "value": "application/pdf"
+                            },
+                            {
+                                "name": "x-upsert",
+                                "value": "true"
+                            }
+                        ]
+                    },
+                    "sendBody": true,
+                    "contentType": "binaryData",
+                    "inputDataFieldName": "data",
+                    "options": {}
+                },
+                "id": "51fc7bbc-aa2c-4140-bd0a-58564a1cf556",
+                "name": "Supabase \u2014 Upload PDF Gratuito",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.2,
+                "position": [
+                    2912,
+                    416
+                ]
+            },
+            {
+                "parameters": {
+                    "jsCode": "const path = $('Calcular Nome PDF Gratuito').item.json.path_gratis;\nconst url = 'https://aftrvqwazdiumibdfjjy.supabase.co/storage/v1/object/public/pdfs/' + path;\nreturn [{ json: { ...$input.first().json, pdf_url_gratis: url } }];"
+                },
+                "id": "beb5b52a-b2aa-40d0-b2f3-4c08b51fcad2",
+                "name": "Montar URL PDF Gratuito",
+                "type": "n8n-nodes-base.code",
+                "typeVersion": 2,
+                "position": [
+                    3136,
+                    416
+                ]
+            },
+            {
+                "parameters": {
+                    "url": "https://api.unsplash.com/search/photos",
+                    "sendQuery": true,
+                    "queryParameters": {
+                        "parameters": [
+                            {
+                                "name": "query",
+                                "value": "={{ $('Extrair Temas do Supabase').item.json.tema_semana + ' skincare beauty woman skin care'  }}"
+                            },
+                            {
+                                "name": "orientation",
+                                "value": "landscape"
+                            },
+                            {
+                                "name": "per_page",
+                                "value": "3"
+                            },
+                            {
+                                "name": "content_filter",
+                                "value": "high"
+                            },
+                            {
+                                "name": "client_id",
+                                "value": "{{UNSPLASH_ACCESS_KEY}}"
+                            }
+                        ]
+                    },
+                    "options": {}
+                },
+                "id": "unsplash-001",
+                "name": "Unsplash \u2014 Imagem do Tema",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.2,
+                "position": [
+                    960,
+                    496
+                ]
+            },
+            {
+                "parameters": {
+                    "jsCode": "const data = $input.first().json;\nlet imagem_url = '';\nlet imagem_autor = '';\nlet imagem_link = '';\n\ntry {\n  if (data.results && data.results.length > 0) {\n    const foto = data.results[0];\n    imagem_url = foto.urls?.regular || foto.urls?.full || '';\n    imagem_autor = foto.user?.name || '';\n    imagem_link = foto.links?.html || '';\n  }\n} catch(e) {}\n\n// Fallback: imagem gen\u00e9rica de skincare se Unsplash falhar\nif (!imagem_url) {\n  imagem_url = 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=1200&q=80';\n  imagem_autor = 'Unsplash';\n}\n\nreturn [{ json: { imagem_url, imagem_autor, imagem_link } }];"
+                },
+                "id": "unsplash-002",
+                "name": "Extrair URL Imagem",
+                "type": "n8n-nodes-base.code",
+                "typeVersion": 2,
+                "position": [
+                    1184,
+                    496
+                ]
             }
-          ]
-        },
-        "options": {}
-      },
-      "id": "a1b2c3d4-0001-0001-0001-000000000003",
-      "name": "SerpAPI — Busca Skincare",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        900,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://api.tavily.com/search",
-        "sendBody": true,
-        "contentType": "json",
-        "body": {
-          "query": "={{ $('Extrair Temas do Supabase').item.json.tema_semana }} skincare women international traditions {{ $('Extrair Temas do Supabase').item.json.clima_semana }}",
-          "api_key": "TAVILY_KEY_PLACEHOLDER",
-          "max_results": 5
-        },
-        "options": {}
-      },
-      "id": "a1b2c3d4-0001-0001-0001-000000000004",
-      "name": "Tavily — Práticas Internacionais",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        1120,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "const serpData = $('SerpAPI — Busca Skincare').item.json;\nconst tavilyData = $input.first().json;\nlet contextParts = [];\nif (serpData.organic_results && Array.isArray(serpData.organic_results)) {\n  const serpSnippets = serpData.organic_results.slice(0, 10).map((r, i) => `[Fonte ${i+1}] ${r.title||''}:\\n${r.snippet||''}\\nURL: ${r.link||''}`).join('\\n\\n');\n  contextParts.push('=== Resultados SerpAPI ===\\n' + serpSnippets);\n}\nif (tavilyData.results && Array.isArray(tavilyData.results)) {\n  const tavilySnippets = tavilyData.results.slice(0, 5).map((r, i) => `[Tavily ${i+1}] ${r.title||''}:\\n${r.content||''}\\nURL: ${r.url||''}`).join('\\n\\n');\n  contextParts.push('=== Resultados Tavily ===\\n' + tavilySnippets);\n}\nconst contexto_pesquisa = contextParts.join('\\n\\n');\nconst tema_semana = $('Extrair Temas do Supabase').item.json.tema_semana;\nconst clima_semana = $('Extrair Temas do Supabase').item.json.clima_semana;\nreturn [{ json: { contexto_pesquisa, tema_semana, clima_semana } }];"
-      },
-      "id": "a1b2c3d4-0001-0001-0001-000000000005",
-      "name": "Merge Resultados de Pesquisa",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        1340,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://api.anthropic.com/v1/messages",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "x-api-key",
-              "value": "CLAUDE_KEY_PLACEHOLDER"
+        ],
+        "connections": {
+            "Schedule Trigger \u2014 Segunda 08h": {
+                "main": [
+                    [
+                        {
+                            "node": "Supabase \u2014 Buscar Temas WF5",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
             },
-            {
-              "name": "anthropic-version",
-              "value": "2023-06-01"
+            "Supabase \u2014 Buscar Temas WF5": {
+                "main": [
+                    [
+                        {
+                            "node": "Extrair Temas do Supabase",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
             },
-            {
-              "name": "content-type",
-              "value": "application/json"
+            "Extrair Temas do Supabase": {
+                "main": [
+                    [
+                        {
+                            "node": "SerpAPI \u2014 Busca Skincare",
+                            "type": "main",
+                            "index": 0
+                        },
+                        {
+                            "node": "Unsplash \u2014 Imagem do Tema",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "SerpAPI \u2014 Busca Skincare": {
+                "main": [
+                    [
+                        {
+                            "node": "Tavily \u2014 Pr\u00e1ticas Internacionais",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Tavily \u2014 Pr\u00e1ticas Internacionais": {
+                "main": [
+                    [
+                        {
+                            "node": "Merge Resultados de Pesquisa",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Merge Resultados de Pesquisa": {
+                "main": [
+                    [
+                        {
+                            "node": "GPT \u2014 Gerar Conte\u00fado PDF",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "GPT \u2014 Gerar Conte\u00fado PDF": {
+                "main": [
+                    [
+                        {
+                            "node": "Extrair Conte\u00fado GPT",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Extrair Conte\u00fado GPT": {
+                "main": [
+                    [
+                        {
+                            "node": "Preparar HTML Pago",
+                            "type": "main",
+                            "index": 0
+                        },
+                        {
+                            "node": "Preparar HTML Gratuito",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Preparar HTML Pago": {
+                "main": [
+                    [
+                        {
+                            "node": "Gotenberg \u2014 PDF Semanal",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Gotenberg \u2014 PDF Semanal": {
+                "main": [
+                    [
+                        {
+                            "node": "Calcular Pasta e Nome do Arquivo",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Calcular Pasta e Nome do Arquivo": {
+                "main": [
+                    [
+                        {
+                            "node": "Supabase \u2014 Upload PDF Semanal",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Supabase \u2014 Upload PDF Semanal": {
+                "main": [
+                    [
+                        {
+                            "node": "Montar URL PDF Semanal",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Montar URL PDF Semanal": {
+                "main": [
+                    [
+                        {
+                            "node": "Supabase \u2014 Salvar URL do PDF",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Supabase \u2014 Salvar URL do PDF": {
+                "main": [
+                    [
+                        {
+                            "node": "Executar WF3 \u2014 Atualiza\u00e7\u00e3o de Link",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Preparar HTML Gratuito": {
+                "main": [
+                    [
+                        {
+                            "node": "Gerar HTML PDF Gratuito",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Gerar HTML PDF Gratuito": {
+                "main": [
+                    [
+                        {
+                            "node": "Gotenberg \u2014 PDF Gratuito",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Gotenberg \u2014 PDF Gratuito": {
+                "main": [
+                    [
+                        {
+                            "node": "Calcular Nome PDF Gratuito",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Calcular Nome PDF Gratuito": {
+                "main": [
+                    [
+                        {
+                            "node": "Supabase \u2014 Upload PDF Gratuito",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Supabase \u2014 Upload PDF Gratuito": {
+                "main": [
+                    [
+                        {
+                            "node": "Montar URL PDF Gratuito",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Montar URL PDF Gratuito": {
+                "main": [
+                    [
+                        {
+                            "node": "Supabase \u2014 Salvar URL PDF Gratuito",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Unsplash \u2014 Imagem do Tema": {
+                "main": [
+                    [
+                        {
+                            "node": "Extrair URL Imagem",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Extrair URL Imagem": {
+                "main": [
+                    [
+                        {
+                            "node": "GPT \u2014 Gerar Conte\u00fado PDF",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
             }
-          ]
         },
-        "sendBody": true,
-        "contentType": "json",
-        "body": {
-          "model": "claude-sonnet-4-6",
-          "max_tokens": 4000,
-          "messages": [
+        "authors": "Erick Bezerra",
+        "name": null,
+        "description": null,
+        "autosaved": false,
+        "workflowPublishHistory": [
             {
-              "role": "user",
-              "content": "={{ 'Você é redatora especialista em skincare feminino e bem-estar. Com base nas pesquisas abaixo, crie um PDF semanal completo em português brasileiro para o projeto Refúgio da Pele.\\n\\nTema da semana: ' + $json.tema_semana + '\\nClima predominante: ' + $json.clima_semana + '\\n\\nPesquisas realizadas:\\n' + $json.contexto_pesquisa + '\\n\\nCrie o conteúdo em HTML estruturado com:\\n\\nREGRAS DE TOM:\\n- Linguagem acessível com profundidade técnica quando necessário\\n- Tom clínico é permitido para clareza científica\\n- Pessoas reais podem ser citadas esporadicamente (dermatologistas, personalidades conhecidas por cuidar bem da pele)\\n- Proibido: julgamento, comparação corporal depreciativa, tom negativo\\n- Escopo: pele = corpo inteiro, não apenas rosto\\n\\nESTRUTURA DO PDF:\\n\\n1. SETE TEMAS DIÁRIOS (segunda a domingo). Para cada dia:\\n   - <h2>Dia X — [Título do Dia]</h2>\\n   - <p>[2-3 parágrafos sobre o tema do dia]</p>\\n   - <h3>Dicas do Dia</h3>\\n   - <ul><li>[3 a 5 dicas práticas de skincare]</li></ul>\\n   - <h3>Perspectiva do Mundo</h3>\\n   - <p>[1 dica comparativa: como outra região ou método diferente aborda este tema. Ex: Na Coreia do Sul... / Na medicina ayurvédica... / Dermatologistas europeus recomendam...]</p>\\n\\n2. SEÇÃO CURIOSIDADE (rotativa — use o formato indicado abaixo conforme o número da semana):\\n   - Semana 1 ou 5 ou 9...: Comparativo cultural — como mulheres de 3 países diferentes cuidam da pele\\n   - Semana 2 ou 6 ou 10...: Linha do tempo — história de um ingrediente ou ritual de skincare\\n   - Semana 3 ou 7 ou 11...: Mito vs Verdade — 4 mitos comuns sobre skincare com explicação científica acessível\\n   - Semana 4 ou 8 ou 12...: Perfil de Ingrediente — deep dive em 1 ingrediente: origem, ciência, como usar, para quem\\n   Use <h2> para o título da seção e <h3> para cada subitem. Até 3 páginas de conteúdo.\\n\\nFormate tudo como HTML semântico. Não inclua <html>, <head> ou <body>.' }}"
+                "createdAt": "2026-03-30T06:29:54.399Z",
+                "id": 273,
+                "workflowId": "8UYOQDq5vVp2Oy7R",
+                "versionId": "78747ca8-b5b8-4021-80f8-389d5bb09f58",
+                "event": "activated",
+                "userId": "01d5e406-ea81-4bf7-8375-919a226646b6"
+            },
+            {
+                "createdAt": "2026-03-30T06:29:54.295Z",
+                "id": 272,
+                "workflowId": "8UYOQDq5vVp2Oy7R",
+                "versionId": "78747ca8-b5b8-4021-80f8-389d5bb09f58",
+                "event": "deactivated",
+                "userId": "01d5e406-ea81-4bf7-8375-919a226646b6"
             }
-          ]
-        },
-        "options": {}
-      },
-      "id": "a1b2c3d4-0001-0001-0001-000000000006",
-      "name": "Claude — Gerar Conteúdo PDF",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        1560,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "const response = $input.first().json;\nlet html_content = '';\nif (response.content && Array.isArray(response.content) && response.content.length > 0) {\n  html_content = response.content[0].text || '';\n} else {\n  throw new Error('Claude API não retornou conteúdo esperado: ' + JSON.stringify(response));\n}\nconst html_wrapped = `<!DOCTYPE html><html lang=\"pt-BR\"><head><meta charset=\"UTF-8\"><style>body{font-family:'Georgia',serif;color:#3a2a1e;margin:40px;line-height:1.7;}h1{color:#8b5e3c;font-size:2em;border-bottom:2px solid #e8c9a0;padding-bottom:10px;}h2{color:#8b5e3c;font-size:1.5em;margin-top:2em;}h3{color:#a0714f;font-size:1.2em;}p{margin:0.8em 0;}ul{margin:0.5em 0 1em 1.5em;}li{margin:0.3em 0;}</style></head><body><h1>Refúgio da Pele — PDF Semanal</h1>${html_content}</body></html>`;\nreturn [{ json: { html_content: html_wrapped, tema_semana: $('Extrair Temas do Supabase').item.json.tema_semana } }];"
-      },
-      "id": "a1b2c3d4-0001-0001-0001-000000000007",
-      "name": "Extrair Conteúdo Claude",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        1780,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://api.pdfshift.io/v3/convert/pdf",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpBasicAuth",
-        "sendBody": true,
-        "contentType": "json",
-        "body": {
-          "source": "={{ $json.html_content }}",
-          "landscape": false,
-          "use_print": true
-        },
-        "options": {
-          "response": {
-            "response": {
-              "responseFormat": "file"
-            }
-          }
-        }
-      },
-      "id": "a1b2c3d4-0001-0001-0001-000000000008",
-      "name": "PDFShift — HTML para PDF",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        2000,
-        300
-      ],
-      "credentials": {
-        "httpBasicAuth": {
-          "id": "pdfshift-basic-auth",
-          "name": "PDFShift Basic Auth — CONFIGURAR"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "// Calcula estrutura de pastas: Ano > Mês (pt-BR) > Semana XX\nconst now = new Date();\nconst meses = ['janeiro','fevereiro','marco','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];\nconst ano = now.getFullYear().toString();\nconst mes = meses[now.getMonth()];\nconst semana = String(Math.ceil(now.getDate() / 7)).padStart(2, '0');\nconst tema = $('Extrair Conteúdo Claude').item.json.tema_semana || 'sem-tema';\nconst nomeArquivo = `refugio-da-pele-${ano}-${mes}-semana${semana}.pdf`;\nconst nomePasta = `Semana ${semana}`;\nreturn [{ json: { ano, mes, semana, nomeArquivo, nomePasta, tema } }];"
-      },
-      "id": "a1b2c3d4-0001-0001-0001-000000000009",
-      "name": "Calcular Pasta e Nome do Arquivo",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        2220,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "operation": "createFolder",
-        "name": "={{ $json.mes }}",
-        "driveId": {
-          "__rl": true,
-          "value": "myDrive",
-          "mode": "list"
-        },
-        "folderId": {
-          "__rl": true,
-          "value": "14PxriIGLSJTSHu0CEP-KU82XWeGuzNXm",
-          "mode": "id"
-        },
-        "options": {}
-      },
-      "id": "a1b2c3d4-0001-0001-0001-000000000010",
-      "name": "Google Drive — Criar Pasta Mês",
-      "type": "n8n-nodes-base.googleDrive",
-      "typeVersion": 3,
-      "position": [
-        2440,
-        200
-      ],
-      "credentials": {
-        "googleDriveOAuth2Api": {
-          "id": "DzhWrB0cOwGmCaUD",
-          "name": "Google Sheets account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "createFolder",
-        "name": "={{ $('Calcular Pasta e Nome do Arquivo').item.json.nomePasta }}",
-        "driveId": {
-          "__rl": true,
-          "value": "myDrive",
-          "mode": "list"
-        },
-        "folderId": {
-          "__rl": true,
-          "value": "={{ $json.id }}",
-          "mode": "id"
-        },
-        "options": {}
-      },
-      "id": "a1b2c3d4-0001-0001-0001-000000000011",
-      "name": "Google Drive — Criar Pasta Semana",
-      "type": "n8n-nodes-base.googleDrive",
-      "typeVersion": 3,
-      "position": [
-        2660,
-        200
-      ],
-      "credentials": {
-        "googleDriveOAuth2Api": {
-          "id": "DzhWrB0cOwGmCaUD",
-          "name": "Google Sheets account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "upload",
-        "name": "={{ $('Calcular Pasta e Nome do Arquivo').item.json.nomeArquivo }}",
-        "driveId": {
-          "__rl": true,
-          "value": "myDrive",
-          "mode": "list"
-        },
-        "folderId": {
-          "__rl": true,
-          "value": "={{ $json.id }}",
-          "mode": "id"
-        },
-        "inputDataFieldName": "data",
-        "options": {}
-      },
-      "id": "a1b2c3d4-0001-0001-0001-000000000012",
-      "name": "Google Drive — Upload PDF",
-      "type": "n8n-nodes-base.googleDrive",
-      "typeVersion": 3,
-      "position": [
-        2880,
-        200
-      ],
-      "credentials": {
-        "googleDriveOAuth2Api": {
-          "id": "DzhWrB0cOwGmCaUD",
-          "name": "Google Sheets account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "const fileId = $input.first().json.id;\nconst pdf_url = `https://drive.google.com/file/d/${fileId}/view?usp=sharing`;\nreturn [{ json: { pdf_url, fileId } }];"
-      },
-      "id": "a1b2c3d4-0001-0001-0001-000000000013",
-      "name": "Extrair URL do PDF",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        3100,
-        200
-      ]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://aftrvqwazdiumibdfjjy.supabase.co/rest/v1/config",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "apikey",
-              "value": "SUPABASE_SERVICE_KEY_PLACEHOLDER"
-            },
-            {
-              "name": "Authorization",
-              "value": "Bearer SUPABASE_SERVICE_KEY_PLACEHOLDER"
-            },
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            },
-            {
-              "name": "Prefer",
-              "value": "resolution=merge-duplicates"
-            }
-          ]
-        },
-        "sendBody": true,
-        "contentType": "json",
-        "body": {
-          "key": "pdf_url_atual",
-          "value": "={{ $json.pdf_url }}"
-        },
-        "options": {}
-      },
-      "id": "a1b2c3d4-0001-0001-0001-000000000014",
-      "name": "Supabase — Salvar URL do PDF",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        3320,
-        200
-      ]
-    },
-    {
-      "parameters": {
-        "workflowId": {
-          "__rl": true,
-          "value": "WF3_ID_PLACEHOLDER",
-          "mode": "id"
-        },
-        "options": {
-          "waitForSubWorkflow": false
-        }
-      },
-      "id": "a1b2c3d4-0001-0001-0001-000000000015",
-      "name": "Executar WF3 — Atualização de Link",
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1,
-      "position": [
-        3540,
-        200
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "const htmlCompleto = $('Extrair Conteúdo Claude').item.json.html_content;\nconst tema = $('Extrair Temas do Supabase').item.json.tema_semana || 'skincare';\nconst folderSemanaId = $input.first().json.id;\n\n// Extract only Day 1 and Day 2 blocks\nconst bodyMatch = htmlCompleto.match(/<body[^>]*>([\\s\\S]*?)<\\/body>/);\nconst bodyContent = bodyMatch ? bodyMatch[1] : htmlCompleto;\nconst diaMatches = [...bodyContent.matchAll(/<h2>Dia \\d/gi)];\nlet teaserContent = '';\nif (diaMatches.length >= 2) {\n  const start = diaMatches[0].index;\n  const end = diaMatches.length >= 3 ? diaMatches[2].index : bodyContent.length;\n  teaserContent = bodyContent.substring(start, end);\n} else {\n  teaserContent = bodyContent.substring(0, Math.floor(bodyContent.length * 0.4));\n}\n\nconst htmlGratuito = `<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n  <meta charset=\"UTF-8\">\n  <style>\n    body { font-family:'Georgia',serif; color:#3a2a1e; margin:40px; line-height:1.7; }\n    h1 { color:#8b5e3c; font-size:2em; border-bottom:2px solid #e8c9a0; padding-bottom:10px; }\n    h2 { color:#8b5e3c; font-size:1.5em; margin-top:2em; }\n    h3 { color:#a0714f; font-size:1.2em; }\n    p { margin:0.8em 0; } ul { margin:0.5em 0 1em 1.5em; } li { margin:0.3em 0; }\n    .teaser-box { background:#fdf3ec; border-left:4px solid #B8697A; padding:16px 20px; margin:32px 0; border-radius:4px; }\n    .teaser-box p { margin:0; color:#5a3a2a; font-style:italic; font-size:1.05em; }\n    .plans-page { page-break-before:always; padding-top:20px; }\n    .plans-page h2 { text-align:center; color:#B8697A; margin-bottom:8px; }\n    .plans-page .subtitle { text-align:center; color:#8b5e3c; margin-bottom:32px; font-size:0.95em; }\n    .plan-card { border:1px solid #e8c9a0; border-radius:8px; padding:20px 24px; margin:16px 0; background:#fffaf7; }\n    .plan-card h3 { margin:0 0 4px; color:#B8697A; font-size:1.15em; }\n    .plan-card .price { font-weight:bold; color:#8b5e3c; font-size:1.1em; margin:4px 0 8px; }\n    .plan-card p { margin:0; font-size:0.92em; color:#5a3a2a; }\n    .cta-section { text-align:center; margin-top:32px; padding:24px; background:#B8697A; border-radius:8px; }\n    .cta-section p { color:#FAF3EE; margin:0 0 12px; }\n    .cta-btn { display:inline-block; background:#FAF3EE; color:#B8697A; padding:12px 32px; border-radius:4px; font-weight:bold; text-decoration:none; }\n  </style>\n</head>\n<body>\n  <h1>Refugio da Pele - Edicao Gratuita</h1>\n  <p style=\"color:#8b5e3c;font-size:0.95em;margin-bottom:8px;\">Tema da semana: <strong>${tema}</strong></p>\n  ${teaserContent}\n  <div class=\"teaser-box\">\n    <p>Ha mais 5 temas nesta semana - incluindo dicas de rituais internacionais, a secao Curiosidade e muito mais.<br>\n    <strong>Assine e receba o PDF completo toda semana direto no seu email.</strong></p>\n  </div>\n  <div class=\"plans-page\">\n    <h2>Continue cuidando da sua pele</h2>\n    <p class=\"subtitle\">Escolha o plano ideal e receba conteudo exclusivo toda semana</p>\n    <div class=\"plan-card\"><h3>A Dose</h3><div class=\"price\">R$9,90/mes</div><p>PDF semanal com 2 temas curados da semana, receitas naturais com ingredientes de casa e dicas por tipo de pele.</p></div>\n    <div class=\"plan-card\"><h3>O Encontro</h3><div class=\"price\">R$14,90/mes</div><p>PDF semanal completo com todos os 7 temas, rotina personalizada ao seu momento de vida e acesso 2h antes a lancamentos.</p><p style=\"font-style:italic;color:#B8697A;margin-top:6px;\">\"Alguem que cuida da sua pele com voce.\"</p></div>\n    <div class=\"plan-card\"><h3>Experiencia Completa</h3><div class=\"price\">R$19,90/mes</div><p>PDF completo + e-book mensal tematico exclusivo, rotina completa (manha, noite e semanal) e cupom exclusivo em lancamentos.</p></div>\n    <div class=\"cta-section\"><p>Comece hoje por apenas R$9,90/mes - cancele quando quiser.</p><a class=\"cta-btn\" href=\"https://refugiodapele.com.br\">Quero assinar agora</a></div>\n  </div>\n</body></html>`;\n\nreturn [{ json: { html_gratuito: htmlGratuito, folderSemanaId, tema } }];"
-      },
-      "id": "wf2-grat-001",
-      "name": "Gerar HTML PDF Gratuito",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        2660,
-        480
-      ]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://api.pdfshift.io/v3/convert/pdf",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpBasicAuth",
-        "sendBody": true,
-        "contentType": "json",
-        "body": {
-          "source": "={{ $json.html_gratuito }}",
-          "landscape": false,
-          "use_print": true
-        },
-        "options": {
-          "response": {
-            "response": {
-              "responseFormat": "file"
-            }
-          }
-        }
-      },
-      "id": "wf2-grat-002",
-      "name": "PDFShift — PDF Gratuito",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        2880,
-        480
-      ],
-      "credentials": {
-        "httpBasicAuth": {
-          "id": "pdfshift-basic-auth",
-          "name": "PDFShift Basic Auth — CONFIGURAR"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "const now = new Date();\nconst meses = ['janeiro','fevereiro','marco','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];\nconst ano = now.getFullYear().toString();\nconst mes = meses[now.getMonth()];\nconst semana = String(Math.ceil(now.getDate() / 7)).padStart(2, '0');\nconst folderSemanaId = $('Gerar HTML PDF Gratuito').item.json.folderSemanaId;\nconst nomeArquivo = `refugio-da-pele-GRATIS-${ano}-${mes}-semana${semana}.pdf`;\nreturn [{ json: { nomeArquivo, folderSemanaId } }];"
-      },
-      "id": "wf2-grat-003",
-      "name": "Calcular Nome PDF Gratuito",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        3100,
-        480
-      ]
-    },
-    {
-      "parameters": {
-        "operation": "upload",
-        "name": "={{ $('Calcular Nome PDF Gratuito').item.json.nomeArquivo }}",
-        "driveId": {
-          "__rl": true,
-          "value": "myDrive",
-          "mode": "list"
-        },
-        "folderId": {
-          "__rl": true,
-          "value": "={{ $('Calcular Nome PDF Gratuito').item.json.folderSemanaId }}",
-          "mode": "id"
-        },
-        "inputDataFieldName": "data",
-        "options": {}
-      },
-      "id": "wf2-grat-004",
-      "name": "Google Drive — Upload PDF Gratuito",
-      "type": "n8n-nodes-base.googleDrive",
-      "typeVersion": 3,
-      "position": [
-        3320,
-        480
-      ],
-      "credentials": {
-        "googleDriveOAuth2Api": {
-          "id": "DzhWrB0cOwGmCaUD",
-          "name": "Google Sheets account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "const fileId = $input.first().json.id;\nconst pdf_gratuito_url = `https://drive.google.com/file/d/${fileId}/view?usp=sharing`;\nreturn [{ json: { pdf_gratuito_url, fileId } }];"
-      },
-      "id": "wf2-grat-005",
-      "name": "Extrair URL PDF Gratuito",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        3540,
-        480
-      ]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://aftrvqwazdiumibdfjjy.supabase.co/rest/v1/config",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "apikey",
-              "value": "SUPABASE_SERVICE_KEY_PLACEHOLDER"
-            },
-            {
-              "name": "Authorization",
-              "value": "Bearer SUPABASE_SERVICE_KEY_PLACEHOLDER"
-            },
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            },
-            {
-              "name": "Prefer",
-              "value": "resolution=merge-duplicates"
-            }
-          ]
-        },
-        "sendBody": true,
-        "contentType": "json",
-        "body": {
-          "key": "pdf_gratuito_url_atual",
-          "value": "={{ $json.pdf_gratuito_url }}"
-        },
-        "options": {}
-      },
-      "id": "wf2-grat-006",
-      "name": "Supabase — Salvar URL PDF Gratuito",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        3760,
-        480
-      ]
+        ]
     }
-  ],
-  "connections": {
-    "Schedule Trigger — Segunda 08h": {
-      "main": [
-        [
-          {
-            "node": "Supabase — Buscar Temas WF5",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Supabase — Buscar Temas WF5": {
-      "main": [
-        [
-          {
-            "node": "Extrair Temas do Supabase",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Extrair Temas do Supabase": {
-      "main": [
-        [
-          {
-            "node": "SerpAPI — Busca Skincare",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "SerpAPI — Busca Skincare": {
-      "main": [
-        [
-          {
-            "node": "Tavily — Práticas Internacionais",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Tavily — Práticas Internacionais": {
-      "main": [
-        [
-          {
-            "node": "Merge Resultados de Pesquisa",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Merge Resultados de Pesquisa": {
-      "main": [
-        [
-          {
-            "node": "Claude — Gerar Conteúdo PDF",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Claude — Gerar Conteúdo PDF": {
-      "main": [
-        [
-          {
-            "node": "Extrair Conteúdo Claude",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Extrair Conteúdo Claude": {
-      "main": [
-        [
-          {
-            "node": "PDFShift — HTML para PDF",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "PDFShift — HTML para PDF": {
-      "main": [
-        [
-          {
-            "node": "Calcular Pasta e Nome do Arquivo",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Calcular Pasta e Nome do Arquivo": {
-      "main": [
-        [
-          {
-            "node": "Google Drive — Criar Pasta Mês",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Google Drive — Criar Pasta Mês": {
-      "main": [
-        [
-          {
-            "node": "Google Drive — Criar Pasta Semana",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Google Drive — Criar Pasta Semana": {
-      "main": [
-        [
-          {
-            "node": "Google Drive — Upload PDF",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Gerar HTML PDF Gratuito",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Google Drive — Upload PDF": {
-      "main": [
-        [
-          {
-            "node": "Extrair URL do PDF",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Extrair URL do PDF": {
-      "main": [
-        [
-          {
-            "node": "Supabase — Salvar URL do PDF",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Supabase — Salvar URL do PDF": {
-      "main": [
-        [
-          {
-            "node": "Executar WF3 — Atualização de Link",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Gerar HTML PDF Gratuito": {
-      "main": [
-        [
-          {
-            "node": "PDFShift — PDF Gratuito",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "PDFShift — PDF Gratuito": {
-      "main": [
-        [
-          {
-            "node": "Calcular Nome PDF Gratuito",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Calcular Nome PDF Gratuito": {
-      "main": [
-        [
-          {
-            "node": "Google Drive — Upload PDF Gratuito",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Google Drive — Upload PDF Gratuito": {
-      "main": [
-        [
-          {
-            "node": "Extrair URL PDF Gratuito",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Extrair URL PDF Gratuito": {
-      "main": [
-        [
-          {
-            "node": "Supabase — Salvar URL PDF Gratuito",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    }
-  },
-  "active": false,
-  "pinData": {},
-  "settings": {
-    "executionOrder": "v1",
-    "binaryMode": "separate",
-    "availableInMCP": false
-  },
-  "versionId": "a1b2c3d4-1111-2222-3333-444444444444",
-  "meta": {
-    "templateCredsSetupCompleted": true,
-    "instanceId": "b3f36ad4b8a579dd86116dc9449ee81a2e4c05ad27fc75bf5538fe5592ed48cb"
-  },
-  "id": "WF2PdfSemanalRefugio",
-  "tags": []
 }
