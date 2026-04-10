@@ -26,8 +26,6 @@ contato@refugiodapele.com.br
 - instanceId: b3f36ad4b8a579dd86116dc9449ee81a2e4c05ad27fc75bf5538fe5592ed48cb
 - SMTP: id "LQzuLvKBJ7VqTETa", name "SMTP account"
 - Z-API instance: 3F06247099D391366D735EC66E320A44
-- Z-API token: 9FEB7A24EE74CDCBC327832A
-- Z-API Client-Token: F212a72ec09cb4f14b062257d320f4573S
 - Google Sheets: id "DzhWrB0cOwGmCaUD", name "Google Sheets account"
 - Planilha ID: 1RJREELqinbpue4-jkIXkb-Bi_pWMot3oI_Sk4GVQc7o
 - Supabase credencial n8n: "Refugio da Pele — Supabase"
